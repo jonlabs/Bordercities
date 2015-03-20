@@ -97,7 +97,12 @@ namespace Bordercities
         [ImageEffectOpaque]
         void OnRenderImage(RenderTexture source, RenderTexture destination)
         {
-            CheckResources();
+
+            if (CheckResources() == false)
+            {
+                Graphics.Blit(source, destination);  // Might need to remove this block and go back to just CheckResources()
+                return;
+            }
 
             Vector2 sensitivity = new Vector2(sensitivityDepth, sensitivityNormals);
             edgeDetectMaterial.SetVector("_Sensitivity", new Vector4(sensitivity.x, sensitivity.y, 1.0f, sensitivity.y));

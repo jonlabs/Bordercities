@@ -12,13 +12,22 @@ namespace Bordercities
         
         private EdgeDetection edge;
         private BloomOptimized bloom;
-       
+
+        public Config.Tab tab;
+        public bool autoEdge;
+
+        private CameraController cameraController;
+        private bool autoEdgeActive;
         void Awake()
         {
+            cameraController = GetComponent<CameraController>();
             config = Config.Deserialize(configPath);
             if (config == null)
             {
                 config = new Config();
+
+                config.memoryTab = Config.Tab.EdgeDetection;
+
                 config.edgeEnabled = false;
                 config.edgeMode = EdgeDetection.EdgeDetectMode.TriangleDepthNormals;
                 config.sensNorm = 1.63f;
@@ -26,6 +35,8 @@ namespace Bordercities
                 config.edgeExpo = 0.09f;
                 config.edgeSamp = 0.82f;
                 config.edgeOnly = 0;
+                config.autoEdge = true;
+
                 config.bloomEnabled = false;
                 config.bloomThresh = 0.27f;
                 config.bloomIntens = 0.39f;
@@ -35,6 +46,7 @@ namespace Bordercities
 
         void LoadSettings()
         {
+            tab = config.memoryTab;
             edge.enabled = config.edgeEnabled;
             edge.mode = config.edgeMode;
             edge.sensitivityNormals = config.sensNorm;
@@ -42,6 +54,7 @@ namespace Bordercities
             edge.edgeExp = config.edgeExpo;
             edge.edgesOnly = config.edgeOnly;
             edge.sampleDist = config.edgeSamp;
+            autoEdge = config.autoEdge;
 
             bloom.enabled = config.bloomEnabled;
             bloom.threshold = config.bloomThresh;
@@ -60,6 +73,8 @@ namespace Bordercities
         
        public void SaveConfig()
         {
+            config.memoryTab = tab;
+
             config.edgeEnabled = edge.enabled;
             config.edgeMode = edge.mode;
             config.sensNorm = edge.sensitivityNormals;
@@ -67,6 +82,7 @@ namespace Bordercities
             config.edgeExpo = edge.edgeExp;
             config.edgeOnly = edge.edgesOnly;
             config.edgeSamp = edge.sampleDist;
+            config.autoEdge = autoEdge;
 
             config.bloomEnabled = bloom.enabled;
             config.bloomThresh = bloom.threshold;
@@ -79,17 +95,32 @@ namespace Bordercities
         {
             if (showSettingsPanel)
             {
-                windowRect = GUI.Window(391435, windowRect, SettingsPanel, "Image Effects");
+                windowRect = GUI.Window(391435, windowRect, SettingsPanel, "Bordercities Configuration Panel");
             }
         }
 
         void SettingsPanel(int wnd)
         {
-            if (edge != null)
+           GUILayout.BeginHorizontal();
+            if (GUILayout.Button("Edge Detection"))
+                    {
+                         tab = Config.Tab.EdgeDetection;
+                    }
+                    if (GUILayout.Button("Bloom"))
+                    {
+                        tab = Config.Tab.Bloom;
+                    }
+                    GUILayout.EndHorizontal();
+
+
+           if (tab == Config.Tab.EdgeDetection)
+            {
+                if (edge != null)
             {
                 edge.enabled = GUILayout.Toggle(edge.enabled, "Edge Detection");
                 if (edge.enabled)
                 {
+                    
                     GUILayout.Label("Edge sample distance: " + edge.sampleDist.ToString());
                     edge.sampleDist = GUILayout.HorizontalSlider(edge.sampleDist, 1, 5, GUILayout.Width(570));
                     GUILayout.Label("Edge mix: " + edge.edgesOnly.ToString());
@@ -151,19 +182,27 @@ namespace Bordercities
                     if (edge.mode == EdgeDetection.EdgeDetectMode.TriangleDepthNormals || edge.mode == EdgeDetection.EdgeDetectMode.RobertsCrossDepthNormals)
                     {
                         GUILayout.Label("Depth sensitivity: " + edge.sensitivityDepth.ToString());
-                        edge.sensitivityDepth = GUILayout.HorizontalSlider(edge.sensitivityDepth, 0.000f, 15.000f, GUILayout.Width(570));
+                        if (!autoEdge)
+                            edge.sensitivityDepth = GUILayout.HorizontalSlider(edge.sensitivityDepth, 0.000f, 20.000f, GUILayout.Width(570));
                         GUILayout.Label("Normal sensitivity: " + edge.sensitivityNormals.ToString());
-                        edge.sensitivityNormals = GUILayout.HorizontalSlider(edge.sensitivityNormals, 0.000f, 15.000f, GUILayout.Width(570));
+                        if (!autoEdge)
+                            edge.sensitivityNormals = GUILayout.HorizontalSlider(edge.sensitivityNormals, 0.000f, 5.000f, GUILayout.Width(570));
+                        
+                        
+                        autoEdge = GUILayout.Toggle(autoEdge, "Automatic Depth (Based on zoom level.  Strongly recommended for regular play.)");
                     }
                     if (edge.mode == EdgeDetection.EdgeDetectMode.SobelDepthThin || edge.mode == EdgeDetection.EdgeDetectMode.SobelDepth)
                     {
                         GUILayout.Label("Edge exponent: " + edge.edgeExp.ToString());
                         edge.edgeExp = GUILayout.HorizontalSlider(edge.edgeExp, 0.000f, 1.000f, GUILayout.Width(570));
+                        
                     }
-
-                    
-                    
                 }
+                }
+           }
+           
+            if (tab == Config.Tab.Bloom)
+            {
                 bloom.enabled = GUILayout.Toggle(bloom.enabled, "Bloom");
                 {
                     if (bloom.enabled)
@@ -176,40 +215,41 @@ namespace Bordercities
                         bloom.blurSize = GUILayout.HorizontalSlider(bloom.blurSize, 0.00f, 5.50f, GUILayout.Width(570));
                     }
                 }
-                GUILayout.BeginHorizontal();
-                if (GUILayout.Button("Save Settings"))
-                {
-                    SaveConfig();
-                }
-                if (GUILayout.Button("Load Previous"))
-                {
-                    LoadSettings();
-                }
-                if (GUILayout.Button("Recommended Defaults (Does not autosave on click.)"))
-                {
-                    edge.mode = EdgeDetection.EdgeDetectMode.TriangleDepthNormals;
-                    edge.sensitivityNormals = 1.63f;
-                    edge.sensitivityDepth= 2.12f;
-                    edge.edgeExp = 0.09f;
-                    edge.sampleDist = 0.82f;
-                    edge.edgesOnly = 0;
+            }
 
-                    bloom.threshold = 0.27f;
-                    bloom.intensity = 0.39f;
-                    bloom.blurSize = 5.50f;
-                }
-                GUILayout.EndHorizontal();
-               
-            }
-            else
+
+            GUILayout.BeginHorizontal();
+            if (GUILayout.Button("Save Settings"))
             {
-                edge = GetComponent<EdgeDetection>();
-                bloom = GetComponent<BloomOptimized>();
+                SaveConfig();
             }
+            if (GUILayout.Button("Load From Save"))
+            {
+                LoadSettings();
+            }
+            if (GUILayout.Button("Recommended Defaults (Does not autosave on click.)"))
+            {
+                edge.mode = EdgeDetection.EdgeDetectMode.TriangleDepthNormals;
+                edge.sensitivityNormals = 1.07f;
+                edge.sensitivityDepth = 2.12f;
+                edge.edgeExp = 0.09f;
+                edge.sampleDist = 0.82f;
+                edge.edgesOnly = 0;
+                autoEdge = true;
+
+
+                bloom.threshold = 0.27f;
+                bloom.intensity = 0.39f;
+                bloom.blurSize = 5.50f;
+            }
+
+            GUILayout.EndHorizontal();
         }
+
+            
+           
         public void Update()
         {
-
             if (Input.GetKeyUp(KeyCode.Backslash))
             {
                 showSettingsPanel = !showSettingsPanel;
@@ -217,6 +257,23 @@ namespace Bordercities
             if (Input.GetKeyUp(KeyCode.Escape) && showSettingsPanel)
             {
                 showSettingsPanel = false;
+            }
+        }
+
+        public void LateUpdate()
+        {
+            if (cameraController != null && autoEdge)
+            {
+                if (cameraController.m_currentSize < 222f)
+                    edge.sensitivityDepth = GetComponent<CameraController>().m_currentSize / 125;
+                if (cameraController.m_currentSize >= 222f)
+                    edge.sensitivityDepth = GetComponent<CameraController>().m_currentSize / 250;
+                autoEdgeActive = true;
+            }
+            if (!autoEdge && autoEdgeActive)
+            {
+                edge.sensitivityDepth = config.sensDepth;
+                autoEdgeActive = false;
             }
         }
     }

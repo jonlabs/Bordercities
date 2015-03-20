@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using ColossalFramework;
 using ICities;
 
 namespace Bordercities
@@ -12,7 +13,7 @@ namespace Bordercities
 
         public string Description
         {
-            get { return "Edge detection and bloom effects.  Backslash to config."; }
+            get { return "Edge detect & bloom.  Backslash to config."; }
         }
     }
 

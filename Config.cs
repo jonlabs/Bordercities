@@ -3,7 +3,7 @@ using System.Xml.Serialization;
 
 namespace Bordercities
 {
-
+    
     public class Config
     {
         public EdgeDetection.EdgeDetectMode edgeMode;
@@ -14,10 +14,20 @@ namespace Bordercities
         public float edgeSamp;
         public float edgeOnly;
 
+        public bool autoEdge;
+
         public bool bloomEnabled;
         public float bloomThresh;
         public float bloomIntens;
         public float bloomBlurSize;
+
+        public enum Tab
+        {
+            EdgeDetection = 0,
+            Bloom = 1,
+        }
+
+        public Tab memoryTab;
 
         public static void Serialize(string filename, Config config)
         {
