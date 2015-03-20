@@ -21,6 +21,8 @@ namespace Bordercities
         public float bloomIntens;
         public float bloomBlurSize;
 
+        public bool automaticMode;
+
         public enum Tab
         {
             EdgeDetection = 0,
