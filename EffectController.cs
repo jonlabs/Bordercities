@@ -246,8 +246,7 @@ namespace Bordercities
                                 if (!autoEdge)
                                     edge.sensitivityDepth = GUILayout.HorizontalSlider(edge.sensitivityDepth, 0.000f, 20.000f, GUILayout.Width(570));
                                 GUILayout.Label("Normal sensitivity: " + edge.sensitivityNormals.ToString());
-                                if (!autoEdge)
-                                    edge.sensitivityNormals = GUILayout.HorizontalSlider(edge.sensitivityNormals, 0.000f, 5.000f, GUILayout.Width(570));
+                                edge.sensitivityNormals = GUILayout.HorizontalSlider(edge.sensitivityNormals, 0.000f, 5.000f, GUILayout.Width(570));
 
 
                                 autoEdge = GUILayout.Toggle(autoEdge, "Automatic Depth (Based on zoom level.  Strongly recommended for regular play.)");
