@@ -18,6 +18,8 @@ namespace Bordercities
 
         private CameraController cameraController;
         private bool autoEdgeActive;
+        private static int clickCount = 0;
+        private bool clickedInappropriately = false;
 
         private bool automaticMode;
         void Awake()
@@ -143,11 +145,40 @@ namespace Bordercities
                     {
                         if (automaticMode)
                         {
-                            if (GUILayout.Button("Automatic mode is on.  Press to manually configure. (Advanced)"))
+
+                            if (!clickedInappropriately)
+                            {
+                                if (GUILayout.Button("Automatic Mode is on.  Enter Manual Mode with.."))
+                                {
+                                    clickCount++;
+                                    if (clickCount >= 10)
+                                    {
+                                        clickedInappropriately = true;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                GUILayout.Button("Dude.  It doesn't do anything.");
+                            }
+                                
+
+                            
+                            GUILayout.BeginHorizontal();
+                            if (GUILayout.Button("..current settings."))
                             {
                                 automaticMode = false;
+                                clickedInappropriately = false;
+                                clickCount = 0;
+                            }
+                            if (GUILayout.Button("..your last saved settings."))
+                            {
+                                automaticMode = false;
+                                clickedInappropriately = false;
+                                clickCount = 0;
                                 LoadManualSettings();
                             }
+                            GUILayout.EndHorizontal();
                         }
                         else
                         {
