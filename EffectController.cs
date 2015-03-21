@@ -418,6 +418,7 @@ namespace Bordercities
                 }
 
                 GUILayout.EndHorizontal();
+                GUILayout.Label("Recommended External Settings: 175% or above with Dynamic Resolution (add +1 edge sample distance if so) & 'Tropical' CC");
             }
             
 
