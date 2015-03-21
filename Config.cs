@@ -1,5 +1,7 @@
 ﻿using System.IO;
 using System.Xml.Serialization;
+using System.Xml;
+using UnityEngine;
 
 namespace Bordercities
 {
@@ -14,6 +16,11 @@ namespace Bordercities
         public float edgeSamp;
         public float edgeOnly;
 
+        public bool firstTime = true;
+        public KeyCode keyCode = KeyCode.None;
+        public KeyCode edgeToggleKeyCode;
+        
+
         public bool autoEdge;
 
         public bool bloomEnabled;
@@ -27,9 +34,10 @@ namespace Bordercities
         {
             EdgeDetection = 0,
             Bloom = 1,
+            Hotkey = 2,
         }
 
-        public Tab memoryTab;
+        public Tab memoryTab = Tab.Hotkey;
 
         public static void Serialize(string filename, Config config)
         {
@@ -56,5 +64,7 @@ namespace Bordercities
             catch { }
             return null;
         }
+
+      
     }
 }

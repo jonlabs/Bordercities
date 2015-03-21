@@ -9,17 +9,22 @@ namespace Bordercities
 
         public Config config;
         private const string configPath = "BordercitiesConfig.xml";
-        
+
         private EdgeDetection edge;
         private BloomOptimized bloom;
 
         public Config.Tab tab;
         public bool autoEdge;
+        public bool firstTime;
+
+        public bool overrideFirstTime;
 
         private CameraController cameraController;
         private bool autoEdgeActive;
         private static int clickCount = 0;
         private bool clickedInappropriately = false;
+        private string keystring = "";
+        private string edgeKeyString = "";
 
         private bool automaticMode;
         void Awake()
@@ -30,7 +35,7 @@ namespace Bordercities
             {
                 config = new Config();
 
-                config.memoryTab = Config.Tab.EdgeDetection;
+                config.memoryTab = Config.Tab.Hotkey;
                 config.automaticMode = true;
                 config.edgeEnabled = false;
                 config.edgeMode = EdgeDetection.EdgeDetectMode.TriangleDepthNormals;
@@ -40,6 +45,7 @@ namespace Bordercities
                 config.edgeSamp = 0.82f;
                 config.edgeOnly = 0;
                 config.autoEdge = true;
+                config.firstTime = true;
 
                 config.bloomEnabled = false;
                 config.bloomThresh = 0.27f;
@@ -47,6 +53,23 @@ namespace Bordercities
                 config.bloomBlurSize = 5.50f;
 
             }
+            
+        }
+
+        void Start()
+        {
+            edge = GetComponent<EdgeDetection>();
+            bloom = GetComponent<BloomOptimized>();
+
+            LoadAllSettings();
+            SaveConfig();
+
+            if (firstTime)
+            {
+                showSettingsPanel = true;
+                tab = Config.Tab.Hotkey;
+            }
+
         }
 
         void LoadAllSettings()
@@ -61,6 +84,7 @@ namespace Bordercities
             edge.edgesOnly = config.edgeOnly;
             edge.sampleDist = config.edgeSamp;
             autoEdge = config.autoEdge;
+            firstTime = config.firstTime;
 
             bloom.enabled = config.bloomEnabled;
             bloom.threshold = config.bloomThresh;
@@ -82,16 +106,9 @@ namespace Bordercities
             bloom.blurSize = config.bloomBlurSize;
         }
 
-        void Start()
-        {
-            edge = GetComponent<EdgeDetection>();
-            bloom = GetComponent<BloomOptimized>();
-
-            LoadAllSettings();
-            SaveConfig();
-        }
         
-       public void SaveConfig()
+
+        public void SaveConfig()
         {
             config.memoryTab = tab;
             config.automaticMode = automaticMode;
@@ -108,11 +125,14 @@ namespace Bordercities
             config.bloomThresh = bloom.threshold;
             config.bloomIntens = bloom.intensity;
             config.bloomBlurSize = bloom.blurSize;
+            config.firstTime = firstTime;
 
             Config.Serialize(configPath, config);
         }
         void OnGUI()
         {
+            if (firstTime)
+                tab = Config.Tab.Hotkey;
             if (showSettingsPanel)
             {
                 windowRect = GUI.Window(391435, windowRect, SettingsPanel, "Bordercities Configuration Panel");
@@ -122,14 +142,22 @@ namespace Bordercities
         void SettingsPanel(int wnd)
         {
             GUILayout.BeginHorizontal();
-            if (GUILayout.Button("Edge Detection"))
+            if (!firstTime)
             {
-                tab = Config.Tab.EdgeDetection;
+                if (GUILayout.Button("Edge Detection"))
+                {
+                    tab = Config.Tab.EdgeDetection;
+                }
+                if (GUILayout.Button("Bloom"))
+                {
+                    tab = Config.Tab.Bloom;
+                }
+                if (GUILayout.Button("Hotkey"))
+                {
+                    tab = Config.Tab.Hotkey;
+                }
             }
-            if (GUILayout.Button("Bloom"))
-            {
-                tab = Config.Tab.Bloom;
-            }
+            
             GUILayout.EndHorizontal();
             GUILayout.Space(20f);
 
@@ -161,9 +189,9 @@ namespace Bordercities
                             {
                                 GUILayout.Button("Dude.  It doesn't do anything.");
                             }
-                                
 
-                            
+
+
                             GUILayout.BeginHorizontal();
                             if (GUILayout.Button("..current settings."))
                             {
@@ -273,7 +301,7 @@ namespace Bordercities
                     bloom.enabled = GUILayout.Toggle(bloom.enabled, "Click to enable Bloom.");
                 else
                     bloom.enabled = GUILayout.Toggle(bloom.enabled, "Click to disable Bloom.");
-              
+
                 {
                     if (bloom.enabled)
                     {
@@ -287,26 +315,143 @@ namespace Bordercities
                 }
             }
 
-            GUILayout.Space(83f);
+            if (tab == Config.Tab.Hotkey)
+            {
+                if (firstTime || config.keyCode == KeyCode.None)
+                {
+                    GUILayout.Label("BORDERCITIES INITIAL HOTKEY CONFIG: (Will never popup again upon making choice below)");
+                    GUILayout.Label("1) Choose below which key will open the Bordercities configuration window.");
+                    GUILayout.Label("2) Press the same key on your keyboard.  If the window closes, setup is complete. If not, pick another hotkey.");
+                    GUILayout.Label("NEW IN UPDATE 10: Edge detection can now be toggled via a hotkey of your choice!!  This option becomes available in the 'Hotkey' tab upon first confirming your 'Configuration Panel' hotkey here.");
+                    GUILayout.Space(5f);
+                    GUILayout.Label("More options for key choices coming soon!");
+                    GUILayout.Space(10f);
+                    GUILayout.Label("NOTE: This window will -never- automatically pop-up again as soon as you've confirmed your hotkey choice.   This initialization process ensures that all users, regardless of hardware, operating system, or current keyboard configuration, will be able to enjoy Bordercities.");
+                
+                    
+                }
 
+
+                if (!firstTime)
+                    GUILayout.Label("WARNING: HOTKEY BUTTONS WILL SAVE UPON CLICK.  THIS INCLUDES YOUR EFFECTS SETTINGS.");
+                KeyboardGrid(0);
+
+
+
+
+                if (firstTime && config.keyCode != KeyCode.None)
+                {
+                    GUILayout.Space(3f);
+                    GUILayout.Label("Hotkey '"+keystring+"' has been chosen and is active.  Confirm it now by using the hotkey.");
+                    GUILayout.Space(3f);
+                }
+
+                if (!firstTime)
+                {
+                    if (config.keyCode != KeyCode.None)
+                        GUILayout.Label("Current 'Config' hotkey: " + config.keyCode);
+                    else
+                        GUILayout.Label("No config hotkey is bound to Bordercities.");
+                    GUILayout.Space(45f);
+                    GUILayout.Label("Set edge toggle hotkey below: ");
+                    KeyboardGrid(1);
+                    if (config.edgeToggleKeyCode != KeyCode.None)
+                        GUILayout.Label("Current 'Edge Enable' hotkey: " + config.edgeToggleKeyCode);
+                    else
+                        GUILayout.Label("No edge enable hotkey is bound to Bordercities.");
+                    GUILayout.Space(5f);
+                    GUILayout.Label("More key options coming soon!");
+                }
+                
+            }
+
+            
+            if (!firstTime)
+            {
+                
                 GUILayout.BeginHorizontal();
-                if (GUILayout.Button("Save Settings"))
+                if (tab != Config.Tab.Hotkey)
                 {
-                    SaveConfig();
+                    if (GUILayout.Button("Save Settings"))
+                    {
+                        SaveConfig();
+                    }
+                    if (GUILayout.Button("Load From Save"))
+                    {
+                        LoadAllSettings();
+                    }
+                    if (GUILayout.Button("Recommended Defaults (Does not autosave on click.)"))
+                    {
+                        RecommendedDefaults();
+                    }
                 }
-                if (GUILayout.Button("Load From Save"))
+                
+                if (GUILayout.Button("Close Window"))
                 {
-                    LoadAllSettings();
-                }
-                if (GUILayout.Button("Recommended Defaults (Does not autosave on click.)"))
-                {
-                    RecommendedDefaults();
+                    showSettingsPanel = false;
+                    if (!overrideFirstTime)
+                        overrideFirstTime = true;
                 }
 
                 GUILayout.EndHorizontal();
+            }
             
+
         }
-        
+
+        void KeyboardGrid(int purpose)
+        {
+            GUILayout.BeginHorizontal();
+            Hotkey("F5", KeyCode.F5, purpose);
+            Hotkey("F6", KeyCode.F6, purpose);
+            Hotkey("F7", KeyCode.F7, purpose);
+            Hotkey("F8", KeyCode.F8, purpose);
+            Hotkey("F9", KeyCode.F9, purpose);
+            GUILayout.EndHorizontal();
+            GUILayout.BeginHorizontal();
+            Hotkey("F10", KeyCode.F10, purpose);
+            Hotkey("F11", KeyCode.F11, purpose);
+            Hotkey("F12", KeyCode.F12, purpose);
+            Hotkey("[", KeyCode.LeftBracket, purpose);
+            Hotkey("]", KeyCode.RightBracket, purpose);
+            GUILayout.EndHorizontal();
+            GUILayout.BeginHorizontal();
+            Hotkey("=", KeyCode.Equals, purpose);
+            Hotkey("Slash", KeyCode.Slash, purpose);
+            Hotkey("Backslash", KeyCode.Backslash, purpose);
+            Hotkey("Home", KeyCode.Home, purpose);
+            Hotkey("End", KeyCode.End, purpose);
+            GUILayout.EndHorizontal();
+            GUILayout.BeginHorizontal();
+            Hotkey("Numpad *", KeyCode.KeypadMultiply, purpose);
+            Hotkey("Numpad -", KeyCode.KeypadMinus, purpose);
+            Hotkey("Numpad =", KeyCode.KeypadEquals, purpose);
+            Hotkey("Numpad +", KeyCode.KeypadPlus, purpose);
+            Hotkey("Numpad /", KeyCode.KeypadDivide, purpose);
+            GUILayout.EndHorizontal();
+
+        }
+        void Hotkey(string label, KeyCode keycode, int purpose)
+        {
+            if (GUILayout.Button(label, GUILayout.MaxWidth(100)))
+            {
+                switch (purpose)
+                {
+                    case 0:
+                        config.keyCode = keycode;
+                        keystring = label;
+                        break;
+                    case 1:
+                        config.edgeToggleKeyCode = keycode;
+                        edgeKeyString = label;
+                        break;
+                    default:
+                        break;
+                } 
+                
+                SaveConfig();
+            }
+        }
 
         void RecommendedDefaults()
         {
@@ -324,17 +469,33 @@ namespace Bordercities
             bloom.intensity = 0.39f;
             bloom.blurSize = 5.50f;
         }
-           
+
         public void Update()
         {
-            if (Input.GetKeyUp(KeyCode.Backslash))
+            if (Input.GetKeyUp(config.keyCode))
             {
                 showSettingsPanel = !showSettingsPanel;
             }
             if (Input.GetKeyUp(KeyCode.Escape) && showSettingsPanel)
             {
+                overrideFirstTime = true;
                 showSettingsPanel = false;
             }
+            if (firstTime && Input.GetKeyUp(config.keyCode))
+            {
+                firstTime = false;
+                showSettingsPanel = false;
+                SaveConfig();
+                tab = Config.Tab.EdgeDetection;
+            }
+         
+            if (firstTime)
+            {
+                if (!overrideFirstTime)
+                    showSettingsPanel = true;
+            }
+            if (Input.GetKeyUp(config.edgeToggleKeyCode))
+                edge.enabled = !edge.enabled;
         }
 
         public void LateUpdate()
