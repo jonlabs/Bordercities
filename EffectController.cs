@@ -69,6 +69,10 @@ namespace Bordercities
                 showSettingsPanel = true;
                 tab = Config.Tab.Hotkey;
             }
+            else
+            {
+                tab = Config.Tab.EdgeDetection;
+            }
 
         }
 
@@ -84,6 +88,7 @@ namespace Bordercities
             edge.edgesOnly = config.edgeOnly;
             edge.sampleDist = config.edgeSamp;
             autoEdge = config.autoEdge;
+            
             firstTime = config.firstTime;
 
             bloom.enabled = config.bloomEnabled;
@@ -110,7 +115,6 @@ namespace Bordercities
 
         public void SaveConfig()
         {
-            config.memoryTab = tab;
             config.automaticMode = automaticMode;
             config.edgeEnabled = edge.enabled;
             config.edgeMode = edge.mode;
@@ -129,6 +133,24 @@ namespace Bordercities
 
             Config.Serialize(configPath, config);
         }
+
+        void RecommendedDefaults()
+        {
+            automaticMode = true;
+            edge.mode = EdgeDetection.EdgeDetectMode.TriangleDepthNormals;
+            edge.sensitivityNormals = 0.63f;
+            edge.sensitivityDepth = 2.12f;
+            edge.edgeExp = 0.09f;
+            edge.sampleDist = 0.82f;
+            edge.edgesOnly = 0;
+            autoEdge = true;
+
+            bloom.enabled = false;
+            bloom.threshold = 0.27f;
+            bloom.intensity = 0.39f;
+            bloom.blurSize = 5.50f;
+        }
+
         void OnGUI()
         {
             if (firstTime)
@@ -176,7 +198,7 @@ namespace Bordercities
 
                             if (!clickedInappropriately)
                             {
-                                if (GUILayout.Button("Automatic Mode is on.  Enter Manual Mode with.."))
+                                if (GUILayout.Button("'Plug & Play' Mode is on.  Enter Manual Mode with.."))
                                 {
                                     clickCount++;
                                     if (clickCount >= 10)
@@ -272,12 +294,14 @@ namespace Bordercities
                             {
                                 GUILayout.Label("Depth sensitivity: " + edge.sensitivityDepth.ToString());
                                 if (!autoEdge)
-                                    edge.sensitivityDepth = GUILayout.HorizontalSlider(edge.sensitivityDepth, 0.000f, 20.000f, GUILayout.Width(570));
+                                    edge.sensitivityDepth = GUILayout.HorizontalSlider(edge.sensitivityDepth, 0.000f, 50.000f, GUILayout.Width(570));
                                 GUILayout.Label("Normal sensitivity: " + edge.sensitivityNormals.ToString());
-                                edge.sensitivityNormals = GUILayout.HorizontalSlider(edge.sensitivityNormals, 0.000f, 5.000f, GUILayout.Width(570));
+                                if (!autoEdge)
+                                    edge.sensitivityNormals = GUILayout.HorizontalSlider(edge.sensitivityNormals, 0.000f, 5.000f, GUILayout.Width(570));
 
 
-                                autoEdge = GUILayout.Toggle(autoEdge, "Automatic Depth (Based on zoom level.  Strongly recommended for regular play.)");
+                                autoEdge = GUILayout.Toggle(autoEdge, "Automatic Mode");
+                                
                             }
                             if (edge.mode == EdgeDetection.EdgeDetectMode.SobelDepthThin || edge.mode == EdgeDetection.EdgeDetectMode.SobelDepth)
                             {
@@ -285,7 +309,7 @@ namespace Bordercities
                                 edge.edgeExp = GUILayout.HorizontalSlider(edge.edgeExp, 0.000f, 1.000f, GUILayout.Width(570));
                             }
 
-                            if (GUILayout.Button("Manual mode is on.  Switch to automatic."))
+                            if (GUILayout.Button("Advanced mode is on.  Switch to 'Plug & Play' mode."))
                             {
                                 automaticMode = true;
                                 RecommendedDefaults();
@@ -453,22 +477,7 @@ namespace Bordercities
             }
         }
 
-        void RecommendedDefaults()
-        {
-            automaticMode = true;
-            edge.mode = EdgeDetection.EdgeDetectMode.TriangleDepthNormals;
-            edge.sensitivityNormals = 1.07f;
-            edge.sensitivityDepth = 2.12f;
-            edge.edgeExp = 0.09f;
-            edge.sampleDist = 0.82f;
-            edge.edgesOnly = 0;
-            autoEdge = true;
-
-            bloom.enabled = false;
-            bloom.threshold = 0.27f;
-            bloom.intensity = 0.39f;
-            bloom.blurSize = 5.50f;
-        }
+        
 
         public void Update()
         {
@@ -496,17 +505,82 @@ namespace Bordercities
             }
             if (Input.GetKeyUp(config.edgeToggleKeyCode))
                 edge.enabled = !edge.enabled;
+
+            
         }
 
+        void SizeCheck(bool value, float min, float max, float depthLimit)
+        {
+            float size = cameraController.m_currentSize;
+            if (min < size && max > size)
+            {
+                if (value)
+                {
+                    if (edge.sensitivityDepth >= depthLimit)
+                        edge.sensitivityDepth = depthLimit;
+                }
+                if (!value)
+                {
+                    edge.sensitivityNormals = Mathf.Lerp(edge.sensitivityNormals, depthLimit, 0.5f);
+                    
+                }
+            }
+        }
+
+        void AutomaticAlgorithms()
+        {
+            SizeCheck(true,40f, 100f, 1.523f);
+            SizeCheck(true,100, 200, 2.956f);
+            SizeCheck(true,200, 300, 3.405f);
+            SizeCheck(true,300, 400, 3.584f);
+            SizeCheck(true,400, 500, 5.017f);
+            SizeCheck(true,500, 600, 6.989f);
+            SizeCheck(true,600, 700, 8.691f);
+            SizeCheck(true,700, 800, 9.408f);
+            SizeCheck(true,800, 1000, 12.186f);
+            SizeCheck(true,1000, 1100, 15.681f);
+
+            SizeCheck(false, 40, 222f, 0.65f);
+            SizeCheck(false, 100, 476f, 0.833f);
+            SizeCheck(false, 476f, 700f, 1.1827f);
+            SizeCheck(false, 700, 1274, 1.2f);
+            SizeCheck(false, 1274f, 4000, 1.24f);
+            //cool mode
+
+
+            float size = cameraController.m_currentSize;
+            if (size < 222f)
+            {
+                edge.sensitivityDepth = size / 125;
+                //edge.sensitivityNormals = Mathf.Lerp(0.57f, 0.93f, 1f);
+            }
+            if (size >= 222f)
+            {
+                edge.sensitivityDepth = size / 250;
+            }
+
+            
+
+
+
+
+            if (edge.sensitivityDepth <= 0.44f)
+                edge.sensitivityDepth = 0.44f;
+            if (edge.sensitivityDepth >= 30f)
+                edge.sensitivityDepth = 30f;
+            if (edge.sensitivityNormals >= 1.29f)
+                edge.sensitivityNormals = 1.29f;
+            if (edge.sensitivityNormals <= 0.65f)
+                edge.sensitivityNormals = 0.65f;
+        }
         public void LateUpdate()
         {
             if (cameraController != null && autoEdge)
             {
-                if (cameraController.m_currentSize < 222f)
-                    edge.sensitivityDepth = GetComponent<CameraController>().m_currentSize / 125;
-                if (cameraController.m_currentSize >= 222f)
-                    edge.sensitivityDepth = GetComponent<CameraController>().m_currentSize / 250;
+                
+
                 autoEdgeActive = true;
+                AutomaticAlgorithms();
             }
             if (!autoEdge && autoEdgeActive)
             {

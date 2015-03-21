@@ -15,6 +15,7 @@ namespace Bordercities
         public float edgeExpo;
         public float edgeSamp;
         public float edgeOnly;
+        public bool superCartoon;
 
         public bool firstTime = true;
         public KeyCode keyCode = KeyCode.None;
