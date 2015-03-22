@@ -19,6 +19,8 @@ namespace Bordercities
         public bool autoEdge;
         public bool firstTime;
 
+        private bool hasClicked = false;
+
         public bool overrideFirstTime;
 
         private CameraController cameraController;
@@ -186,9 +188,9 @@ namespace Bordercities
                 case KeyCode.F12:
                     return "F12";
                 case KeyCode.LeftBracket:
-                    return "[";
-                case KeyCode.RightAlt:
-                    return "]";
+                    return "LeftBracket";
+                case KeyCode.RightBracket:
+                    return "RightBracket";
                 case KeyCode.Equals:
                     return "=";
                 case KeyCode.Slash:
@@ -220,15 +222,15 @@ namespace Bordercities
             GUILayout.BeginHorizontal();
             if (!firstTime)
             {
-                if (GUILayout.Button("Edge Detection"))
+                if (GUILayout.Button("The Bordercities Effect"))
                 {
                     tab = Config.Tab.EdgeDetection;
                 }
-                if (GUILayout.Button("Bloom"))
+                if (GUILayout.Button("Bonus Effects"))
                 {
                     tab = Config.Tab.Bloom;
                 }
-                if (GUILayout.Button("Hotkey"))
+                if (GUILayout.Button("Hotkey Configuration"))
                 {
                     tab = Config.Tab.Hotkey;
                 }
@@ -243,9 +245,9 @@ namespace Bordercities
                 if (edge != null)
                 {
                     if (!edge.enabled)
-                        edge.enabled = GUILayout.Toggle(edge.enabled, "Click to enable Edge Detection.");
+                        edge.enabled = GUILayout.Toggle(edge.enabled, "Ready?  Click to enable the Bordercities effect!");
                     else
-                        edge.enabled = GUILayout.Toggle(edge.enabled, "Click to disable Edge Detection.");
+                        edge.enabled = GUILayout.Toggle(edge.enabled, "Click to disable the Bordercities effect.");
                     if (edge.enabled)
                     {
                         if (automaticMode)
@@ -389,7 +391,7 @@ namespace Bordercities
                 if (firstTime)
                 {
                     WindowSet(551, 336);
-                    GUILayout.Label("BORDERCITIES FIRST-TIME INITIALIZATION");
+                    GUILayout.Label("BORDERCITIES FIRST-TIME INITIALIZATION (Never popups again after choice)");
                     GUILayout.Label("Choose and confirm your hotkey for Bordercities.  LeftBracket is default.");
                     GUILayout.Label("NOTE: Bordercities will -never- automatically pop-up again as soon as you've confirmed your hotkey choice.   This initialization process ensures that all users, regardless of hardware, operating system, or current keyboard configuration, will be able to enjoy Bordercities.");
 
@@ -411,7 +413,8 @@ namespace Bordercities
                 if (firstTime && config.keyCode != KeyCode.None)
                 {
                     GUILayout.Space(3f);
-                    GUILayout.Label("Hotkey '" + KeyToString(config.keyCode) + "' has been chosen and is active.  Confirm it now by using the hotkey.");
+                    if (hasClicked)
+                        GUILayout.Label("Hotkey '" + KeyToString(config.keyCode) + "' has been chosen and is active.  Confirm it now by using the hotkey.");
                     GUILayout.Space(10f);
                     GUILayout.Label("NOTE: Hotkey can be changed at anytime via the 'Hotkey' window tab in the config panel.");
                 }
@@ -530,7 +533,7 @@ namespace Bordercities
                     default:
                         break;
                 }
-
+                hasClicked = true;
                 SaveConfig();
             }
         }
