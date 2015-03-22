@@ -15,10 +15,9 @@ namespace Bordercities
         public float edgeExpo;
         public float edgeSamp;
         public float edgeOnly;
-        public bool superCartoon;
 
         public bool firstTime = true;
-        public KeyCode keyCode = KeyCode.None;
+        public KeyCode keyCode = KeyCode.LeftBracket;
         public KeyCode edgeToggleKeyCode;
         
 
@@ -38,7 +37,6 @@ namespace Bordercities
             Hotkey = 2,
         }
 
-        public Tab memoryTab = Tab.Hotkey;
 
         public static void Serialize(string filename, Config config)
         {

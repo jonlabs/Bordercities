@@ -6,6 +6,8 @@ namespace Bordercities
     {
         public bool showSettingsPanel = false;
         private Rect windowRect = new Rect(64, 250, 803, 466);
+        private float defaultHeight;
+        private float defaultWidth;
 
         public Config config;
         private const string configPath = "BordercitiesConfig.xml";
@@ -21,8 +23,7 @@ namespace Bordercities
 
         private CameraController cameraController;
         private bool autoEdgeActive;
-        private static int clickCount = 0;
-        private bool clickedInappropriately = false;
+
         private string keystring = "";
         private string edgeKeyString = "";
 
@@ -35,14 +36,13 @@ namespace Bordercities
             {
                 config = new Config();
 
-                config.memoryTab = Config.Tab.Hotkey;
                 config.automaticMode = true;
                 config.edgeEnabled = false;
                 config.edgeMode = EdgeDetection.EdgeDetectMode.TriangleDepthNormals;
                 config.sensNorm = 1.63f;
                 config.sensDepth = 2.12f;
                 config.edgeExpo = 0.09f;
-                config.edgeSamp = 0.82f;
+                config.edgeSamp = 1.0f;
                 config.edgeOnly = 0;
                 config.autoEdge = true;
                 config.firstTime = true;
@@ -53,7 +53,8 @@ namespace Bordercities
                 config.bloomBlurSize = 5.50f;
 
             }
-            
+            defaultWidth = windowRect.width;
+            defaultHeight = windowRect.height;
         }
 
         void Start()
@@ -62,6 +63,10 @@ namespace Bordercities
             bloom = GetComponent<BloomOptimized>();
 
             LoadAllSettings();
+            if (config.keyCode == KeyCode.None)
+            {
+                config.keyCode = KeyCode.LeftBracket;
+            }
             SaveConfig();
 
             if (firstTime)
@@ -78,7 +83,6 @@ namespace Bordercities
 
         void LoadAllSettings()
         {
-            tab = config.memoryTab;
             automaticMode = config.automaticMode;
             edge.enabled = config.edgeEnabled;
             edge.mode = config.edgeMode;
@@ -88,7 +92,7 @@ namespace Bordercities
             edge.edgesOnly = config.edgeOnly;
             edge.sampleDist = config.edgeSamp;
             autoEdge = config.autoEdge;
-            
+
             firstTime = config.firstTime;
 
             bloom.enabled = config.bloomEnabled;
@@ -111,7 +115,7 @@ namespace Bordercities
             bloom.blurSize = config.bloomBlurSize;
         }
 
-        
+
 
         public void SaveConfig()
         {
@@ -141,7 +145,7 @@ namespace Bordercities
             edge.sensitivityNormals = 0.63f;
             edge.sensitivityDepth = 2.12f;
             edge.edgeExp = 0.09f;
-            edge.sampleDist = 0.82f;
+            edge.sampleDist = 1.0f;
             edge.edgesOnly = 0;
             autoEdge = true;
 
@@ -159,6 +163,56 @@ namespace Bordercities
             {
                 windowRect = GUI.Window(391435, windowRect, SettingsPanel, "Bordercities Configuration Panel");
             }
+        }
+
+        string KeyToString(KeyCode kc)
+        {
+            switch (kc)
+            {
+                case KeyCode.F5:
+                    return "F5";
+                case KeyCode.F6:
+                    return "F6";
+                case KeyCode.F7:
+                    return "F7";
+                case KeyCode.F8:
+                    return "F8";
+                case KeyCode.F9:
+                    return "F9";
+                case KeyCode.F10:
+                    return "F10";
+                case KeyCode.F11:
+                    return "F11";
+                case KeyCode.F12:
+                    return "F12";
+                case KeyCode.LeftBracket:
+                    return "[";
+                case KeyCode.RightAlt:
+                    return "]";
+                case KeyCode.Equals:
+                    return "=";
+                case KeyCode.Slash:
+                    return "Slash";
+                case KeyCode.Backslash:
+                    return "Backslash";
+                case KeyCode.Home:
+                    return "Home";
+                case KeyCode.End:
+                    return "End";
+                case KeyCode.KeypadDivide:
+                    return "Numpad /";
+                case KeyCode.KeypadMultiply:
+                    return "Numpad *";
+                case KeyCode.KeypadMinus:
+                    return "Numpad -";
+                case KeyCode.KeypadPlus:
+                    return "Numpad +";
+                case KeyCode.KeypadEquals:
+                    return "Numpad =";
+                default:
+                    return kc.ToString();
+            }
+
         }
 
         void SettingsPanel(int wnd)
@@ -179,12 +233,13 @@ namespace Bordercities
                     tab = Config.Tab.Hotkey;
                 }
             }
-            
+
             GUILayout.EndHorizontal();
             GUILayout.Space(20f);
 
             if (tab == Config.Tab.EdgeDetection)
             {
+                WindowDefaults();
                 if (edge != null)
                 {
                     if (!edge.enabled)
@@ -195,43 +250,36 @@ namespace Bordercities
                     {
                         if (automaticMode)
                         {
-
-                            if (!clickedInappropriately)
-                            {
-                                if (GUILayout.Button("'Plug & Play' Mode is on.  Enter Manual Mode with.."))
-                                {
-                                    clickCount++;
-                                    if (clickCount >= 10)
-                                    {
-                                        clickedInappropriately = true;
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                GUILayout.Button("Dude.  It doesn't do anything.");
-                            }
+                            GUILayout.Space(75f);
+                            GUILayout.Label("'Plug & Play Mode' is on.  Simply close this window now, or, enter 'Advanced Mode' below using..");
 
 
 
                             GUILayout.BeginHorizontal();
-                            if (GUILayout.Button("..current settings."))
+                            if (GUILayout.Button("'Plug & Play' settings"))
                             {
                                 automaticMode = false;
-                                clickedInappropriately = false;
-                                clickCount = 0;
                             }
-                            if (GUILayout.Button("..your last saved settings."))
+                            if (GUILayout.Button("Your last saved settings"))
                             {
                                 automaticMode = false;
-                                clickedInappropriately = false;
-                                clickCount = 0;
                                 LoadManualSettings();
                             }
                             GUILayout.EndHorizontal();
+                            GUILayout.Space(75f);
                         }
                         else
                         {
+                            GUILayout.Space(25f);
+
+                            if (GUILayout.Button("Advanced mode is on.  Switch to 'Plug & Play' mode."))
+                            {
+                                automaticMode = true;
+                                RecommendedDefaults();
+                            }
+
+                            GUILayout.Space(25f);
+
                             GUILayout.Label("Edge sample distance: " + edge.sampleDist.ToString());
                             edge.sampleDist = GUILayout.HorizontalSlider(edge.sampleDist, 1, 5, GUILayout.Width(570));
                             GUILayout.Label("Edge mix: " + edge.edgesOnly.ToString());
@@ -301,7 +349,7 @@ namespace Bordercities
 
 
                                 autoEdge = GUILayout.Toggle(autoEdge, "Automatic Mode");
-                                
+
                             }
                             if (edge.mode == EdgeDetection.EdgeDetectMode.SobelDepthThin || edge.mode == EdgeDetection.EdgeDetectMode.SobelDepth)
                             {
@@ -309,11 +357,7 @@ namespace Bordercities
                                 edge.edgeExp = GUILayout.HorizontalSlider(edge.edgeExp, 0.000f, 1.000f, GUILayout.Width(570));
                             }
 
-                            if (GUILayout.Button("Advanced mode is on.  Switch to 'Plug & Play' mode."))
-                            {
-                                automaticMode = true;
-                                RecommendedDefaults();
-                            }
+
                         }
                     }
                 }
@@ -321,6 +365,7 @@ namespace Bordercities
 
             if (tab == Config.Tab.Bloom)
             {
+                WindowDefaults();
                 if (!bloom.enabled)
                     bloom.enabled = GUILayout.Toggle(bloom.enabled, "Click to enable Bloom.");
                 else
@@ -341,23 +386,23 @@ namespace Bordercities
 
             if (tab == Config.Tab.Hotkey)
             {
-                if (firstTime || config.keyCode == KeyCode.None)
+                if (firstTime)
                 {
-                    GUILayout.Label("BORDERCITIES INITIAL HOTKEY CONFIG: (Will never popup again upon making choice below)");
-                    GUILayout.Label("1) Choose below which key will open the Bordercities configuration window.");
-                    GUILayout.Label("2) Press the same key on your keyboard.  If the window closes, setup is complete. If not, pick another hotkey.");
-                    GUILayout.Label("NEW IN UPDATE 10: Edge detection can now be toggled via a hotkey of your choice!!  This option becomes available in the 'Hotkey' tab upon first confirming your 'Configuration Panel' hotkey here.");
-                    GUILayout.Space(5f);
-                    GUILayout.Label("More options for key choices coming soon!");
-                    GUILayout.Space(10f);
-                    GUILayout.Label("NOTE: This window will -never- automatically pop-up again as soon as you've confirmed your hotkey choice.   This initialization process ensures that all users, regardless of hardware, operating system, or current keyboard configuration, will be able to enjoy Bordercities.");
-                
-                    
+                    WindowSet(551, 336);
+                    GUILayout.Label("BORDERCITIES FIRST-TIME INITIALIZATION");
+                    GUILayout.Label("Choose and confirm your hotkey for Bordercities.  LeftBracket is default.");
+                    GUILayout.Label("NOTE: Bordercities will -never- automatically pop-up again as soon as you've confirmed your hotkey choice.   This initialization process ensures that all users, regardless of hardware, operating system, or current keyboard configuration, will be able to enjoy Bordercities.");
+
+
                 }
 
 
                 if (!firstTime)
+                {
+                    WindowDefaults();
                     GUILayout.Label("WARNING: HOTKEY BUTTONS WILL SAVE UPON CLICK.  THIS INCLUDES YOUR EFFECTS SETTINGS.");
+
+                }
                 KeyboardGrid(0);
 
 
@@ -366,8 +411,9 @@ namespace Bordercities
                 if (firstTime && config.keyCode != KeyCode.None)
                 {
                     GUILayout.Space(3f);
-                    GUILayout.Label("Hotkey '"+keystring+"' has been chosen and is active.  Confirm it now by using the hotkey.");
-                    GUILayout.Space(3f);
+                    GUILayout.Label("Hotkey '" + KeyToString(config.keyCode) + "' has been chosen and is active.  Confirm it now by using the hotkey.");
+                    GUILayout.Space(10f);
+                    GUILayout.Label("NOTE: Hotkey can be changed at anytime via the 'Hotkey' window tab in the config panel.");
                 }
 
                 if (!firstTime)
@@ -386,13 +432,13 @@ namespace Bordercities
                     GUILayout.Space(5f);
                     GUILayout.Label("More key options coming soon!");
                 }
-                
+
             }
 
-            
+
             if (!firstTime)
             {
-                
+
                 GUILayout.BeginHorizontal();
                 if (tab != Config.Tab.Hotkey)
                 {
@@ -404,12 +450,12 @@ namespace Bordercities
                     {
                         LoadAllSettings();
                     }
-                    if (GUILayout.Button("Recommended Defaults (Does not autosave on click.)"))
+                    if (GUILayout.Button("Reset All (Doesn't save)"))
                     {
                         RecommendedDefaults();
                     }
                 }
-                
+
                 if (GUILayout.Button("Close Window"))
                 {
                     showSettingsPanel = false;
@@ -420,8 +466,19 @@ namespace Bordercities
                 GUILayout.EndHorizontal();
                 GUILayout.Label("Recommended External Settings: 175% or above with Dynamic Resolution (add +1 edge sample distance if so) & 'Tropical' CC");
             }
-            
 
+
+        }
+
+        void WindowDefaults()
+        {
+            windowRect.width = defaultWidth;
+            windowRect.height = defaultHeight;
+        }
+        void WindowSet(float width, float height)
+        {
+            windowRect.width = width;
+            windowRect.height = height;
         }
 
         void KeyboardGrid(int purpose)
@@ -472,18 +529,20 @@ namespace Bordercities
                         break;
                     default:
                         break;
-                } 
-                
+                }
+
                 SaveConfig();
             }
         }
 
-        
+
 
         public void Update()
         {
             if (Input.GetKeyUp(config.keyCode))
             {
+                if (!showSettingsPanel)
+                    tab = Config.Tab.EdgeDetection;
                 showSettingsPanel = !showSettingsPanel;
             }
             if (Input.GetKeyUp(KeyCode.Escape) && showSettingsPanel)
@@ -495,10 +554,11 @@ namespace Bordercities
             {
                 firstTime = false;
                 showSettingsPanel = false;
-                SaveConfig();
                 tab = Config.Tab.EdgeDetection;
+                SaveConfig();
+
             }
-         
+
             if (firstTime)
             {
                 if (!overrideFirstTime)
@@ -507,7 +567,7 @@ namespace Bordercities
             if (Input.GetKeyUp(config.edgeToggleKeyCode))
                 edge.enabled = !edge.enabled;
 
-            
+
         }
 
         void SizeCheck(bool value, float min, float max, float depthLimit)
@@ -523,23 +583,23 @@ namespace Bordercities
                 if (!value)
                 {
                     edge.sensitivityNormals = Mathf.Lerp(edge.sensitivityNormals, depthLimit, 0.5f);
-                    
+
                 }
             }
         }
 
         void AutomaticAlgorithms()
         {
-            SizeCheck(true,40f, 100f, 1.523f);
-            SizeCheck(true,100, 200, 2.956f);
-            SizeCheck(true,200, 300, 3.405f);
-            SizeCheck(true,300, 400, 3.584f);
-            SizeCheck(true,400, 500, 5.017f);
-            SizeCheck(true,500, 600, 6.989f);
-            SizeCheck(true,600, 700, 8.691f);
-            SizeCheck(true,700, 800, 9.408f);
-            SizeCheck(true,800, 1000, 12.186f);
-            SizeCheck(true,1000, 1100, 15.681f);
+            SizeCheck(true, 40f, 100f, 1.523f);
+            SizeCheck(true, 100, 200, 2.956f);
+            SizeCheck(true, 200, 300, 3.405f);
+            SizeCheck(true, 300, 400, 3.584f);
+            SizeCheck(true, 400, 500, 5.017f);
+            SizeCheck(true, 500, 600, 6.989f);
+            SizeCheck(true, 600, 700, 8.691f);
+            SizeCheck(true, 700, 800, 9.408f);
+            SizeCheck(true, 800, 1000, 12.186f);
+            SizeCheck(true, 1000, 1100, 15.681f);
 
             SizeCheck(false, 40, 222f, 0.65f);
             SizeCheck(false, 100, 476f, 0.833f);
@@ -560,7 +620,7 @@ namespace Bordercities
                 edge.sensitivityDepth = size / 250;
             }
 
-            
+
 
 
 
@@ -578,7 +638,7 @@ namespace Bordercities
         {
             if (cameraController != null && autoEdge)
             {
-                
+
 
                 autoEdgeActive = true;
                 AutomaticAlgorithms();
