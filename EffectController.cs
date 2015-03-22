@@ -24,15 +24,22 @@ namespace Bordercities
         public bool overrideFirstTime;
 
         private CameraController cameraController;
+        private InfoManager infoManager;
+
         private bool autoEdgeActive;
+        public bool subViewOnly;
 
         private string keystring = "";
         private string edgeKeyString = "";
 
         private bool automaticMode;
+
+        private bool userWantsEdge;
+
         void Awake()
         {
             cameraController = GetComponent<CameraController>();
+            infoManager = InfoManager.instance;
             config = Config.Deserialize(configPath);
             if (config == null)
             {
@@ -48,6 +55,7 @@ namespace Bordercities
                 config.edgeOnly = 0;
                 config.autoEdge = true;
                 config.firstTime = true;
+                config.subViewOnly = false;
 
                 config.bloomEnabled = false;
                 config.bloomThresh = 0.27f;
@@ -80,6 +88,7 @@ namespace Bordercities
             {
                 tab = Config.Tab.EdgeDetection;
             }
+            userWantsEdge = config.edgeEnabled;
 
         }
 
@@ -94,6 +103,7 @@ namespace Bordercities
             edge.edgesOnly = config.edgeOnly;
             edge.sampleDist = config.edgeSamp;
             autoEdge = config.autoEdge;
+            subViewOnly = config.subViewOnly;
 
             firstTime = config.firstTime;
 
@@ -115,6 +125,8 @@ namespace Bordercities
             bloom.threshold = config.bloomThresh;
             bloom.intensity = config.bloomIntens;
             bloom.blurSize = config.bloomBlurSize;
+            subViewOnly = config.subViewOnly;
+
         }
 
 
@@ -130,6 +142,7 @@ namespace Bordercities
             config.edgeOnly = edge.edgesOnly;
             config.edgeSamp = edge.sampleDist;
             config.autoEdge = autoEdge;
+            config.subViewOnly = subViewOnly;
 
             config.bloomEnabled = bloom.enabled;
             config.bloomThresh = bloom.threshold;
@@ -150,6 +163,7 @@ namespace Bordercities
             edge.sampleDist = 1.0f;
             edge.edgesOnly = 0;
             autoEdge = true;
+            subViewOnly = false;
 
             bloom.enabled = false;
             bloom.threshold = 0.27f;
@@ -244,12 +258,14 @@ namespace Bordercities
                 WindowDefaults();
                 if (edge != null)
                 {
-                    if (!edge.enabled)
-                        edge.enabled = GUILayout.Toggle(edge.enabled, "Ready?  Click to enable the Bordercities effect!");
+                    if (!userWantsEdge)
+                        userWantsEdge = GUILayout.Toggle(userWantsEdge, "Ready?  Click to enable the Bordercities effect!");
                     else
-                        edge.enabled = GUILayout.Toggle(edge.enabled, "Click to disable the Bordercities effect.");
-                    if (edge.enabled)
+                        userWantsEdge = GUILayout.Toggle(userWantsEdge, "Click to disable the Bordercities effect.");
+                    if (userWantsEdge)
                     {
+                        subViewOnly = GUILayout.Toggle(subViewOnly, "Optional: Bordercities Effect enabled for Info Modes only.");
+
                         if (automaticMode)
                         {
                             GUILayout.Space(75f);
@@ -484,6 +500,34 @@ namespace Bordercities
             windowRect.height = height;
         }
 
+        void SubviewModeState ()
+        {
+            if (infoManager.CurrentMode == InfoManager.InfoMode.None)
+            {
+                edge.enabled = false;
+            }
+            else
+            {
+                edge.enabled = true;
+            }
+        }
+
+
+        
+        void EffectState()
+        {
+            if (userWantsEdge)
+            {
+                edge.enabled = true;
+                if (subViewOnly)
+                    SubviewModeState();
+            }
+            else
+            {
+                edge.enabled = false;
+            }
+        }
+
         void KeyboardGrid(int purpose)
         {
             GUILayout.BeginHorizontal();
@@ -542,6 +586,8 @@ namespace Bordercities
 
         public void Update()
         {
+            EffectState();
+            
             if (Input.GetKeyUp(config.keyCode))
             {
                 if (!showSettingsPanel)
@@ -568,7 +614,7 @@ namespace Bordercities
                     showSettingsPanel = true;
             }
             if (Input.GetKeyUp(config.edgeToggleKeyCode))
-                edge.enabled = !edge.enabled;
+                userWantsEdge = !userWantsEdge;
 
 
         }

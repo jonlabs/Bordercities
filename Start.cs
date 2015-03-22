@@ -32,6 +32,8 @@ namespace Bordercities
             EffectController toggler = camera.gameObject.AddComponent<EffectController>();
             AttachEffects();
         }
+
+        
         private void AttachEffects()
         {
 

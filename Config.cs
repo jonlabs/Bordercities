@@ -19,7 +19,7 @@ namespace Bordercities
         public bool firstTime = true;
         public KeyCode keyCode = KeyCode.LeftBracket;
         public KeyCode edgeToggleKeyCode;
-        
+        public bool subViewOnly;
 
         public bool autoEdge;
 
