@@ -47,6 +47,17 @@ namespace Bordercities
         private float roundedB;
         private float roundedMult;
 
+        public Color mixCurrentColor;
+        public float mixSetR;
+        public float mixSetG;
+        public float mixSetB;
+        public float mixColorMultiplier = 1f;
+        private Color mixNewColor;
+        private float mixRoundedR;
+        private float mixRoundedG;
+        private float mixRoundedB;
+        private float mixRoundedMult;
+
         void Awake()
         {
             cameraController = GetComponent<CameraController>();
@@ -67,8 +78,12 @@ namespace Bordercities
                 config.autoEdge = true;
                 config.firstTime = true;
                 config.subViewOnly = false;
+                
                 config.currentColor = new Color(0, 0, 0, 0);
                 config.colorMultiplier = 1.0f;
+                
+                config.mixColorMultiplier = 1.0f;
+                config.mixCurrentColor = new Color(1, 1, 1, 0);
 
                 config.bloomEnabled = false;
                 config.bloomThresh = 0.27f;
@@ -117,6 +132,16 @@ namespace Bordercities
             currentColor = newColor;
         }
 
+        void MixColor(float r, float g, float b)
+        {
+            float mixNewR = r * mixColorMultiplier;
+            float mixNewG = g * mixColorMultiplier;
+            float mixNewB = b * mixColorMultiplier;
+            mixNewColor = new Color(mixNewR, mixNewG, mixNewB, 0);
+            edge.SetMixColor(mixNewColor);
+            mixCurrentColor = mixNewColor;
+        }
+
         void LoadAllSettings()
         {
             automaticMode = config.automaticMode;
@@ -132,9 +157,15 @@ namespace Bordercities
             currentColor = config.currentColor;
             edge.edgeColor = currentColor;
             colorMultiplier = config.colorMultiplier;
+            mixCurrentColor = config.mixCurrentColor;
+            edge.edgesOnlyBgColor = mixCurrentColor;
+            mixColorMultiplier = config.mixColorMultiplier;
             setR = config.setR;
             setG = config.setG;
             setB = config.setB;
+            mixSetR = config.mixSetR;
+            mixSetG = config.mixSetG;
+            mixSetB = config.mixSetB;
 
             firstTime = config.firstTime;
 
@@ -159,10 +190,16 @@ namespace Bordercities
             subViewOnly = config.subViewOnly;
             currentColor = config.currentColor;
             colorMultiplier = config.colorMultiplier;
+            edge.edgeColor = config.currentColor;
             setR = config.setR;
             setG = config.setG;
             setB = config.setB;
-            edge.edgeColor = config.currentColor;
+            mixSetR = config.mixSetR;
+            mixSetG = config.mixSetG;
+            mixSetB = config.mixSetB;
+            mixCurrentColor = config.mixCurrentColor;
+            edge.edgesOnlyBgColor = mixCurrentColor;
+            mixColorMultiplier = config.mixColorMultiplier;
 
         }
 
@@ -180,11 +217,18 @@ namespace Bordercities
             config.edgeSamp = edge.sampleDist;
             config.autoEdge = autoEdge;
             config.subViewOnly = subViewOnly;
+
             config.currentColor = currentColor;
             config.setR = setR;
             config.setG = setG;
             config.setB = setB;
             config.colorMultiplier = colorMultiplier;
+
+            config.mixCurrentColor = mixCurrentColor;
+            config.mixSetR = mixSetR;
+            config.mixSetG = mixSetG;
+            config.mixSetB = mixSetB;
+            config.mixColorMultiplier = mixColorMultiplier;
 
             config.bloomEnabled = bloom.enabled;
             config.bloomThresh = bloom.threshold;
@@ -337,7 +381,7 @@ namespace Bordercities
                         else
                         {
                             GUILayout.Space(25f);
-                            ResizeWindow(803, 625);
+                            ResizeWindow(803, 825);
                             if (GUILayout.Button("Advanced mode is on.  Switch to 'Plug & Play' mode."))
                             {
                                 automaticMode = true;
@@ -448,12 +492,59 @@ namespace Bordercities
                                 GUILayout.EndHorizontal();
 
 
-
-                                if (GUILayout.Button("Apply Color Settings (Does not overwrite saved color.)"))
+                                if (GUILayout.Button("Apply Edge Color"))
                                 {
                                     MakeColor(setR,setG,setB);
                                     MakeColor(setR,setG,setB); // double entry here is intentional, I am too in shock over how cool this is to do it totally right but this is acceptable enough for now
                                 }
+                                
+                                
+                                
+                                GUILayout.Label("Mix Coloring: (1,1,1 for default white)");
+                                GUILayout.Space(5f);
+
+
+                                GUILayout.BeginHorizontal();
+                                mixRoundedR = Mathf.Round(mixSetR * 100f) / 100f;
+                                GUILayout.Label("R " + mixRoundedR.ToString());
+
+                                mixSetR = GUILayout.HorizontalSlider(mixSetR, 0.000f, 3.000f, GUILayout.Width(570));
+                                GUILayout.EndHorizontal();
+
+
+                                GUILayout.BeginHorizontal();
+                                mixRoundedG = Mathf.Round(mixSetG * 100f) / 100f;
+                                GUILayout.Label("G " + mixRoundedG.ToString());
+
+                                mixSetG = GUILayout.HorizontalSlider(mixSetG, 0.000f, 3.000f, GUILayout.Width(570));
+                                GUILayout.EndHorizontal();
+
+
+                                GUILayout.BeginHorizontal();
+                                mixRoundedB = Mathf.Round(mixSetB * 100f) / 100f;
+                                GUILayout.Label("B " + mixRoundedB.ToString());
+
+                                mixSetB = GUILayout.HorizontalSlider(mixSetB, 0.000f, 3.000f, GUILayout.Width(570));
+                                GUILayout.EndHorizontal();
+
+
+
+                                GUILayout.Space(10f);
+
+                                GUILayout.BeginHorizontal();
+                                mixRoundedMult = Mathf.Round(mixColorMultiplier * 100f) / 100f;
+                                GUILayout.Label("Color multiplier: " + mixRoundedMult.ToString());
+
+                                mixColorMultiplier = GUILayout.HorizontalSlider(mixColorMultiplier, 0.0f, 10.0f, GUILayout.Width(570));
+                                GUILayout.EndHorizontal();
+
+
+                                if (GUILayout.Button("Apply Edge Mix Color"))
+                                {
+                                    MixColor(mixSetR, mixSetG, mixSetB);
+                                    MixColor(mixSetR, mixSetG, mixSetB); // double entry here is intentional, I am too in shock over how cool this is to do it totally right but this is acceptable enough for now
+                                }
+                                
 
                                 GUILayout.Label("Depth sensitivity: " + edge.sensitivityDepth.ToString());
                                 if (!autoEdge)

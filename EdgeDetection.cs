@@ -49,7 +49,7 @@ namespace Bordercities
         public float edgeExp = 1.0f;
         public float sampleDist = 1.0f;
         public float edgesOnly = 0.0f;
-        public Color edgesOnlyBgColor = Color.white;
+        public Color edgesOnlyBgColor;
         private Material edgeDetectMaterial = null;
         public Color edgeColor;
 
@@ -123,6 +123,10 @@ namespace Bordercities
         public void SetEdgeColor(Color edgecol)
         {
             edgeColor = edgecol;
+        }
+        public void SetMixColor(Color mixcol)
+        {
+            edgesOnlyBgColor = mixcol;
         }
     }
 }

@@ -36,6 +36,12 @@ namespace Bordercities
         public float setG;
         public float setB;
 
+        public Color mixCurrentColor;
+        public float mixColorMultiplier;
+        public float mixSetR;
+        public float mixSetG;
+        public float mixSetB;
+
         public enum Tab
         {
             EdgeDetection = 0,
