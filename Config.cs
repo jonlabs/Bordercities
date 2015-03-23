@@ -30,6 +30,12 @@ namespace Bordercities
 
         public bool automaticMode;
 
+        public Color currentColor;
+        public float colorMultiplier;
+        public float setR;
+        public float setG;
+        public float setB;
+
         public enum Tab
         {
             EdgeDetection = 0,

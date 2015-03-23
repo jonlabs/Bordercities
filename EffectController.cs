@@ -5,7 +5,7 @@ namespace Bordercities
     public class EffectController : MonoBehaviour
     {
         public bool showSettingsPanel = false;
-        private Rect windowRect = new Rect(64, 250, 803, 466);
+        private Rect windowRect = new Rect(64, 64, 803, 700); //was 64,250,803,466
         private float defaultHeight;
         private float defaultWidth;
 
@@ -36,6 +36,17 @@ namespace Bordercities
 
         private bool userWantsEdge;
 
+        public Color currentColor;
+        public float setR;
+        public float setG;
+        public float setB;
+        public float colorMultiplier = 1f;
+        private Color newColor;
+        private float roundedR;
+        private float roundedG;
+        private float roundedB;
+        private float roundedMult;
+
         void Awake()
         {
             cameraController = GetComponent<CameraController>();
@@ -56,6 +67,8 @@ namespace Bordercities
                 config.autoEdge = true;
                 config.firstTime = true;
                 config.subViewOnly = false;
+                config.currentColor = new Color(0, 0, 0, 0);
+                config.colorMultiplier = 1.0f;
 
                 config.bloomEnabled = false;
                 config.bloomThresh = 0.27f;
@@ -65,6 +78,7 @@ namespace Bordercities
             }
             defaultWidth = windowRect.width;
             defaultHeight = windowRect.height;
+
         }
 
         void Start()
@@ -89,7 +103,18 @@ namespace Bordercities
                 tab = Config.Tab.EdgeDetection;
             }
             userWantsEdge = config.edgeEnabled;
+           
+        }
 
+        
+        void MakeColor(float r, float g, float b)
+        {
+            float newR = r * colorMultiplier;
+            float newG = g * colorMultiplier;
+            float newB = b * colorMultiplier;
+            newColor = new Color(newR, newG, newB, 0);
+            edge.SetEdgeColor(newColor);
+            currentColor = newColor;
         }
 
         void LoadAllSettings()
@@ -104,6 +129,12 @@ namespace Bordercities
             edge.sampleDist = config.edgeSamp;
             autoEdge = config.autoEdge;
             subViewOnly = config.subViewOnly;
+            currentColor = config.currentColor;
+            edge.edgeColor = currentColor;
+            colorMultiplier = config.colorMultiplier;
+            setR = config.setR;
+            setG = config.setG;
+            setB = config.setB;
 
             firstTime = config.firstTime;
 
@@ -126,6 +157,12 @@ namespace Bordercities
             bloom.intensity = config.bloomIntens;
             bloom.blurSize = config.bloomBlurSize;
             subViewOnly = config.subViewOnly;
+            currentColor = config.currentColor;
+            colorMultiplier = config.colorMultiplier;
+            setR = config.setR;
+            setG = config.setG;
+            setB = config.setB;
+            edge.edgeColor = config.currentColor;
 
         }
 
@@ -143,6 +180,11 @@ namespace Bordercities
             config.edgeSamp = edge.sampleDist;
             config.autoEdge = autoEdge;
             config.subViewOnly = subViewOnly;
+            config.currentColor = currentColor;
+            config.setR = setR;
+            config.setG = setG;
+            config.setB = setB;
+            config.colorMultiplier = colorMultiplier;
 
             config.bloomEnabled = bloom.enabled;
             config.bloomThresh = bloom.threshold;
@@ -164,6 +206,7 @@ namespace Bordercities
             edge.edgesOnly = 0;
             autoEdge = true;
             subViewOnly = false;
+            edge.edgeColor = Color.black;
 
             bloom.enabled = false;
             bloom.threshold = 0.27f;
@@ -255,11 +298,14 @@ namespace Bordercities
 
             if (tab == Config.Tab.EdgeDetection)
             {
-                WindowDefaults();
+                ResizeDefaults();
                 if (edge != null)
                 {
                     if (!userWantsEdge)
+                    {
+                        ResizeWindow(803, 140);
                         userWantsEdge = GUILayout.Toggle(userWantsEdge, "Ready?  Click to enable the Bordercities effect!");
+                    }
                     else
                         userWantsEdge = GUILayout.Toggle(userWantsEdge, "Click to disable the Bordercities effect.");
                     if (userWantsEdge)
@@ -268,6 +314,8 @@ namespace Bordercities
 
                         if (automaticMode)
                         {
+                            ResizeWindow(803, 375);
+
                             GUILayout.Space(75f);
                             GUILayout.Label("'Plug & Play Mode' is on.  Simply close this window now, or, enter 'Advanced Mode' below using..");
 
@@ -289,14 +337,17 @@ namespace Bordercities
                         else
                         {
                             GUILayout.Space(25f);
-
+                            ResizeWindow(803, 625);
                             if (GUILayout.Button("Advanced mode is on.  Switch to 'Plug & Play' mode."))
                             {
                                 automaticMode = true;
                                 RecommendedDefaults();
                             }
 
-                            GUILayout.Space(25f);
+                           
+
+
+                            GUILayout.Space(20f);
 
                             GUILayout.Label("Edge sample distance: " + edge.sampleDist.ToString());
                             edge.sampleDist = GUILayout.HorizontalSlider(edge.sampleDist, 1, 5, GUILayout.Width(570));
@@ -358,6 +409,52 @@ namespace Bordercities
 
                             if (edge.mode == EdgeDetection.EdgeDetectMode.TriangleDepthNormals || edge.mode == EdgeDetection.EdgeDetectMode.RobertsCrossDepthNormals)
                             {
+                                GUILayout.Label("Edge Coloring: (0,0,0 for default black)");
+                                GUILayout.Space(5f);
+
+
+                                GUILayout.BeginHorizontal();
+                                roundedR = Mathf.Round(setR * 100f) / 100f;
+                                GUILayout.Label("R " + roundedR.ToString());
+
+                                setR = GUILayout.HorizontalSlider(setR, 0.000f, 3.000f, GUILayout.Width(570));
+                                GUILayout.EndHorizontal();
+
+
+                                GUILayout.BeginHorizontal();
+                                roundedG = Mathf.Round(setG * 100f) / 100f;
+                                GUILayout.Label("G " + roundedG.ToString());
+
+                                setG = GUILayout.HorizontalSlider(setG, 0.000f, 3.000f, GUILayout.Width(570));
+                                GUILayout.EndHorizontal();
+
+
+                                GUILayout.BeginHorizontal();
+                                roundedB = Mathf.Round(setB * 100f) / 100f;
+                                GUILayout.Label("B " + roundedB.ToString());
+
+                                setB = GUILayout.HorizontalSlider(setB, 0.000f, 3.000f, GUILayout.Width(570));
+                                GUILayout.EndHorizontal();
+                                
+                                
+
+                                GUILayout.Space(10f);
+
+                                GUILayout.BeginHorizontal();
+                                roundedMult = Mathf.Round(colorMultiplier * 100f) / 100f;
+                                GUILayout.Label("Color multiplier: " + roundedMult.ToString());
+
+                                colorMultiplier = GUILayout.HorizontalSlider(colorMultiplier, 0.0f, 10.0f, GUILayout.Width(570));
+                                GUILayout.EndHorizontal();
+
+
+
+                                if (GUILayout.Button("Apply Color Settings (Does not overwrite saved color.)"))
+                                {
+                                    MakeColor(setR,setG,setB);
+                                    MakeColor(setR,setG,setB); // double entry here is intentional, I am too in shock over how cool this is to do it totally right but this is acceptable enough for now
+                                }
+
                                 GUILayout.Label("Depth sensitivity: " + edge.sensitivityDepth.ToString());
                                 if (!autoEdge)
                                     edge.sensitivityDepth = GUILayout.HorizontalSlider(edge.sensitivityDepth, 0.000f, 50.000f, GUILayout.Width(570));
@@ -383,7 +480,7 @@ namespace Bordercities
 
             if (tab == Config.Tab.Bloom)
             {
-                WindowDefaults();
+                ResizeWindow(803,265);
                 if (!bloom.enabled)
                     bloom.enabled = GUILayout.Toggle(bloom.enabled, "Click to enable Bloom.");
                 else
@@ -398,6 +495,7 @@ namespace Bordercities
                         bloom.intensity = GUILayout.HorizontalSlider(bloom.intensity, 0.00f, 2.50f, GUILayout.Width(570));
                         GUILayout.Label("Blur size: " + bloom.blurSize.ToString());
                         bloom.blurSize = GUILayout.HorizontalSlider(bloom.blurSize, 0.00f, 5.50f, GUILayout.Width(570));
+                        
                     }
                 }
             }
@@ -406,7 +504,7 @@ namespace Bordercities
             {
                 if (firstTime)
                 {
-                    WindowSet(551, 336);
+                    ResizeWindow(575, 336);
                     GUILayout.Label("BORDERCITIES FIRST-TIME INITIALIZATION (Never popups again after choice)");
                     GUILayout.Label("Choose and confirm your hotkey for Bordercities.  LeftBracket is default.");
                     GUILayout.Label("NOTE: Bordercities will -never- automatically pop-up again as soon as you've confirmed your hotkey choice.   This initialization process ensures that all users, regardless of hardware, operating system, or current keyboard configuration, will be able to enjoy Bordercities.");
@@ -417,7 +515,7 @@ namespace Bordercities
 
                 if (!firstTime)
                 {
-                    WindowDefaults();
+                    ResizeWindow(538,512);
                     GUILayout.Label("WARNING: HOTKEY BUTTONS WILL SAVE UPON CLICK.  THIS INCLUDES YOUR EFFECTS SETTINGS.");
 
                 }
@@ -489,15 +587,10 @@ namespace Bordercities
 
         }
 
-        void WindowDefaults()
+        void ResizeDefaults()
         {
             windowRect.width = defaultWidth;
             windowRect.height = defaultHeight;
-        }
-        void WindowSet(float width, float height)
-        {
-            windowRect.width = width;
-            windowRect.height = height;
         }
 
         void SubviewModeState ()
@@ -582,7 +675,13 @@ namespace Bordercities
             }
         }
 
-
+        void ResizeWindow(int width, int height)
+        {
+            if (windowRect.height != height)
+                windowRect.height = height;
+            if (windowRect.width != width)
+                windowRect.width = width;
+        }
 
         public void Update()
         {
@@ -616,7 +715,14 @@ namespace Bordercities
             if (Input.GetKeyUp(config.edgeToggleKeyCode))
                 userWantsEdge = !userWantsEdge;
 
-
+            if (Input.GetKeyUp(KeyCode.E))
+            {
+                edge.SetEdgeColor(Color.green);
+            }
+            if (Input.GetKeyUp(KeyCode.R))
+            {
+                edge.SetEdgeColor(Color.yellow);
+            }
         }
 
         void SizeCheck(bool value, float min, float max, float depthLimit)

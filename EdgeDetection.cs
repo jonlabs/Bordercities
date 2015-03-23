@@ -51,6 +51,7 @@ namespace Bordercities
         public float edgesOnly = 0.0f;
         public Color edgesOnlyBgColor = Color.white;
         private Material edgeDetectMaterial = null;
+        public Color edgeColor;
 
 
 
@@ -111,11 +112,17 @@ namespace Bordercities
             edgeDetectMaterial.SetVector("_BgColor", edgesOnlyBgColor);
             edgeDetectMaterial.SetFloat("_Exponent", edgeExp);
             edgeDetectMaterial.SetFloat("_Threshold", lumThreshold);
+            edgeDetectMaterial.SetColor("_Color", edgeColor);
             Graphics.Blit(source, destination, edgeDetectMaterial, (int)mode);
             UnityEngine.Object shadTrash = edgeDetectMaterial.shader;
             UnityEngine.Object matTrash = edgeDetectMaterial;
             DestroyImmediate(shadTrash, true);
             DestroyImmediate(matTrash, true);
+        }
+
+        public void SetEdgeColor(Color edgecol)
+        {
+            edgeColor = edgecol;
         }
     }
 }
