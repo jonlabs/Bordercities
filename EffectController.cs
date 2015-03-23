@@ -715,14 +715,7 @@ namespace Bordercities
             if (Input.GetKeyUp(config.edgeToggleKeyCode))
                 userWantsEdge = !userWantsEdge;
 
-            if (Input.GetKeyUp(KeyCode.E))
-            {
-                edge.SetEdgeColor(Color.green);
-            }
-            if (Input.GetKeyUp(KeyCode.R))
-            {
-                edge.SetEdgeColor(Color.yellow);
-            }
+         
         }
 
         void SizeCheck(bool value, float min, float max, float depthLimit)
