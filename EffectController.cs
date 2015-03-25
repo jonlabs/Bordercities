@@ -67,6 +67,8 @@ namespace Bordercities
         private float defaultGamma;
         private float defaultBoost;
 
+        private float tempExp;
+
         void Awake()
         {
             cameraController = GetComponent<CameraController>();
@@ -117,7 +119,7 @@ namespace Bordercities
             defaultBoost = tonem.m_ToneMappingBoostFactor;
             defaultGamma = tonem.m_ToneMappingGamma;
 
-            LoadAllSettings();
+            LoadSettings(false);
             if (config.keyCode == KeyCode.None)
             {
                 config.keyCode = KeyCode.LeftBracket;
@@ -145,7 +147,7 @@ namespace Bordercities
         }
 
 
-        void MakeColor(float r, float g, float b)
+        void EdgeColor(float r, float g, float b)
         {
             float newR = r * colorMultiplier;
             float newG = g * colorMultiplier;
@@ -165,7 +167,7 @@ namespace Bordercities
             mixCurrentColor = mixNewColor;
         }
 
-        void LoadAllSettings()
+        /*void LoadAllSettings()
         {
             automaticMode = config.automaticMode;
             edge.enabled = config.edgeEnabled;
@@ -193,7 +195,6 @@ namespace Bordercities
             tonem.m_ToneMappingGamma = config.toneMapGamma;
             
 
-            firstTime = config.firstTime;
 
             bloom.enabled = config.bloomEnabled;
             bloom.threshold = config.bloomThresh;
@@ -229,6 +230,44 @@ namespace Bordercities
             tonem.m_ToneMappingGamma = config.toneMapGamma;
             tonem.m_ToneMappingBoostFactor = config.toneMapBoost;
 
+        }*/
+
+        void LoadSettings(bool falseIfInitializationLoadOnly)
+        {
+            if (!falseIfInitializationLoadOnly)
+            {
+                automaticMode = config.automaticMode;
+                edge.enabled = config.edgeEnabled;
+                subViewOnly = config.subViewOnly;
+                firstTime = config.firstTime;
+            }
+
+            edge.mode = config.edgeMode;
+            edge.sensitivityNormals = config.sensNorm;
+            edge.sensitivityDepth = config.sensDepth;
+            edge.edgeExp = config.edgeExpo;
+            tempExp = edge.edgeExp;
+            edge.edgesOnly = config.edgeOnly;
+            edge.sampleDist = config.edgeSamp;
+            autoEdge = config.autoEdge;
+            currentColor = config.currentColor;
+            edge.edgeColor = currentColor;
+            colorMultiplier = config.colorMultiplier;
+            mixCurrentColor = config.mixCurrentColor;
+            edge.edgesOnlyBgColor = mixCurrentColor;
+            mixColorMultiplier = config.mixColorMultiplier;
+            setR = config.setR;
+            setG = config.setG;
+            setB = config.setB;
+            mixSetR = config.mixSetR;
+            mixSetG = config.mixSetG;
+            mixSetB = config.mixSetB;
+            tonem.m_ToneMappingBoostFactor = config.toneMapBoost;
+            tonem.m_ToneMappingGamma = config.toneMapGamma;
+            bloom.enabled = config.bloomEnabled;
+            bloom.threshold = config.bloomThresh;
+            bloom.intensity = config.bloomIntens;
+            bloom.blurSize = config.bloomBlurSize;
         }
 
 
@@ -307,6 +346,11 @@ namespace Bordercities
             {
                 tonem.m_ToneMappingGamma = 1.98f;
                 tonem.m_ToneMappingBoostFactor = 8.13f;
+            }
+            else
+            {
+                if (!CheckTonemapper())
+                    ResetTonemapper();
             }
             bloom.enabled = false;
             bloom.threshold = 0.27f;
@@ -420,11 +464,11 @@ namespace Bordercities
                             ResizeWindow(803, 460);
 
                             GUILayout.Space(35f);
-                            GUILayout.Label("NEW 3/24:  Bordercities now features a new default 'plug & play' mode based upon the Sobel method of edge detection!  Although Sobel is far better for achieving a more realistic (yet still playful) look, Triangle is here to stay on account of its strong (if supported by Dynamic Resolution) auto-cartooning abilities!  Switch them as you choose below!");
+                            GUILayout.Label("NEW 3/24:  Bordercities now features two different 'Plug & Play' modes, each with their own unique method of creating the Edge Detection effect!");
                             GUILayout.Space(5f);
                             if (displayText != null)
                                 GUILayout.Label(displayText);
-                            if (GUILayout.Button("Switch 'Plug & Play' Modes"))
+                            if (GUILayout.Button("Switch 'Plug & Play' Mode"))
                             {
                                 if (edge.mode == EdgeDetection.EdgeDetectMode.TriangleDepthNormals)
                                     SobelAutomatic();
@@ -444,10 +488,18 @@ namespace Bordercities
                             if (GUILayout.Button("Your previously saved settings"))
                             {
                                 automaticMode = false;
-                                LoadManualSettings();
+                                LoadSettings(true);
                             }
                             GUILayout.EndHorizontal();
-                            GUILayout.Space(75f);
+                            if (!firstTime)
+                            {
+                                GUILayout.Space(30f);
+                                if (config.edgeToggleKeyCode == KeyCode.None)
+                                    GUILayout.Label("Hey! Listen! You can set a hotkey for toggling the Bordercities Effect! It would appear you haven't done this yet: simply press the 'Hotkey Configuration' tab and choose a hotkey from the bottom keyboard grid!");
+                                GUILayout.Space(3f);
+                            }
+                            else
+                                GUILayout.Space(75f);
                         }
                         else
                         {
@@ -513,11 +565,19 @@ namespace Bordercities
                             {
                                 edge.mode = EdgeDetection.EdgeDetectMode.SobelDepth;
                                 edge.SetCameraFlag();
+                                if (infoManager.CurrentMode != InfoManager.InfoMode.None)
+                                {
+                                    edge.edgeExp = 0.44f;
+                                }
                             }
                             if (GUILayout.Button("Sobel Depth Thin"))
                             {
                                 edge.mode = EdgeDetection.EdgeDetectMode.SobelDepthThin;
                                 edge.SetCameraFlag();
+                                if (infoManager.CurrentMode != InfoManager.InfoMode.None)
+                                {
+                                    edge.edgeExp = 0.44f;
+                                }
                             }
                             GUILayout.EndHorizontal();
                             GUILayout.Space(5f);
@@ -540,10 +600,21 @@ namespace Bordercities
                             }
                             if (edge.mode == EdgeDetection.EdgeDetectMode.SobelDepthThin || edge.mode == EdgeDetection.EdgeDetectMode.SobelDepth)
                             {
-                                GUILayout.Label("Edge exponent: " + edge.edgeExp.ToString());
-                                edge.edgeExp = GUILayout.HorizontalSlider(edge.edgeExp, 0.004f, 1.000f, GUILayout.Width(570));
-                                if (edge.edgeExp < 0.004f)
-                                    edge.edgeExp = 0.004f;
+                                if (infoManager.CurrentMode == InfoManager.InfoMode.None)
+                                {
+                                    if (!subViewOnly)
+                                    {
+                                        GUILayout.Label("Edge exponent: " + edge.edgeExp.ToString());
+                                        edge.edgeExp = GUILayout.HorizontalSlider(edge.edgeExp, 0.004f, 1.000f, GUILayout.Width(570));
+                                        if (edge.edgeExp < 0.004f)
+                                            edge.edgeExp = 0.004f;
+                                    }
+                                }
+                                if (subViewOnly)
+                                {
+                                    GUILayout.Label("Edge exponent is unavailable with 'Info Modes only', as this setting renders it redundant.");
+                                }
+                                
                             }
 
                             GUILayout.Label("Edge Coloring: (0,0,0 for default black)");
@@ -587,8 +658,8 @@ namespace Bordercities
 
                             if (GUILayout.Button("Apply Edge Color"))
                             {
-                                MakeColor(setR, setG, setB);
-                                MakeColor(setR, setG, setB); // double entry here is intentional, I am too in shock over how cool this is to do it totally right but this is acceptable enough for now
+                                EdgeColor(setR, setG, setB);
+                                EdgeColor(setR, setG, setB); // double entry here is intentional, I am too in shock over how cool this is to do it totally right but this is acceptable enough for now
                             }
 
 
@@ -649,7 +720,9 @@ namespace Bordercities
 
             if (tab == Config.Tab.Bloom)
             {
-                ResizeWindow(803, 265);
+                ResizeWindow(803, 315);
+                GUILayout.Label("NOTE: There is already a Bloom effect in Cities Skylines, and it is quite better than what Bordercities provides here.  However, because they both achieve a different effect, the Bordercities Bloom has been maintained in the event you wish to stack the bloom effects.");
+                GUILayout.Space(5f);
                 if (!bloom.enabled)
                     bloom.enabled = GUILayout.Toggle(bloom.enabled, "Click to enable Bloom.");
                 else
@@ -736,7 +809,7 @@ namespace Bordercities
                         }
                         if (GUILayout.Button("Load Settings"))
                         {
-                            LoadAllSettings();
+                            LoadSettings(false);
                         }
                     }
                     if (GUILayout.Button("Save Settings"))
@@ -895,11 +968,24 @@ namespace Bordercities
 
         }
 
+        bool CheckTonemapper()
+        {
+            if (tonem.m_ToneMappingGamma != defaultGamma || tonem.m_ToneMappingBoostFactor != defaultBoost)
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
         void EffectState()
         {
             if (userWantsEdge)
             {
                 edge.enabled = true;
+                if (infoManager.CurrentMode == InfoManager.InfoMode.None)
+                    tempExp = edge.edgeExp;
                 if (subViewOnly)
                     SubviewModeState();
                 if (automaticMode)
@@ -935,19 +1021,18 @@ namespace Bordercities
                     {
                         edge.edgeExp = 0.03f;
                     }
-                    SetTonemapper(oldGamma, oldToneMapBoost);
                 }
+                if (!CheckTonemapper())
+                    ResetTonemapper();
+
             }
             else
             {
                 edge.enabled = true;
-                if (automaticMode)
+                if (edge.mode == EdgeDetection.EdgeDetectMode.SobelDepth)
                 {
-                    if (edge.mode == EdgeDetection.EdgeDetectMode.SobelDepth)
-                    {
-                        edge.edgeExp = 0.44f;
-                    }
-                }
+                    edge.edgeExp = 0.44f;
+                }   
             }
         }
 
