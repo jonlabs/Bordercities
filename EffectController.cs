@@ -771,8 +771,8 @@ namespace Bordercities
 
         void ResetTonemapper()
         {
-            tonem.m_ToneMappingBoostFactor = oldToneMapBoost;
-            tonem.m_ToneMappingGamma = oldGamma;
+            tonem.m_ToneMappingBoostFactor = defaultBoost;
+            tonem.m_ToneMappingGamma = defaultGamma;
         }
         void SetTonemapper(float gam, float boost)
         {
