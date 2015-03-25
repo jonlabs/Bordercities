@@ -60,11 +60,11 @@ namespace Bordercities
             CheckSupport(true);
 
 
-           
 
-            edgeDetectMaterial = CreateMaterialFromString(edgeDetectMaterial, HiddenShaderText.edgeDetectShader);// This is where you'll want to plug the string in.
-            
-         
+
+            edgeDetectMaterial = CreateMaterialFromString(edgeDetectMaterial, HiddenShaderText.edgeDetectShaderTwo);// This is where you'll want to plug the string in.
+
+
 
             if (mode != oldMode)
                 SetCameraFlag();

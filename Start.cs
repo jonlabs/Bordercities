@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+﻿﻿using UnityEngine;
 using ColossalFramework;
 using ICities;
 
@@ -33,7 +33,7 @@ namespace Bordercities
             AttachEffects();
         }
 
-        
+
         private void AttachEffects()
         {
 

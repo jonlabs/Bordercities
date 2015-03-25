@@ -16,6 +16,11 @@ namespace Bordercities
         public float edgeSamp;
         public float edgeOnly;
 
+        public float oldBoost;
+        public float toneMapBoost;
+        public float oldGamma;
+        public float toneMapGamma;
+
         public bool firstTime = true;
         public KeyCode keyCode = KeyCode.LeftBracket;
         public KeyCode edgeToggleKeyCode;
