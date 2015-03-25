@@ -64,6 +64,8 @@ namespace Bordercities
         private float mixRoundedB;
         private float mixRoundedMult;
 
+        private float defaultGamma;
+        private float defaultBoost;
 
         void Awake()
         {
@@ -112,8 +114,8 @@ namespace Bordercities
             edge = GetComponent<EdgeDetection>();
             bloom = GetComponent<BloomOptimized>();
             tonem = GetComponent<ToneMapping>();
-            oldGamma = tonem.m_ToneMappingGamma;
-            oldToneMapBoost = tonem.m_ToneMappingBoostFactor;
+            defaultBoost = tonem.m_ToneMappingBoostFactor;
+            defaultGamma = tonem.m_ToneMappingGamma;
 
             LoadAllSettings();
             if (config.keyCode == KeyCode.None)
@@ -136,6 +138,10 @@ namespace Bordercities
             }
             userWantsEdge = config.edgeEnabled;
 
+            if (tonem.m_ToneMappingGamma == 0)
+                tonem.m_ToneMappingGamma = defaultGamma;
+            if (tonem.m_ToneMappingBoostFactor == 0)
+                tonem.m_ToneMappingBoostFactor = defaultBoost;
         }
 
 
@@ -185,6 +191,7 @@ namespace Bordercities
             mixSetB = config.mixSetB;
             tonem.m_ToneMappingBoostFactor = config.toneMapBoost;
             tonem.m_ToneMappingGamma = config.toneMapGamma;
+            
 
             firstTime = config.firstTime;
 
@@ -869,7 +876,21 @@ namespace Bordercities
                     showSettingsPanel = true;
             }
             if (Input.GetKeyUp(config.edgeToggleKeyCode))
+            {
                 userWantsEdge = !userWantsEdge;
+                if (userWantsEdge)
+                {
+                    tonem.m_ToneMappingGamma = toneMapGamma;
+                    tonem.m_ToneMappingBoostFactor = toneMapBoost;
+                }
+                else
+                {
+                    toneMapGamma = tonem.m_ToneMappingGamma;
+                    toneMapBoost = tonem.m_ToneMappingBoostFactor;
+                    tonem.m_ToneMappingGamma = config.toneMapGamma;
+                    tonem.m_ToneMappingBoostFactor = config.toneMapBoost;
+                }
+            }
 
 
         }
