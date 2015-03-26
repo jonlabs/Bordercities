@@ -6,34 +6,27 @@ using UnityEngine;
 namespace Bordercities
 {
     
-    public class Config
+    public class Preset
     {
+        private const string presetPath = "BordercitiesPresets";
+
+        public string presetName;
+        
         public EdgeDetection.EdgeDetectMode edgeMode;
-        public bool edgeEnabled;
         public float sensNorm;
         public float sensDepth;
         public float edgeExpo;
         public float edgeSamp;
         public float edgeOnly;
-
-        public float oldBoost;
         public float toneMapBoost;
-        public float oldGamma;
         public float toneMapGamma;
-
-        public bool firstTime = true;
-        public KeyCode keyCode = KeyCode.LeftBracket;
-        public KeyCode edgeToggleKeyCode;
         public bool subViewOnly;
-
         public bool autoEdge;
 
         public bool bloomEnabled;
         public float bloomThresh;
         public float bloomIntens;
         public float bloomBlurSize;
-
-        public bool automaticMode;
 
         public Color currentColor;
         public float colorMultiplier;
@@ -48,40 +41,35 @@ namespace Bordercities
         public float mixSetB;
 
 
-        public enum Tab
+        public static void Serialize(string filename, Preset preset)
         {
-            EdgeDetection = 0,
-            Bloom = 1,
-            Hotkey = 2,
-            Presets = 3,
-        }
+            var serializer = new XmlSerializer(typeof(Preset));
 
-
-        public static void Serialize(string filename, Config config)
-        {
-            var serializer = new XmlSerializer(typeof(Config));
-
-            using (var writer = new StreamWriter(filename))
+            using (var writer = new StreamWriter(presetPath + "/" + filename + ".xml"))
             {
-                serializer.Serialize(writer, config);
+                serializer.Serialize(writer, preset);
             }
         }
 
-        public static Config Deserialize(string filename)
+        public static Preset Deserialize(string filename)
         {
-            var serializer = new XmlSerializer(typeof(Config));
+            var serializer = new XmlSerializer(typeof(Preset));
 
             try
             {
-                using (var reader = new StreamReader(filename))
+                using (var reader = new StreamReader(presetPath + "/" + filename + ".xml"))
                 {
-                    var config = (Config)serializer.Deserialize(reader);
-                    return config;
+                    var preset = (Preset)serializer.Deserialize(reader);
+                    return preset;
                 }
             }
             catch { }
             return null;
         }
 
+        public static void MakeFolderIfNonexistent()
+        {
+            DirectoryInfo di = Directory.CreateDirectory("BordercitiesPresets");
+        }
     }
 }

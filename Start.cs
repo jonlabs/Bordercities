@@ -13,13 +13,14 @@ namespace Bordercities
 
         public string Description
         {
-            get { return "Edge detect & bloom.  Backslash to config."; }
+            get { return "Edge detection FX suite for gamers and artists alike!"; }
         }
     }
 
     public class ModLoad : LoadingExtensionBase
     {
         private Camera camera;
+        private EffectController toggler;
 
         public override void OnLevelLoaded(LoadMode mode)
         {
@@ -29,10 +30,17 @@ namespace Bordercities
             }
             var cameraController = GameObject.FindObjectOfType<CameraController>();
             camera = cameraController.gameObject.GetComponent<Camera>();
-            EffectController toggler = camera.gameObject.AddComponent<EffectController>();
+            toggler = camera.gameObject.AddComponent<EffectController>();
             AttachEffects();
         }
 
+        public override void OnLevelUnloading()
+        {
+            if (toggler != null)
+                toggler.SaveBank();
+        }
+
+        
 
         private void AttachEffects()
         {

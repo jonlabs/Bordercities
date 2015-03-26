@@ -1,5 +1,7 @@
 ﻿﻿using UnityEngine;
 using ColossalFramework;
+using System.Text.RegularExpressions;
+using ICities;
 
 namespace Bordercities
 {
@@ -11,7 +13,12 @@ namespace Bordercities
         private float defaultWidth;
 
         public Config config;
+        public Preset preset;
+        public PresetBank bank;
+
         private const string configPath = "BordercitiesConfig.xml";
+        private const string bankPath = "BordercitiesPresetBank.xml";
+
 
         private EdgeDetection edge;
         private BloomOptimized bloom;
@@ -69,18 +76,34 @@ namespace Bordercities
 
         private float tempExp;
 
+        public string[] presetEntries;
+     
+
         void Awake()
         {
+            
             cameraController = GetComponent<CameraController>();
             infoManager = InfoManager.instance;
             config = Config.Deserialize(configPath);
-            if (config == null)
+            bank = PresetBank.Deserialize(bankPath);
+            
+            defaultWidth = windowRect.width;
+            defaultHeight = windowRect.height;
+
+            InitializeFromConfig();
+            InitializeBanking();
+
+        }
+
+        void InitializeFromConfig()
+        {
+            if (config == null) 
             {
                 config = new Config();
-
+                #region parameters#
                 config.automaticMode = true;
                 config.edgeEnabled = false;
-                config.edgeMode = EdgeDetection.EdgeDetectMode.SobelDepth;
+                config.edgeMode = EdgeDetection.EdgeDetectMode.SobelDepthThin;
                 config.sensNorm = 1.63f;
                 config.sensDepth = 2.12f;
                 config.edgeExpo = 0.09f;
@@ -104,11 +127,99 @@ namespace Bordercities
                 config.bloomThresh = 0.27f;
                 config.bloomIntens = 0.39f;
                 config.bloomBlurSize = 5.50f;
+                #endregion
+            }
+            else 
+            {
+                #region parameters
+                if (IsNull(config.automaticMode))
+                    config.automaticMode = true;
+                if (IsNull(config.edgeEnabled))
+                    config.edgeEnabled = false;
+                if (IsNull(config.edgeMode))
+                    config.edgeMode = EdgeDetection.EdgeDetectMode.SobelDepthThin;
+                if (IsNull(config.sensNorm))
+                    config.sensNorm = 1.63f;
+                if (IsNull(config.sensDepth))
+                    config.sensDepth = 2.12f;
+                if (IsNull(config.edgeExpo))
+                    config.edgeExpo = 0.09f;
+                if (IsNull(config.edgeSamp))
+                    config.edgeSamp = 1.0f;
+                if (IsNull(config.edgeOnly))
+                    config.edgeOnly = 0;
+                if (IsNull(config.autoEdge))
+                    config.autoEdge = true;
+                if (IsNull(config.firstTime))
+                    config.firstTime = true;
+                if (IsNull(config.subViewOnly))
+                    config.subViewOnly = false;
+                if (IsNull(config.oldGamma))
+                    config.oldGamma = 2.2f;
+                if (IsNull(config.toneMapGamma))
+                    config.toneMapGamma = 1.6f;
+                if (IsNull(config.oldBoost))
+                    config.oldBoost = 1.15f;
+                if (IsNull(config.toneMapBoost))
+                    config.toneMapBoost = 5f;
+
+                if (IsNull(config.currentColor))
+                    config.currentColor = new Color(0, 0, 0, 0);
+                if (IsNull(config.colorMultiplier))
+                    config.colorMultiplier = 1.0f;
+
+                if (IsNull(config.mixColorMultiplier))
+                    config.mixColorMultiplier = 1.0f;
+                if (IsNull(config.mixCurrentColor))
+                    config.mixCurrentColor = new Color(1, 1, 1, 0);
+
+                if (IsNull(config.bloomEnabled))
+                    config.bloomEnabled = false;
+                if (IsNull(config.bloomThresh))
+                    config.bloomThresh = 0.27f;
+                if (IsNull(config.bloomIntens))
+                    config.bloomIntens = 0.39f;
+                if (IsNull(config.bloomBlurSize))
+                    config.bloomBlurSize = 5.50f;
+                #endregion
 
             }
-            defaultWidth = windowRect.width;
-            defaultHeight = windowRect.height;
+        }
 
+        void InitializeBanking()
+        {
+            presetEntries = new string[30];
+            for (int i = 0; i < presetEntries.Length; i++)
+            {
+                presetEntries[i] = "";
+            }
+
+            if (bank == null)
+            {
+                bank = new PresetBank();
+                bank.presetEntries = new string[30];
+
+                for (int i = 0; i < presetEntries.Length; i++)
+                {
+                    bank.presetEntries[i] = "";
+                }
+            }
+            LoadBank();
+        }
+
+        void LoadBank()
+        {
+
+            presetEntries = bank.presetEntries;
+            for (int i = 0; i < presetEntries.Length; i++)
+            {
+                presetEntries[i] = bank.presetEntries[i];
+            }
+        }
+
+        static bool IsNull(System.Object aObj)
+        {
+            return aObj == null || aObj.Equals(null);
         }
 
         void Start()
@@ -118,12 +229,14 @@ namespace Bordercities
             tonem = GetComponent<ToneMapping>();
             defaultBoost = tonem.m_ToneMappingBoostFactor;
             defaultGamma = tonem.m_ToneMappingGamma;
-
-            LoadSettings(false);
+            
+            LoadConfig(false);
+            
             if (config.keyCode == KeyCode.None)
             {
                 config.keyCode = KeyCode.LeftBracket;
             }
+            SaveBank();
             SaveConfig();
 
             if (firstTime && automaticMode)
@@ -167,72 +280,7 @@ namespace Bordercities
             mixCurrentColor = mixNewColor;
         }
 
-        /*void LoadAllSettings()
-        {
-            automaticMode = config.automaticMode;
-            edge.enabled = config.edgeEnabled;
-            edge.mode = config.edgeMode;
-            edge.sensitivityNormals = config.sensNorm;
-            edge.sensitivityDepth = config.sensDepth;
-            edge.edgeExp = config.edgeExpo;
-            edge.edgesOnly = config.edgeOnly;
-            edge.sampleDist = config.edgeSamp;
-            autoEdge = config.autoEdge;
-            subViewOnly = config.subViewOnly;
-            currentColor = config.currentColor;
-            edge.edgeColor = currentColor;
-            colorMultiplier = config.colorMultiplier;
-            mixCurrentColor = config.mixCurrentColor;
-            edge.edgesOnlyBgColor = mixCurrentColor;
-            mixColorMultiplier = config.mixColorMultiplier;
-            setR = config.setR;
-            setG = config.setG;
-            setB = config.setB;
-            mixSetR = config.mixSetR;
-            mixSetG = config.mixSetG;
-            mixSetB = config.mixSetB;
-            tonem.m_ToneMappingBoostFactor = config.toneMapBoost;
-            tonem.m_ToneMappingGamma = config.toneMapGamma;
-            
-
-
-            bloom.enabled = config.bloomEnabled;
-            bloom.threshold = config.bloomThresh;
-            bloom.intensity = config.bloomIntens;
-            bloom.blurSize = config.bloomBlurSize;
-        }
-
-        void LoadManualSettings()
-        {
-            edge.mode = config.edgeMode;
-            edge.sensitivityNormals = config.sensNorm;
-            edge.sensitivityDepth = config.sensDepth;
-            edge.edgeExp = config.edgeExpo;
-            edge.edgesOnly = config.edgeOnly;
-            edge.sampleDist = config.edgeSamp;
-            autoEdge = config.autoEdge;
-            bloom.threshold = config.bloomThresh;
-            bloom.intensity = config.bloomIntens;
-            bloom.blurSize = config.bloomBlurSize;
-            subViewOnly = config.subViewOnly;
-            currentColor = config.currentColor;
-            colorMultiplier = config.colorMultiplier;
-            edge.edgeColor = config.currentColor;
-            setR = config.setR;
-            setG = config.setG;
-            setB = config.setB;
-            mixSetR = config.mixSetR;
-            mixSetG = config.mixSetG;
-            mixSetB = config.mixSetB;
-            mixCurrentColor = config.mixCurrentColor;
-            edge.edgesOnlyBgColor = mixCurrentColor;
-            mixColorMultiplier = config.mixColorMultiplier;
-            tonem.m_ToneMappingGamma = config.toneMapGamma;
-            tonem.m_ToneMappingBoostFactor = config.toneMapBoost;
-
-        }*/
-
-        void LoadSettings(bool falseIfInitializationLoadOnly)
+        void LoadConfig(bool falseIfInitializationLoadOnly)
         {
             if (!falseIfInitializationLoadOnly)
             {
@@ -306,9 +354,23 @@ namespace Bordercities
             config.toneMapBoost = tonem.m_ToneMappingBoostFactor;
             config.toneMapGamma = tonem.m_ToneMappingGamma;
 
+            
+
 
             Config.Serialize(configPath, config);
         }
+
+        public void SaveBank()
+        {
+            bank.presetEntries = presetEntries;
+            for (int i = 0; i < presetEntries.Length; i++ )
+            {
+                bank.presetEntries[i] = presetEntries[i];
+            }
+            PresetBank.Serialize(bankPath, bank);
+        }
+
+        
 
         void TriangleAutomatic()
         {
@@ -316,7 +378,7 @@ namespace Bordercities
             edge.mode = EdgeDetection.EdgeDetectMode.TriangleDepthNormals;
             edge.sensitivityNormals = 0.63f;
             edge.sensitivityDepth = 2.12f;
-            edge.edgeExp = 0.09f;
+            edge.edgeExp = 0.5f;
             edge.sampleDist = 1.0f;
             edge.edgesOnly = 0;
             autoEdge = true;
@@ -333,25 +395,14 @@ namespace Bordercities
         void SobelAutomatic()
         {
             automaticMode = true;
-            edge.mode = EdgeDetection.EdgeDetectMode.SobelDepth;
-            edge.sampleDist = 1.0f;
-            if (infoManager.CurrentMode == InfoManager.InfoMode.None)
-                edge.edgeExp = 0.03f;
-            else
-                edge.edgeExp = 0.44f;
+            edge.mode = EdgeDetection.EdgeDetectMode.SobelDepthThin;
+            edge.sampleDist = 1.81f;
             edge.edgesOnly = 0;
+            edge.edgeExp = 0.5f;
             edge.edgeColor = Color.black;
             edge.edgesOnlyBgColor = Color.white;
-            if (!subViewOnly)
-            {
-                tonem.m_ToneMappingGamma = 1.98f;
-                tonem.m_ToneMappingBoostFactor = 8.13f;
-            }
-            else
-            {
-                if (!CheckTonemapper())
-                    ResetTonemapper();
-            }
+            if (!CheckTonemapper())
+                ResetTonemapper();
             bloom.enabled = false;
             bloom.threshold = 0.27f;
             bloom.intensity = 0.39f;
@@ -418,8 +469,50 @@ namespace Bordercities
 
         }
 
+        void SavePreset(string name)
+        {
+            Preset.MakeFolderIfNonexistent();
+            Preset presetToSave;
+            presetToSave = Preset.Deserialize(name);
+            if (presetToSave == null) // If no presets file, create one.
+            {
+                presetToSave = new Preset();
+            }
+            presetToSave.edgeMode = edge.mode;
+            presetToSave.sensNorm = edge.sensitivityNormals;
+            presetToSave.sensDepth = edge.sensitivityDepth;
+            presetToSave.edgeExpo = edge.edgeExp;
+            presetToSave.edgeOnly = edge.edgesOnly;
+            presetToSave.edgeSamp = edge.sampleDist;
+            presetToSave.autoEdge = autoEdge;
+            presetToSave.subViewOnly = subViewOnly;
+
+            presetToSave.currentColor = currentColor;
+            presetToSave.setR = setR;
+            presetToSave.setG = setG;
+            presetToSave.setB = setB;
+            presetToSave.colorMultiplier = colorMultiplier;
+
+            presetToSave.mixCurrentColor = mixCurrentColor;
+            presetToSave.mixSetR = mixSetR;
+            presetToSave.mixSetG = mixSetG;
+            presetToSave.mixSetB = mixSetB;
+            presetToSave.mixColorMultiplier = mixColorMultiplier;
+
+            presetToSave.bloomEnabled = bloom.enabled;
+            presetToSave.bloomThresh = bloom.threshold;
+            presetToSave.bloomIntens = bloom.intensity;
+            presetToSave.bloomBlurSize = bloom.blurSize;
+
+            presetToSave.toneMapBoost = tonem.m_ToneMappingBoostFactor;
+            presetToSave.toneMapGamma = tonem.m_ToneMappingGamma;
+
+            Preset.Serialize(name, presetToSave);
+        }
+
         void SettingsPanel(int wnd)
         {
+            #region Top Navigation Buttons
             GUILayout.BeginHorizontal();
             if (!firstTime || !automaticMode)
             {
@@ -433,16 +526,24 @@ namespace Bordercities
                     {
                         tab = Config.Tab.Bloom;
                     }
+                    if (GUILayout.Button("Presets"))
+                    {
+                        LoadBank();
+                        tab = Config.Tab.Presets;
+
+                    }
                 }
                 if (GUILayout.Button("Hotkey Configuration"))
                 {
                     tab = Config.Tab.Hotkey;
                 }
+                
             }
 
             GUILayout.EndHorizontal();
             GUILayout.Space(20f);
-
+#endregion
+            #region Tab - Edge Detection
             if (tab == Config.Tab.EdgeDetection)
             {
                 ResizeDefaults();
@@ -488,7 +589,7 @@ namespace Bordercities
                             if (GUILayout.Button("Your previously saved settings"))
                             {
                                 automaticMode = false;
-                                LoadSettings(true);
+                                LoadConfig(true);
                             }
                             GUILayout.EndHorizontal();
                             if (!firstTime)
@@ -565,19 +666,11 @@ namespace Bordercities
                             {
                                 edge.mode = EdgeDetection.EdgeDetectMode.SobelDepth;
                                 edge.SetCameraFlag();
-                                if (infoManager.CurrentMode != InfoManager.InfoMode.None)
-                                {
-                                    edge.edgeExp = 0.44f;
-                                }
                             }
                             if (GUILayout.Button("Sobel Depth Thin"))
                             {
                                 edge.mode = EdgeDetection.EdgeDetectMode.SobelDepthThin;
                                 edge.SetCameraFlag();
-                                if (infoManager.CurrentMode != InfoManager.InfoMode.None)
-                                {
-                                    edge.edgeExp = 0.44f;
-                                }
                             }
                             GUILayout.EndHorizontal();
                             GUILayout.Space(5f);
@@ -600,20 +693,8 @@ namespace Bordercities
                             }
                             if (edge.mode == EdgeDetection.EdgeDetectMode.SobelDepthThin || edge.mode == EdgeDetection.EdgeDetectMode.SobelDepth)
                             {
-                                if (infoManager.CurrentMode == InfoManager.InfoMode.None)
-                                {
-                                    if (!subViewOnly)
-                                    {
-                                        GUILayout.Label("Edge exponent: " + edge.edgeExp.ToString());
-                                        edge.edgeExp = GUILayout.HorizontalSlider(edge.edgeExp, 0.004f, 1.000f, GUILayout.Width(570));
-                                        if (edge.edgeExp < 0.004f)
-                                            edge.edgeExp = 0.004f;
-                                    }
-                                }
-                                if (subViewOnly)
-                                {
-                                    GUILayout.Label("Edge exponent is unavailable with 'Info Modes only', as this setting renders it redundant.");
-                                }
+                                GUILayout.Label("Edge exponent: " + edge.edgeExp.ToString());
+                                edge.edgeExp = GUILayout.HorizontalSlider(edge.edgeExp, 0.004f, 1.000f, GUILayout.Width(570));
                                 
                             }
 
@@ -708,19 +789,20 @@ namespace Bordercities
                                 MixColor(mixSetR, mixSetG, mixSetB);
                                 MixColor(mixSetR, mixSetG, mixSetB); // double entry here is intentional, I am too in shock over how cool this is to do it totally right but this is acceptable enough for now
                             }
-                            GUILayout.Label("Gamma: " + tonem.m_ToneMappingGamma.ToString());
-                            tonem.m_ToneMappingGamma = GUILayout.HorizontalSlider(tonem.m_ToneMappingGamma, 0.0f, 30.0f, GUILayout.Width(570));
-                            GUILayout.Label("Boost: " + tonem.m_ToneMappingBoostFactor.ToString());
-                            tonem.m_ToneMappingBoostFactor = GUILayout.HorizontalSlider(tonem.m_ToneMappingBoostFactor, 0.0f, 30.0f, GUILayout.Width(570));
-
+                                GUILayout.Label("Gamma: " + tonem.m_ToneMappingGamma.ToString());
+                                tonem.m_ToneMappingGamma = GUILayout.HorizontalSlider(tonem.m_ToneMappingGamma, 0.0f, 30.0f, GUILayout.Width(570));
+                                GUILayout.Label("Boost: " + tonem.m_ToneMappingBoostFactor.ToString());
+                                tonem.m_ToneMappingBoostFactor = GUILayout.HorizontalSlider(tonem.m_ToneMappingBoostFactor, 0.0f, 30.0f, GUILayout.Width(570));
+                            
                         }
                     }
                 }
             }
-
+            #endregion
+            #region Tab - Bloom
             if (tab == Config.Tab.Bloom)
             {
-                ResizeWindow(803, 315);
+                ResizeWindow(803, 415);
                 GUILayout.Label("NOTE: There is already a Bloom effect in Cities Skylines, and it is quite better than what Bordercities provides here.  However, because they both achieve a different effect, the Bordercities Bloom has been maintained in the event you wish to stack the bloom effects.");
                 GUILayout.Space(5f);
                 if (!bloom.enabled)
@@ -741,12 +823,13 @@ namespace Bordercities
                     }
                 }
             }
-
+            #endregion
+            #region Tab - Hotkey
             if (tab == Config.Tab.Hotkey)
             {
                 if (firstTime)
                 {
-                    ResizeWindow(575, 336);
+                    ResizeWindow(575, 400);
                     GUILayout.Label("BORDERCITIES FIRST-TIME INITIALIZATION (Never popups again after choice)");
                     GUILayout.Label("Choose and confirm your hotkey for Bordercities.  LeftBracket is default.");
                     GUILayout.Label("NOTE: Bordercities will -never- automatically pop-up again as soon as you've confirmed your hotkey choice.   This initialization process ensures that all users, regardless of hardware, operating system, or current keyboard configuration, will be able to enjoy Bordercities.");
@@ -757,8 +840,8 @@ namespace Bordercities
 
                 if (!firstTime)
                 {
-                    ResizeWindow(538, 512);
-                    GUILayout.Label("WARNING: HOTKEY BUTTONS WILL SAVE UPON CLICK.  THIS INCLUDES YOUR EFFECTS SETTINGS.");
+                    ResizeWindow(538, 600);
+                    GUILayout.Label("WARNING: HOTKEY BUTTONS WILL SAVE UPON CLICK.  THIS INCLUDES YOUR EFFECTS SETTINGS.  If you wish to create a safe backup of your active Effect, navigate to the 'Presets' tab above and create a permanent copy before selecting a hotkey here.  This will not be like this for much longer.");
 
                 }
                 KeyboardGrid(0);
@@ -793,8 +876,60 @@ namespace Bordercities
                 }
 
             }
+            #endregion
+            #region Tab - Presets
+            if (tab == Config.Tab.Presets)
+            {
+                ResizeWindow(600, 750);
+                GUILayout.Label("Coming soon: Fourth 'Preset Bind' tab where you can allocate these assigned entries to Info Modes and/or hotkeys!");
+                GUILayout.Label("NOTE: Your preset bank list is saved automatically, and as a whole, upon either saving any of your fields, or, proper exit of the game.  Note that your changes to this list will NOT be saved in the event of an Alt-F4 or other similarly graceless exit.  You will the preset files stored within steamapps/common/Cities_Skylines/BordercitiesPresets.");
 
+                GUILayout.Space(2f);
 
+                for (int i = 0; i < presetEntries.Length; i++)
+                {
+                    GUILayout.BeginHorizontal();
+                    
+                    presetEntries[i] = GUILayout.TextField(presetEntries[i], 31, GUILayout.MaxWidth(280));
+                    presetEntries[i] = Regex.Replace(presetEntries[i], @"[^a-zA-Z0-9 ]", "");
+                    if (GUILayout.Button("Save", GUILayout.MaxWidth(60), GUILayout.MaxHeight(25)))
+                    {
+                        if (IsValidFilename(presetEntries[i]))
+                        {
+                            SavePreset(presetEntries[i]);
+                            SaveBank();
+                        }
+                        
+                    }
+                    if (GUILayout.Button("Load", GUILayout.MaxWidth(60),GUILayout.MaxHeight(25)))
+                    {
+                        LoadPreset(presetEntries[i]);
+                    }
+
+                    i++;
+
+                    presetEntries[i] = GUILayout.TextField(presetEntries[i], 31, GUILayout.MaxWidth(280));
+                    presetEntries[i] = Regex.Replace(presetEntries[i], @"[^a-zA-Z0-9 ]", "");
+                    if (GUILayout.Button("Save", GUILayout.MaxWidth(60), GUILayout.MaxHeight(25)))
+                    {
+                        if (IsValidFilename(presetEntries[i]))
+                        {
+                            SavePreset(presetEntries[i]);
+                        }
+                    }
+                    if (GUILayout.Button("Load", GUILayout.MaxWidth(60), GUILayout.MaxHeight(25)))
+                    {
+                        LoadPreset(presetEntries[i]);
+                    }
+
+                    GUILayout.EndHorizontal();  
+                }
+
+                GUILayout.Label("Support for presets is sort of thrown together for the moment. The name of the input field must match the filename, and is case sensitive.  Having a nicer preset browser is on the todo list.");
+
+            }
+            #endregion
+            #region Bottom Navigation
             if (!firstTime)
             {
 
@@ -803,21 +938,34 @@ namespace Bordercities
                 {
                     if (!automaticMode)
                     {
-                        if (GUILayout.Button("Reset Brightness") && !automaticMode)
+                        if (tab != Config.Tab.Presets)
                         {
-                            ResetTonemapper();
+                            if (GUILayout.Button("Reset Brightness") && !automaticMode)
+                            {
+                                ResetTonemapper();
+                            }
+                            if (GUILayout.Button("Load Settings"))
+                            {
+                                LoadConfig(false);
+                            }
                         }
-                        if (GUILayout.Button("Load Settings"))
-                        {
-                            LoadSettings(false);
-                        }
+                        
                     }
-                    if (GUILayout.Button("Save Settings"))
+                    if (tab != Config.Tab.Presets)
                     {
-                        SaveConfig();
+                        if (GUILayout.Button("Save Settings"))
+                        {
+                            SaveConfig(); // TO DO... SAVE PRESET LIST SEPARATELY FROM REGULAR CONFIG
+                        }
                     }
-                    
-                    
+                    else
+                    {
+                        
+                        if (GUILayout.Button("Save Visible to Main Save"))
+                        {
+                            SaveConfig(); // TO DO... SAVE PRESET LIST SEPARATELY FROM REGULAR CONFIG
+                        }
+                    }
                 }
                 
                 if (GUILayout.Button("Close Window"))
@@ -830,8 +978,56 @@ namespace Bordercities
                 GUILayout.EndHorizontal();
                 GUILayout.Label("Recommended: 175% Dynamic Resolution min. for 'Triangle' mode.  CC|Realism: Clear & Bright|Cartoon: Tropical|");
             }
+            #endregion
+        }
 
+       
+        bool LoadPreset(string name)
+        {
+            Preset presetToLoad;
+            presetToLoad = Preset.Deserialize(name);
+            if (presetToLoad == null)
+            {
+                return false;
+            }
+            else
+            {
+                edge.mode = presetToLoad.edgeMode;
+                edge.sensitivityNormals = presetToLoad.sensNorm;
+                edge.sensitivityDepth = presetToLoad.sensDepth;
+                edge.edgeExp = presetToLoad.edgeExpo;
+                tempExp = edge.edgeExp;
+                edge.edgesOnly = presetToLoad.edgeOnly;
+                edge.sampleDist = presetToLoad.edgeSamp;
+                autoEdge = presetToLoad.autoEdge;
+                currentColor = presetToLoad.currentColor;
+                edge.edgeColor = currentColor;
+                colorMultiplier = presetToLoad.colorMultiplier;
+                mixCurrentColor = presetToLoad.mixCurrentColor;
+                edge.edgesOnlyBgColor = mixCurrentColor;
+                mixColorMultiplier = presetToLoad.mixColorMultiplier;
+                setR = presetToLoad.setR;
+                setG = presetToLoad.setG;
+                setB = presetToLoad.setB;
+                mixSetR = presetToLoad.mixSetR;
+                mixSetG = presetToLoad.mixSetG;
+                mixSetB = presetToLoad.mixSetB;
+                tonem.m_ToneMappingBoostFactor = presetToLoad.toneMapBoost;
+                tonem.m_ToneMappingGamma = presetToLoad.toneMapGamma;
+                bloom.enabled = presetToLoad.bloomEnabled;
+                bloom.threshold = presetToLoad.bloomThresh;
+                bloom.intensity = presetToLoad.bloomIntens;
+                bloom.blurSize = presetToLoad.bloomBlurSize;
+                return true;
+            }
+        }
 
+        bool IsValidFilename(string testName)
+        {
+            Regex containsABadCharacter = new Regex("[" + Regex.Escape(new string(System.IO.Path.GetInvalidPathChars())) + "]");
+            if (containsABadCharacter.IsMatch(testName))
+                return false;
+            return true;
         }
 
         void ResizeDefaults()
@@ -984,13 +1180,11 @@ namespace Bordercities
             if (userWantsEdge)
             {
                 edge.enabled = true;
-                if (infoManager.CurrentMode == InfoManager.InfoMode.None)
-                    tempExp = edge.edgeExp;
                 if (subViewOnly)
                     SubviewModeState();
                 if (automaticMode)
                 {
-                    if (edge.mode == EdgeDetection.EdgeDetectMode.SobelDepth)
+                    if (edge.mode == EdgeDetection.EdgeDetectMode.SobelDepthThin)
                     {
                         SobelAutomatic();
                         displayText = "Currently in Auto-Sobel:  Sobel deals with three-dimensional graphics more realistically than Triangle.  Unlike Triangle, it does not require Dynamic Resolution to look good, however, it cannot be exaggerated for cartoon-effect as effectively as Triangle can.";
@@ -1015,13 +1209,6 @@ namespace Bordercities
             if (infoManager.CurrentMode == InfoManager.InfoMode.None)
             {
                 edge.enabled = false;
-                if (automaticMode)
-                {
-                    if (edge.mode == EdgeDetection.EdgeDetectMode.SobelDepth)
-                    {
-                        edge.edgeExp = 0.03f;
-                    }
-                }
                 if (!CheckTonemapper())
                     ResetTonemapper();
 
@@ -1029,10 +1216,6 @@ namespace Bordercities
             else
             {
                 edge.enabled = true;
-                if (edge.mode == EdgeDetection.EdgeDetectMode.SobelDepth)
-                {
-                    edge.edgeExp = 0.44f;
-                }   
             }
         }
 
