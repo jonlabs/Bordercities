@@ -8,12 +8,12 @@ namespace Bordercities
     {
         public string Name
         {
-            get { return "Bordercities 2"; }
+            get { return "Bordered Skylines"; }
         }
 
         public string Description
         {
-            get { return "Edge detection FX suite for gamers and artists alike!"; }
+            get { return "Edge detection FX suite for both gameplay and screenshot art!"; }
         }
     }
 

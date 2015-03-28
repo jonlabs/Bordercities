@@ -47,6 +47,10 @@ namespace Bordercities
         public float mixSetG;
         public float mixSetB;
 
+        public Color cartoonMixColor;
+
+        public EffectController.ActiveStockPreset activeStockPreset;
+
 
         public enum Tab
         {
