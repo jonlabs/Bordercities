@@ -726,7 +726,7 @@ namespace Bordercities
             if (!CheckTonemapper())
                 ResetTonemapper();
             bloom.enabled = false;
-            displayText = "No explanation required!  Optionally, add a random color theme by clicking the below button until satisfied.  Make sure to save your color once you've found it!  If you prefer to tweak this manually, simply convert your 'Plug & Play' into your own personalized preset by entering Advanced Mode via 'currently displayed settings', tweak to your liking, and save!";
+            displayText = "No explanation required!  Unlike the other cartoon presets, this one does not use a color theme.";
             mixSetR = edge.edgesOnlyBgColor.r;
             mixSetG = edge.edgesOnlyBgColor.g;
             mixSetB = edge.edgesOnlyBgColor.b;
@@ -736,7 +736,7 @@ namespace Bordercities
             mixColorMultiplier = 1.0f;
             colorMultiplier = 1.0f;
             toneMapGamma = 3.978f;
-            toneMapBoost = 0.376f;
+            toneMapBoost = 0.376f; 
         }
 
         void RandomAutomatic()
