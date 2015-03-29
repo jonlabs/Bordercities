@@ -11,12 +11,16 @@ namespace Bordercities
         public enum ActiveStockPreset
         {
             Bordercities,
+            BordercitiesGritty,
+            BordercitiesBright,
             Cartoon,
             Realism,
             HighEndPC,
             LowEndMain,
             LowEndAlt,
             Random,
+            CartoonAlt,
+            CartoonThree,
         }
 
         public bool showSettingsPanel = false;
@@ -60,7 +64,6 @@ namespace Bordercities
 
         private bool automaticMode;
 
-        private bool userWantsEdge;
 
         public Color currentColor;
         public float setR;
@@ -86,6 +89,8 @@ namespace Bordercities
 
         private float defaultGamma;
         private float defaultBoost;
+        private float prevGamma;
+        private float prevBoost;
 
         private float tempExp;
 
@@ -97,11 +102,13 @@ namespace Bordercities
         private Color realismEdgeC;
 
         private ActiveStockPreset activeStockPreset;
+
+        private bool isOn;
      
         void InitializeColors()
         {
-            cartoonEdgeC = new Color(0.04f, 0.1f, 0.04f);
-            lowEndEdgeC = new Color(0.23f, 0.23f, 0.15f);
+            cartoonEdgeC = new Color(0.04f, 0.04f, 0.04f);
+            lowEndEdgeC = new Color(0.08f, 0.08f, 0.06f);
             realismEdgeC = new Color(0.17f,0.17f,0.17f);
         }
 
@@ -155,7 +162,7 @@ namespace Bordercities
                 config.bloomBlurSize = 5.50f;
 
                 config.cartoonMixColor = Color.white;
-                config.activeStockPreset = ActiveStockPreset.LowEndMain;
+                config.activeStockPreset = ActiveStockPreset.LowEndAlt;
                 #endregion
             }
             else 
@@ -211,7 +218,7 @@ namespace Bordercities
                 if (IsNull(config.bloomBlurSize))
                     config.bloomBlurSize = 5.50f;
                 if (IsNull(config.activeStockPreset))
-                    config.activeStockPreset = ActiveStockPreset.LowEndMain;
+                    config.activeStockPreset = ActiveStockPreset.LowEndAlt;
                 if (IsNull(config.cartoonMixColor))
                     config.cartoonMixColor = new Color(1, 1, 1, 0);
 
@@ -263,6 +270,8 @@ namespace Bordercities
             tonem = GetComponent<ToneMapping>();
             defaultBoost = tonem.m_ToneMappingBoostFactor;
             defaultGamma = tonem.m_ToneMappingGamma;
+            prevGamma = defaultGamma;
+            prevBoost = defaultBoost;
             
             LoadConfig(false);
             
@@ -272,7 +281,6 @@ namespace Bordercities
             }
             SaveBank();
             SaveConfig();
-
             if (firstTime && automaticMode)
                 LowEndAutomatic();
 
@@ -285,13 +293,24 @@ namespace Bordercities
             {
                 tab = Config.Tab.EdgeDetection;
             }
-            userWantsEdge = config.edgeEnabled;
+            toneMapGamma = config.toneMapGamma;
+            toneMapBoost = config.toneMapBoost;
+            if (config.edgeEnabled)
+                ToggleBorderedSkylines(true);
+            else
+                ToggleBorderedSkylines(false);
 
+            
+            FixTonemapperIfZeroed();
+
+        }
+
+        void FixTonemapperIfZeroed()
+        {
             if (tonem.m_ToneMappingGamma == 0)
                 tonem.m_ToneMappingGamma = defaultGamma;
             if (tonem.m_ToneMappingBoostFactor == 0)
                 tonem.m_ToneMappingBoostFactor = defaultBoost;
-
         }
 
         void EdgeColor(float r, float g, float b)
@@ -322,8 +341,12 @@ namespace Bordercities
                 edge.enabled = config.edgeEnabled;
                 subViewOnly = config.subViewOnly;
                 firstTime = config.firstTime;
-                cartoonMixC = config.cartoonMixColor;
+                toneMapGamma = config.toneMapGamma;
+                toneMapBoost = config.toneMapBoost;
             }
+            toneMapGamma = config.toneMapGamma;
+            toneMapBoost = config.toneMapBoost;
+            cartoonMixC = config.cartoonMixColor;
             activeStockPreset = config.activeStockPreset;
             edge.mode = config.edgeMode;
             edge.sensitivityNormals = config.sensNorm;
@@ -345,8 +368,6 @@ namespace Bordercities
             mixSetR = config.mixSetR;
             mixSetG = config.mixSetG;
             mixSetB = config.mixSetB;
-            tonem.m_ToneMappingBoostFactor = config.toneMapBoost;
-            tonem.m_ToneMappingGamma = config.toneMapGamma;
             bloom.enabled = config.bloomEnabled;
             bloom.threshold = config.bloomThresh;
             bloom.intensity = config.bloomIntens;
@@ -362,6 +383,12 @@ namespace Bordercities
                         break;
                     case ActiveStockPreset.Bordercities:
                        BordercitiesAutomatic();
+                        break;
+                    case ActiveStockPreset.BordercitiesGritty:
+                        BordercitiesGrittyAutomatic();
+                        break;
+                    case ActiveStockPreset.BordercitiesBright:
+                        BordercitiesGrittyAutomatic();
                         break;
                     case ActiveStockPreset.LowEndMain:
                         LowEndAutomatic();
@@ -415,8 +442,8 @@ namespace Bordercities
             config.bloomBlurSize = bloom.blurSize;
             config.firstTime = firstTime;
 
-            config.toneMapBoost = tonem.m_ToneMappingBoostFactor;
-            config.toneMapGamma = tonem.m_ToneMappingGamma;
+            config.toneMapBoost = toneMapBoost;
+            config.toneMapGamma = toneMapGamma;
 
             config.activeStockPreset = activeStockPreset;
             config.cartoonMixColor = cartoonMixC;
@@ -448,7 +475,7 @@ namespace Bordercities
             automaticMode = true;
             edge.mode = EdgeDetection.EdgeDetectMode.SobelDepthThin;
             edge.sampleDist = 1f;
-            edge.edgesOnly = 0;
+            edge.edgesOnly = 0.01f;
             edge.edgeExp = 0.43f;
             edge.edgeColor = Color.black;
             edge.edgesOnlyBgColor = Color.white;
@@ -467,6 +494,8 @@ namespace Bordercities
             setB = edge.edgeColor.b;
             mixColorMultiplier = 1.0f;
             colorMultiplier = 1.0f;
+            toneMapGamma = 1.505f;
+            toneMapBoost = 2.580f;
         }
 
         void LowEndAltAutomatic()
@@ -475,10 +504,10 @@ namespace Bordercities
             activeStockPreset = ActiveStockPreset.LowEndAlt;
             automaticMode = true;
             edge.mode = EdgeDetection.EdgeDetectMode.TriangleDepthNormals;
-            edge.sampleDist = 1.15f;
+            edge.sampleDist = 1f;
             autoEdge = true;
             edge.edgeExp = 0.5f;
-            edge.edgesOnly = 0;
+            edge.edgesOnly = 0.01f;
             edge.edgeColor = lowEndEdgeC;
             edge.edgesOnlyBgColor = Color.white;
             if (!CheckTonemapper())
@@ -496,11 +525,13 @@ namespace Bordercities
             setB = edge.edgeColor.b;
             mixColorMultiplier = 1.0f;
             colorMultiplier = 1.0f;
+            toneMapGamma = 1.505f;
+            toneMapBoost = 2.580f;
         }
 
         void BordercitiesAutomatic()
         {
-            displayTitle = "Bordercities - REQUIRES 1920x1080 AND DYNAMIC RESOLUTION 175-250% FOR INTENDED LOOK.";
+            displayTitle = "Bordercities Classic - REQUIRES 1920x1080 AND DYNAMIC RESOLUTION 175-250% FOR INTENDED LOOK.";
             activeStockPreset = ActiveStockPreset.Bordercities;
             automaticMode = true;
             edge.mode = EdgeDetection.EdgeDetectMode.RobertsCrossDepthNormals;
@@ -512,7 +543,7 @@ namespace Bordercities
             edge.edgesOnlyBgColor = Color.white;
             if (!CheckTonemapper())
                 ResetTonemapper();
-            displayText = "Bordercities very specifically attempts to capture the vibe of Borderlands & XIII.";
+            displayText = "Bordercities very specifically attempts to capture the vibe of Borderlands & XIII.  This is the original Bordercities preset, before the gamma/boost settings were set per preset.";
             bloom.enabled = false;
             bloom.threshold = 0.27f;
             bloom.intensity = 0.39f;
@@ -525,6 +556,68 @@ namespace Bordercities
             setB = edge.edgeColor.b;
             mixColorMultiplier = 1.0f;
             colorMultiplier = 1.0f;
+        }
+
+        void BordercitiesGrittyAutomatic()
+        {
+            displayTitle = "Bordercities Gritty - REQUIRES 1920x1080 AND DYNAMIC RESOLUTION 175-250% FOR INTENDED LOOK.";
+            activeStockPreset = ActiveStockPreset.BordercitiesGritty;
+            automaticMode = true;
+            edge.mode = EdgeDetection.EdgeDetectMode.RobertsCrossDepthNormals;
+            edge.edgeExp = 0.5f;
+            edge.sampleDist = 1.0f;
+            edge.edgesOnly = 0f;
+            autoEdge = true;
+            edge.edgeColor = Color.black;
+            edge.edgesOnlyBgColor = Color.white;
+            if (!CheckTonemapper())
+                ResetTonemapper();
+            displayText = "Bordercities-Gritty adds a bit of extra grit over the normal Bordercities preset.";
+            bloom.enabled = false;
+            bloom.threshold = 0.27f;
+            bloom.intensity = 0.39f;
+            bloom.blurSize = 5.50f;
+            mixSetR = edge.edgesOnlyBgColor.r;
+            mixSetG = edge.edgesOnlyBgColor.g;
+            mixSetB = edge.edgesOnlyBgColor.b;
+            setR = edge.edgeColor.r;
+            setG = edge.edgeColor.g;
+            setB = edge.edgeColor.b;
+            mixColorMultiplier = 1.0f;
+            colorMultiplier = 1.0f;
+            toneMapGamma = 1.128f;
+            toneMapBoost = 4.031f;
+        }
+
+        void BordercitiesBrightAutomatic()
+        {
+            displayTitle = "Bordercities Bright - REQUIRES 1920x1080 AND DYNAMIC RESOLUTION 175-250% FOR INTENDED LOOK.";
+            activeStockPreset = ActiveStockPreset.BordercitiesBright;
+            automaticMode = true;
+            edge.mode = EdgeDetection.EdgeDetectMode.RobertsCrossDepthNormals;
+            edge.edgeExp = 0.5f;
+            edge.sampleDist = 1.0f;
+            edge.edgesOnly = 0f;
+            autoEdge = true;
+            edge.edgeColor = Color.black;
+            edge.edgesOnlyBgColor = Color.white;
+            if (!CheckTonemapper())
+                ResetTonemapper();
+            displayText = "Bordercities-Bright brings a little bit more fun to the world than its vanilla-based and grittier counterparts.";
+            bloom.enabled = false;
+            bloom.threshold = 0.27f;
+            bloom.intensity = 0.39f;
+            bloom.blurSize = 5.50f;
+            mixSetR = edge.edgesOnlyBgColor.r;
+            mixSetG = edge.edgesOnlyBgColor.g;
+            mixSetB = edge.edgesOnlyBgColor.b;
+            setR = edge.edgeColor.r;
+            setG = edge.edgeColor.g;
+            setB = edge.edgeColor.b;
+            mixColorMultiplier = 1.0f;
+            colorMultiplier = 1.0f;
+            toneMapGamma = 1.881f;
+            toneMapBoost = 2.849f;
         }
 
         void RealismAutomatic()
@@ -553,11 +646,13 @@ namespace Bordercities
             setB = edge.edgeColor.b;
             mixColorMultiplier = 1.0f;
             colorMultiplier = 1.0f;
+            toneMapGamma = defaultGamma;
+            toneMapBoost = defaultBoost;
         }
 
         void CartoonAutomatic()
         {
-            displayTitle = "Cartoon - REQUIRES 1920x1080 AND DYNAMIC RESOLUTION 175-250% FOR INTENDED LOOK.";
+            displayTitle = "Cartoon|Classic REQUIRES 1920x1080 AND DYNAMIC RESOLUTION 175-250% FOR INTENDED LOOK.";
             activeStockPreset = ActiveStockPreset.Cartoon;
             automaticMode = true;
             edge.mode = EdgeDetection.EdgeDetectMode.RobertsCrossDepthNormals;
@@ -581,6 +676,67 @@ namespace Bordercities
             setB = edge.edgeColor.b;
             mixColorMultiplier = 1.0f;
             colorMultiplier = 1.0f;
+            toneMapGamma = 3.064f;
+            toneMapBoost = 0.537f;
+        }
+
+        void CartoonAltAutomatic()
+        {
+            displayTitle = "Cartoon|Colorful - REQUIRES 1920x1080 AND DYNAMIC RESOLUTION 175-250% FOR INTENDED LOOK.";
+            activeStockPreset = ActiveStockPreset.CartoonAlt;
+            automaticMode = true;
+            edge.mode = EdgeDetection.EdgeDetectMode.RobertsCrossDepthNormals;
+            edge.sampleDist = 1.09f;
+            edge.edgesOnly = 0.067f;
+            autoEdge = false;
+            edge.sensitivityDepth = 0;
+            edge.sensitivityNormals = 1.68f;
+            mixColorMultiplier = 1.0f;
+            edge.edgeColor = Color.black;
+            edge.edgesOnlyBgColor = cartoonMixC;
+            if (!CheckTonemapper())
+                ResetTonemapper();
+            bloom.enabled = false;
+            displayText = "No explanation required!  Optionally, add a random color theme by clicking the below button until satisfied.  Make sure to save your color once you've found it!  If you prefer to tweak this manually, simply convert your 'Plug & Play' into your own personalized preset by entering Advanced Mode via 'currently displayed settings', tweak to your liking, and save!";
+            mixSetR = edge.edgesOnlyBgColor.r;
+            mixSetG = edge.edgesOnlyBgColor.g;
+            mixSetB = edge.edgesOnlyBgColor.b;
+            setR = edge.edgeColor.r;
+            setG = edge.edgeColor.g;
+            setB = edge.edgeColor.b;
+            mixColorMultiplier = 1.0f;
+            colorMultiplier = 1.0f;
+            toneMapGamma = 5.376f;
+            toneMapBoost = 0.128f;
+        }
+        void CartoonThreeAutomatic()
+        {
+            displayTitle = "Cartoon|Clean - REQUIRES 1920x1080 AND DYNAMIC RESOLUTION 175-250% FOR INTENDED LOOK.";
+            activeStockPreset = ActiveStockPreset.CartoonThree;
+            automaticMode = true;
+            edge.mode = EdgeDetection.EdgeDetectMode.TriangleDepthNormals;
+            edge.sampleDist = 1;
+            edge.edgesOnly = 0f;
+            autoEdge = false;
+            edge.sensitivityDepth = 0;
+            edge.sensitivityNormals = 1.68f;
+            mixColorMultiplier = 1.0f;
+            edge.edgeColor = Color.black;
+            edge.edgesOnlyBgColor = cartoonMixC;
+            if (!CheckTonemapper())
+                ResetTonemapper();
+            bloom.enabled = false;
+            displayText = "No explanation required!  Optionally, add a random color theme by clicking the below button until satisfied.  Make sure to save your color once you've found it!  If you prefer to tweak this manually, simply convert your 'Plug & Play' into your own personalized preset by entering Advanced Mode via 'currently displayed settings', tweak to your liking, and save!";
+            mixSetR = edge.edgesOnlyBgColor.r;
+            mixSetG = edge.edgesOnlyBgColor.g;
+            mixSetB = edge.edgesOnlyBgColor.b;
+            setR = edge.edgeColor.r;
+            setG = edge.edgeColor.g;
+            setB = edge.edgeColor.b;
+            mixColorMultiplier = 1.0f;
+            colorMultiplier = 1.0f;
+            toneMapGamma = 3.978f;
+            toneMapBoost = 0.376f;
         }
 
         void RandomAutomatic()
@@ -615,6 +771,8 @@ namespace Bordercities
             edge.edgesOnlyBgColor = Color.white;
             MatchColorsOnGUI();
             bloom.enabled = false;
+            toneMapBoost = defaultBoost;
+            toneMapGamma = defaultGamma;
 
 
         }
@@ -770,14 +928,25 @@ namespace Bordercities
                 ResizeDefaults();
                 if (edge != null)
                 {
-                    if (!userWantsEdge)
+                    if (!isOn)
                     {
-                        ResizeWindow(803, 140);
-                        userWantsEdge = GUILayout.Toggle(userWantsEdge, "Ready?  Click to enable Bordered Skylines!");
+                        ResizeWindow(803, 190);
+                        GUILayout.Space(30f);
+                        if (GUILayout.Button("Enable Bordered Skylines"))
+                        {
+                            ToggleBorderedSkylines(true);
+                        }
+                        GUILayout.Space(30f);
+                        
                     }
                     else
-                        userWantsEdge = GUILayout.Toggle(userWantsEdge, "Click to disable Bordered Skylines.");
-                    if (userWantsEdge)
+                    {
+                        if (GUILayout.Button("Disable Bordered Skylines"))
+                        {
+                            ToggleBorderedSkylines(false);
+                        }
+                    }
+                    if (isOn)
                     {
                         subViewOnly = GUILayout.Toggle(subViewOnly, "Optional: Shown in 'Info Modes' only.");
 
@@ -797,15 +966,35 @@ namespace Bordercities
                             {
                                 LowEndAltAutomatic();
                             }
-                            if (GUILayout.Button("Cartoon", GUILayout.MaxWidth(90f)))
+                            if (GUILayout.Button("Cartoon|Classic", GUILayout.MaxWidth(110f)))
                             {
                                 CartoonAutomatic();
                             }
-                            if (GUILayout.Button("Bordercities", GUILayout.MaxWidth(90f)))
+                            if (GUILayout.Button("Cartoon|Colorful", GUILayout.MaxWidth(110f)))
+                            {
+                                CartoonAltAutomatic();
+                            }
+                            if (GUILayout.Button("Cartoon|Clean", GUILayout.MaxWidth(110f)))
+                            {
+                                CartoonThreeAutomatic();
+                            }
+
+
+                            GUILayout.EndHorizontal();
+                            GUILayout.BeginHorizontal();
+                            if (GUILayout.Button("Bordercities|Classic", GUILayout.MaxWidth(160f)))
                             {
                                 BordercitiesAutomatic();
                             }
-                            if (GUILayout.Button("Realism", GUILayout.MaxWidth(90f)))
+                            if (GUILayout.Button("Bordercities|Bright", GUILayout.MaxWidth(160f)))
+                            {
+                                BordercitiesBrightAutomatic();
+                            }
+                            if (GUILayout.Button("Bordercities|Gritty", GUILayout.MaxWidth(160f)))
+                            {
+                                BordercitiesGrittyAutomatic();
+                            }
+                            if (GUILayout.Button("Realism", GUILayout.MaxWidth(160f)))
                             {
                                 RealismAutomatic();
                             }
@@ -824,7 +1013,7 @@ namespace Bordercities
                                 GUILayout.Space(3f);
                                 GUILayout.Label(displayText);
                             }
-                            if (activeStockPreset == ActiveStockPreset.Cartoon)
+                            if (activeStockPreset == ActiveStockPreset.Cartoon || activeStockPreset == ActiveStockPreset.CartoonAlt)
                             {
                                 if (GUILayout.Button("CARTOON SPECIFIC: Randomize Color Theme)"))
                                 {
@@ -1093,10 +1282,10 @@ namespace Bordercities
                             }
                             if (infoManager.CurrentMode == InfoManager.InfoMode.None)
                             {
-                                GUILayout.Label("Gamma: " + tonem.m_ToneMappingGamma.ToString());
-                                tonem.m_ToneMappingGamma = GUILayout.HorizontalSlider(tonem.m_ToneMappingGamma, 0.0f, 30.0f, GUILayout.Width(570));
-                                GUILayout.Label("Boost: " + tonem.m_ToneMappingBoostFactor.ToString());
-                                tonem.m_ToneMappingBoostFactor = GUILayout.HorizontalSlider(tonem.m_ToneMappingBoostFactor, 0.0f, 30.0f, GUILayout.Width(570));
+                                GUILayout.Label("Gamma: " + toneMapGamma.ToString());
+                                toneMapGamma = GUILayout.HorizontalSlider(toneMapGamma, 0.0f, 30.0f, GUILayout.Width(570));
+                                GUILayout.Label("Boost: " + toneMapBoost.ToString());
+                                toneMapBoost = GUILayout.HorizontalSlider(toneMapBoost, 0.0f, 30.0f, GUILayout.Width(570));
                             }
                             else
                             {
@@ -1256,7 +1445,7 @@ namespace Bordercities
                             }
                             if (GUILayout.Button("Load Settings"))
                             {
-                                LoadConfig(false);
+                                LoadConfig(true);
                             }
                         }
                         
@@ -1351,8 +1540,8 @@ namespace Bordercities
 
         void ResetTonemapper()
         {
-            tonem.m_ToneMappingBoostFactor = defaultBoost;
-            tonem.m_ToneMappingGamma = defaultGamma;
+            toneMapBoost = defaultBoost;
+            toneMapGamma = defaultGamma;
         }
         void SetTonemapper(float gam, float boost)
         {
@@ -1444,6 +1633,11 @@ namespace Bordercities
         {
             EffectState();
 
+            if (isOn)
+            {
+                tonem.m_ToneMappingBoostFactor = toneMapBoost;
+                tonem.m_ToneMappingGamma = toneMapGamma;
+            }
             if (Input.GetKeyUp(config.keyCode))
             {
                 if (!showSettingsPanel)
@@ -1475,23 +1669,47 @@ namespace Bordercities
 
             if (Input.GetKeyUp(config.edgeToggleKeyCode))
             {
-                userWantsEdge = !userWantsEdge;
-                if (!userWantsEdge)
+                if (isOn)
                 {
-                    if (CheckTonemapper())
-                        ResetTonemapper();
+                    ToggleBorderedSkylines(false);
                 }
+                else
+                {
+                    ToggleBorderedSkylines(true);
+                }
+                
+                
             }
 
 
         }
 
+        void ToggleBorderedSkylines(bool state)
+        {
+            if (state)
+            {
+                isOn = true;
+                edge.enabled = true;
+                prevGamma = tonem.m_ToneMappingGamma;
+                prevBoost = tonem.m_ToneMappingBoostFactor;
+                tonem.m_ToneMappingGamma = toneMapGamma;
+                tonem.m_ToneMappingBoostFactor = toneMapBoost;
+                FixTonemapperIfZeroed();
+            }
+            else
+            {
+                isOn = false;
+                edge.enabled = false;
+                tonem.m_ToneMappingGamma = prevGamma;
+                tonem.m_ToneMappingBoostFactor = prevBoost;
+                FixTonemapperIfZeroed();
+            }
+        }
         
         void EffectState()
         {
-            if (userWantsEdge)
+            if (isOn)
             {
-                edge.enabled = true;
                 if (subViewOnly)
                 {
                     if (infoManager.CurrentMode == InfoManager.InfoMode.None)
@@ -1504,10 +1722,11 @@ namespace Bordercities
                     }
                 }
             }
-            else
+            /*else
             {
-                edge.enabled = false;
-            }
+                if (edge.enabled)
+                    edge.enabled = false;
+            }*/
         }
 
         void SizeCheck(bool value, float min, float max, float depthLimit)
