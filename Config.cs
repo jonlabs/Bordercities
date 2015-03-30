@@ -24,7 +24,11 @@ namespace Bordercities
         public bool firstTime = true;
         public KeyCode keyCode = KeyCode.LeftBracket;
         public KeyCode edgeToggleKeyCode;
+       
+        
         public bool subViewOnly;
+        public bool useInfoModeSpecific;
+
 
         public bool autoEdge;
 
@@ -48,6 +52,7 @@ namespace Bordercities
         public float mixSetB;
 
         public Color cartoonMixColor;
+        public Vector2 windowLoc;
 
         public EffectController.ActiveStockPreset activeStockPreset;
 
@@ -58,6 +63,7 @@ namespace Bordercities
             Bloom = 1,
             Hotkey = 2,
             Presets = 3,
+            ViewModes = 4,
         }
 
 

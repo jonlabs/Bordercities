@@ -25,6 +25,8 @@ namespace Bordercities
 
         public bool showSettingsPanel = false;
         private Rect windowRect = new Rect(32, 32, 803, 700); //was 64,250,803,466
+        private Rect dragBar = new Rect(0, 0, 803, 25);
+        private Vector2 windowLoc;
         private float defaultHeight;
         private float defaultWidth;
 
@@ -58,6 +60,7 @@ namespace Bordercities
 
         private bool autoEdgeActive;
         public bool subViewOnly;
+        public bool useInfoModeSpecific;
 
         private string keystring = "";
         private string edgeKeyString = "";
@@ -92,7 +95,6 @@ namespace Bordercities
         private float prevGamma;
         private float prevBoost;
 
-        private float tempExp;
 
         public string[] presetEntries;
 
@@ -103,8 +105,59 @@ namespace Bordercities
 
         private ActiveStockPreset activeStockPreset;
 
+        private bool uniqueUtilities;
+
+        private string infoBuildingLevel = "";
+        private string infoConnections = "";
+        private string infoCrime = "";
+        private string infoDensity = "";
+        private string infoDistricts = "";
+        private string infoEducation = "";
+        private string infoElectricity = "";
+        private string infoEntertainment = "";
+        private string infoFireSafety = "";
+        private string infoGarbage = "";
+        private string infoHappiness = "";
+        private string infoHealth = "";
+        private string infoLandValue = "";
+        private string infoNaturalResources = "";
+        private string infoNoisePollution = "";
+        private string infoPollution = "";
+        private string infoTerrainHeight = "";
+        private string infoTraffic = "";
+        private string infoTransport = "";
+        private string infoWater = "";
+        private string infoWind = "";
+
+        private string inputInfoBuildingLevel = "";
+        private string inputInfoConnections = "";
+        private string inputInfoCrime = "";
+        private string inputInfoDensity = "";
+        private string inputInfoDistricts = "";
+        private string inputInfoEducation = "";
+        private string inputInfoElectricity = "";
+        private string inputInfoEntertainment = "";
+        private string inputInfoFireSafety = "";
+        private string inputInfoGarbage = "";
+        private string inputInfoHappiness = "";
+        private string inputInfoHealth = "";
+        private string inputInfoLandValue = "";
+        private string inputInfoNaturalResources = "";
+        private string inputInfoNoisePollution = "";
+        private string inputInfoPollution = "";
+        private string inputInfoTerrainHeight = "";
+        private string inputInfoTraffic = "";
+        private string inputInfoTransport = "";
+        private string inputInfoWater = "";
+        private string inputInfoWind = "";
+
+        private bool hasSetUtility;
+        private InfoManager.InfoMode currentInfoMode;
+
         private bool isOn;
-     
+        private bool userIsPreviewing = false;
+
+
         void InitializeColors()
         {
             cartoonEdgeC = new Color(0.04f, 0.04f, 0.04f);
@@ -115,8 +168,10 @@ namespace Bordercities
         void Awake()
         {
             InitializeColors();
+            
             cameraController = GetComponent<CameraController>();
             infoManager = InfoManager.instance;
+            currentInfoMode = infoManager.CurrentMode;
             config = Config.Deserialize(configPath);
             bank = PresetBank.Deserialize(bankPath);
             
@@ -125,8 +180,11 @@ namespace Bordercities
 
             InitializeFromConfig();
             InitializeBanking();
+            InitializeExistBools();
 
         }
+
+        
 
         void InitializeFromConfig()
         {
@@ -144,7 +202,10 @@ namespace Bordercities
                 config.edgeOnly = 0;
                 config.autoEdge = true;
                 config.firstTime = true;
+
                 config.subViewOnly = false;
+                config.useInfoModeSpecific = false;
+
                 config.oldGamma = 2.2f;
                 config.toneMapGamma = 1.6f;
                 config.oldBoost = 1.15f;
@@ -163,6 +224,8 @@ namespace Bordercities
 
                 config.cartoonMixColor = Color.white;
                 config.activeStockPreset = ActiveStockPreset.LowEndAlt;
+                config.windowLoc = new Vector2(32, 32);
+                
                 #endregion
             }
             else 
@@ -190,6 +253,8 @@ namespace Bordercities
                     config.firstTime = true;
                 if (IsNull(config.subViewOnly))
                     config.subViewOnly = false;
+                if (IsNull(config.useInfoModeSpecific))
+                    config.useInfoModeSpecific = false;
                 if (IsNull(config.oldGamma))
                     config.oldGamma = 2.2f;
                 if (IsNull(config.toneMapGamma))
@@ -221,7 +286,8 @@ namespace Bordercities
                     config.activeStockPreset = ActiveStockPreset.LowEndAlt;
                 if (IsNull(config.cartoonMixColor))
                     config.cartoonMixColor = new Color(1, 1, 1, 0);
-
+                if (IsNull(config.windowLoc))
+                    config.windowLoc = new Vector2(32,32);
                 #endregion
 
             }
@@ -248,6 +314,15 @@ namespace Bordercities
             LoadBank();
         }
 
+        void ResetBank()
+        {
+            for (int i = 0; i < presetEntries.Length; i++)
+            {
+                presetEntries[i] = "";
+            }
+            SaveBank();
+        }
+
         void LoadBank()
         {
 
@@ -272,7 +347,6 @@ namespace Bordercities
             defaultGamma = tonem.m_ToneMappingGamma;
             prevGamma = defaultGamma;
             prevBoost = defaultBoost;
-            
             LoadConfig(false);
             
             if (config.keyCode == KeyCode.None)
@@ -300,10 +374,11 @@ namespace Bordercities
             else
                 ToggleBorderedSkylines(false);
 
-            
             FixTonemapperIfZeroed();
 
         }
+
+
 
         void FixTonemapperIfZeroed()
         {
@@ -340,9 +415,13 @@ namespace Bordercities
                 automaticMode = config.automaticMode;
                 edge.enabled = config.edgeEnabled;
                 subViewOnly = config.subViewOnly;
+                useInfoModeSpecific = config.useInfoModeSpecific;
                 firstTime = config.firstTime;
-                toneMapGamma = config.toneMapGamma;
-                toneMapBoost = config.toneMapBoost;
+                windowLoc = config.windowLoc;
+                windowRect.x = windowLoc.x;
+                windowRect.y = windowRect.y;
+                //toneMapGamma = config.toneMapGamma;
+               // toneMapBoost = config.toneMapBoost;
             }
             toneMapGamma = config.toneMapGamma;
             toneMapBoost = config.toneMapBoost;
@@ -352,7 +431,6 @@ namespace Bordercities
             edge.sensitivityNormals = config.sensNorm;
             edge.sensitivityDepth = config.sensDepth;
             edge.edgeExp = config.edgeExpo;
-            tempExp = edge.edgeExp;
             edge.edgesOnly = config.edgeOnly;
             edge.sampleDist = config.edgeSamp;
             autoEdge = config.autoEdge;
@@ -413,6 +491,9 @@ namespace Bordercities
 
         public void SaveConfig()
         {
+            config.subViewOnly = subViewOnly;
+            config.useInfoModeSpecific = useInfoModeSpecific;
+
             config.automaticMode = automaticMode;
             config.edgeEnabled = edge.enabled;
             config.edgeMode = edge.mode;
@@ -422,7 +503,9 @@ namespace Bordercities
             config.edgeOnly = edge.edgesOnly;
             config.edgeSamp = edge.sampleDist;
             config.autoEdge = autoEdge;
+
             config.subViewOnly = subViewOnly;
+            config.useInfoModeSpecific = useInfoModeSpecific;
 
             config.currentColor = currentColor;
             config.setR = setR;
@@ -447,6 +530,8 @@ namespace Bordercities
 
             config.activeStockPreset = activeStockPreset;
             config.cartoonMixColor = cartoonMixC;
+
+            config.windowLoc = windowLoc;
 
             
 
@@ -494,8 +579,16 @@ namespace Bordercities
             setB = edge.edgeColor.b;
             mixColorMultiplier = 1.0f;
             colorMultiplier = 1.0f;
-            toneMapGamma = 1.505f;
-            toneMapBoost = 2.580f;
+            if (!subViewOnly)
+            {
+                toneMapGamma = 1.505f;
+                toneMapBoost = 2.580f;
+            }
+            else
+            {
+                toneMapGamma = defaultGamma;
+                toneMapBoost = defaultBoost;
+            }
         }
 
         void LowEndAltAutomatic()
@@ -525,8 +618,16 @@ namespace Bordercities
             setB = edge.edgeColor.b;
             mixColorMultiplier = 1.0f;
             colorMultiplier = 1.0f;
-            toneMapGamma = 1.505f;
-            toneMapBoost = 2.580f;
+            if (!subViewOnly)
+            {
+                toneMapGamma = 1.505f;
+                toneMapBoost = 2.580f;
+            }
+            else
+            {
+                toneMapGamma = defaultGamma;
+                toneMapBoost = defaultBoost;
+            }
         }
 
         void BordercitiesAutomatic()
@@ -556,6 +657,16 @@ namespace Bordercities
             setB = edge.edgeColor.b;
             mixColorMultiplier = 1.0f;
             colorMultiplier = 1.0f;
+            if (!subViewOnly)
+            {
+                toneMapGamma = defaultGamma;
+                toneMapBoost = defaultBoost;
+            }
+            else
+            {
+                toneMapGamma = defaultGamma;
+                toneMapBoost = defaultBoost;
+            }
         }
 
         void BordercitiesGrittyAutomatic()
@@ -585,8 +696,16 @@ namespace Bordercities
             setB = edge.edgeColor.b;
             mixColorMultiplier = 1.0f;
             colorMultiplier = 1.0f;
-            toneMapGamma = 1.128f;
-            toneMapBoost = 4.031f;
+            if (!subViewOnly)
+            {
+                toneMapGamma = 1.128f;
+                toneMapBoost = 4.031f;
+            }
+            else
+            {
+                toneMapGamma = defaultGamma;
+                toneMapBoost = defaultBoost;
+            }
         }
 
         void BordercitiesBrightAutomatic()
@@ -616,8 +735,16 @@ namespace Bordercities
             setB = edge.edgeColor.b;
             mixColorMultiplier = 1.0f;
             colorMultiplier = 1.0f;
-            toneMapGamma = 1.881f;
-            toneMapBoost = 2.849f;
+            if (!subViewOnly)
+            {
+                toneMapGamma = 1.881f;
+                toneMapBoost = 2.849f;
+            }
+            else
+            {
+                toneMapGamma = defaultGamma;
+                toneMapBoost = defaultBoost;
+            }
         }
 
         void RealismAutomatic()
@@ -646,8 +773,16 @@ namespace Bordercities
             setB = edge.edgeColor.b;
             mixColorMultiplier = 1.0f;
             colorMultiplier = 1.0f;
-            toneMapGamma = defaultGamma;
-            toneMapBoost = defaultBoost;
+            if (!subViewOnly)
+            {
+                toneMapGamma = defaultGamma;
+                toneMapBoost = defaultBoost;
+            }
+            else
+            {
+                toneMapGamma = defaultGamma;
+                toneMapBoost = defaultBoost;
+            }
         }
 
         void CartoonAutomatic()
@@ -676,8 +811,16 @@ namespace Bordercities
             setB = edge.edgeColor.b;
             mixColorMultiplier = 1.0f;
             colorMultiplier = 1.0f;
-            toneMapGamma = 3.064f;
-            toneMapBoost = 0.537f;
+            if (!subViewOnly)
+            {
+                toneMapGamma = 3.064f;
+                toneMapBoost = 0.537f;
+            }
+            else
+            {
+                toneMapGamma = defaultGamma;
+                toneMapBoost = defaultBoost;
+            }
         }
 
         void CartoonAltAutomatic()
@@ -706,8 +849,16 @@ namespace Bordercities
             setB = edge.edgeColor.b;
             mixColorMultiplier = 1.0f;
             colorMultiplier = 1.0f;
-            toneMapGamma = 5.376f;
-            toneMapBoost = 0.128f;
+            if (!subViewOnly)
+            {
+                toneMapGamma = 5.376f;
+                toneMapBoost = 0.128f;
+            }
+            else
+            {
+                toneMapGamma = defaultGamma;
+                toneMapBoost = defaultBoost;
+            }
         }
         void CartoonThreeAutomatic()
         {
@@ -735,8 +886,16 @@ namespace Bordercities
             setB = edge.edgeColor.b;
             mixColorMultiplier = 1.0f;
             colorMultiplier = 1.0f;
-            toneMapGamma = 3.978f;
-            toneMapBoost = 0.376f; 
+            if (!subViewOnly)
+            {
+                toneMapGamma = 3.978f;
+                toneMapBoost = 0.376f;
+            }
+            else
+            {
+                toneMapGamma = defaultGamma;
+                toneMapBoost = defaultBoost;
+            }
         }
 
         void RandomAutomatic()
@@ -771,19 +930,30 @@ namespace Bordercities
             edge.edgesOnlyBgColor = Color.white;
             MatchColorsOnGUI();
             bloom.enabled = false;
-            toneMapBoost = defaultBoost;
-            toneMapGamma = defaultGamma;
+            if (!subViewOnly)
+            {
+                toneMapBoost = defaultBoost;
+                toneMapGamma = defaultGamma;
+            }
+            else
+            {
+                toneMapGamma = defaultGamma;
+                toneMapBoost = defaultBoost;
+            }
+            
 
 
         }
 
+
         void OnGUI()
         {
+            GUI.backgroundColor = Color.gray;
             if (firstTime)
                 tab = Config.Tab.Hotkey;
             if (showSettingsPanel)
             {
-                windowRect = GUI.Window(391435, windowRect, SettingsPanel, "Bordered Skylines");
+                windowRect = GUI.Window(391435, windowRect, SettingsPanel, "Bordered Skylines (NEW: Draggable Window!)");
             }
         }
 
@@ -848,11 +1018,14 @@ namespace Bordercities
 
         }
 
-        void SavePreset(string name)
+        void SavePreset(string name, bool falseIfInfoMode)
         {
             Preset.MakeFolderIfNonexistent();
             Preset presetToSave;
-            presetToSave = Preset.Deserialize(name);
+            if (falseIfInfoMode)
+                presetToSave = Preset.Deserialize(name);
+            else
+                presetToSave = Preset.DeserializeInfoMode(name);
             if (presetToSave == null) // If no presets file, create one.
             {
                 presetToSave = new Preset();
@@ -886,11 +1059,17 @@ namespace Bordercities
             presetToSave.toneMapBoost = tonem.m_ToneMappingBoostFactor;
             presetToSave.toneMapGamma = tonem.m_ToneMappingGamma;
 
-            Preset.Serialize(name, presetToSave);
+            if (falseIfInfoMode)
+                Preset.Serialize(name, presetToSave);
+            else
+                Preset.SerializeInfoMode(name, presetToSave);
         }
+
 
         void SettingsPanel(int wnd)
         {
+            
+            GUI.DragWindow(dragBar);
             #region Top Navigation Buttons
             GUILayout.BeginHorizontal();
             if (!firstTime || !automaticMode)
@@ -910,6 +1089,13 @@ namespace Bordercities
                         LoadBank();
                         tab = Config.Tab.Presets;
 
+                    }
+                }
+                if (useInfoModeSpecific)
+                {
+                    if (GUILayout.Button("Info Modes"))
+                    {
+                        tab = Config.Tab.ViewModes;
                     }
                 }
                 if (GUILayout.Button("Hotkey Configuration"))
@@ -939,22 +1125,14 @@ namespace Bordercities
                         GUILayout.Space(30f);
                         
                     }
-                    else
-                    {
-                        if (GUILayout.Button("Disable Bordered Skylines"))
-                        {
-                            ToggleBorderedSkylines(false);
-                        }
-                    }
                     if (isOn)
                     {
-                        subViewOnly = GUILayout.Toggle(subViewOnly, "Optional: Shown in 'Info Modes' only.");
 
                         if (automaticMode)
                         {
-                            ResizeWindow(803, 550);
+                            ResizeWindow(803, 580);
 
-                            GUILayout.Space(30f);
+                            GUILayout.Space(5f);
                             GUILayout.Label("Pick a preset!  Or, jump into Advanced Mode down below to start tweaking for yourself!");
                             GUILayout.Space(5f);
                             GUILayout.BeginHorizontal();
@@ -1059,60 +1237,29 @@ namespace Bordercities
                             GUILayout.EndHorizontal();
                             if (!firstTime)
                             {
-                                GUILayout.Space(30f);
+                                GUILayout.Space(5f);
                                 if (config.edgeToggleKeyCode == KeyCode.None)
                                     GUILayout.Label("Hey! Listen! You can set a hotkey for toggling the Bordercities Effect! It would appear you haven't done this yet: simply press the 'Hotkey Configuration' tab and choose a hotkey from the bottom keyboard grid!");
-                                GUILayout.Space(3f);
+                                GUILayout.Space(5f);
                             }
                             else
-                                GUILayout.Space(75f);
+                                GUILayout.Space(15f);
+
+                            
+
                         }
                         else
                         {
                             GUILayout.Space(10f);
                             ResizeWindow(803, 875);
-                            if (GUILayout.Button("Advanced mode is on.  Switch to 'Plug & Play' mode."))
-                            {
-                                automaticMode = true;
-                                switch (activeStockPreset)
-                                {
-                                    case ActiveStockPreset.Cartoon:
-                                        CartoonAutomatic();
-                                        break;
-                                    case ActiveStockPreset.Bordercities:
-                                        BordercitiesAutomatic();
-                                        break;
-                                    case ActiveStockPreset.LowEndMain:
-                                        LowEndAutomatic();
-                                        break;
-                                    case ActiveStockPreset.LowEndAlt:
-                                        LowEndAltAutomatic();
-                                        break;
-                                    case ActiveStockPreset.Realism:
-                                        RealismAutomatic();
-                                        break;
-                                    case ActiveStockPreset.Random:
-                                        RandomAutomatic();
-                                        break;
-                                    default:
-                                        LowEndAutomatic();
-                                        break;
-                                }
-                            }
+                            
 
 
 
 
                             GUILayout.Space(10f);
-                            
-                            
-                            
-                            
-                            GUILayout.Label("Edge distance: " + edge.sampleDist.ToString());
-                            edge.sampleDist = GUILayout.HorizontalSlider(edge.sampleDist, 1, 5, GUILayout.MaxWidth(100));
-                            GUILayout.Label("Mix: " + edge.edgesOnly.ToString());
-                            edge.edgesOnly = GUILayout.HorizontalSlider(edge.edgesOnly, 0.000f, 1.000f, GUILayout.MaxWidth(500));                            
-                            GUILayout.Space(5f);
+
+
                             switch (edge.mode)
                             {
                                 case EdgeDetection.EdgeDetectMode.TriangleDepthNormals:
@@ -1141,6 +1288,7 @@ namespace Bordercities
                                         break;
                                     }
                             }
+                            GUILayout.Space(5f);
                             GUILayout.BeginHorizontal();
                             if (GUILayout.Button("Triangle Depth Normals"))
                             {
@@ -1164,7 +1312,12 @@ namespace Bordercities
                                 edge.SetCameraFlag();
                             }
                             GUILayout.EndHorizontal();
+                            GUILayout.Label("Edge distance: " + edge.sampleDist.ToString());
+                            edge.sampleDist = GUILayout.HorizontalSlider(edge.sampleDist, 1, 5, GUILayout.MaxWidth(100));
+                            GUILayout.Label("Mix: " + edge.edgesOnly.ToString());
+                            edge.edgesOnly = GUILayout.HorizontalSlider(edge.edgesOnly, 0.000f, 1.000f, GUILayout.MaxWidth(500));                            
                             GUILayout.Space(5f);
+                            
 
                             if (edge.mode == EdgeDetection.EdgeDetectMode.TriangleDepthNormals || edge.mode == EdgeDetection.EdgeDetectMode.RobertsCrossDepthNormals)
                             {
@@ -1291,8 +1444,38 @@ namespace Bordercities
                             {
                                 GUILayout.Label("Gamma and boost settings have no effect in View Modes.");
                             }
-                            
-                            
+                            GUILayout.Space(15f);
+
+                            if (GUILayout.Button("Advanced mode is on.  Switch back to 'Plug & Play' mode."))
+                            {
+                                automaticMode = true;
+                                switch (activeStockPreset)
+                                {
+                                    case ActiveStockPreset.Cartoon:
+                                        CartoonAutomatic();
+                                        break;
+                                    case ActiveStockPreset.Bordercities:
+                                        BordercitiesAutomatic();
+                                        break;
+                                    case ActiveStockPreset.LowEndMain:
+                                        LowEndAutomatic();
+                                        break;
+                                    case ActiveStockPreset.LowEndAlt:
+                                        LowEndAltAutomatic();
+                                        break;
+                                    case ActiveStockPreset.Realism:
+                                        RealismAutomatic();
+                                        break;
+                                    case ActiveStockPreset.Random:
+                                        RandomAutomatic();
+                                        break;
+                                    default:
+                                        LowEndAutomatic();
+                                        break;
+                                }
+                            }
+
+                            GUILayout.Space(15);
                         }
                     }
                 }
@@ -1395,14 +1578,14 @@ namespace Bordercities
                     {
                         if (IsValidFilename(presetEntries[i]))
                         {
-                            SavePreset(presetEntries[i]);
+                            SavePreset(presetEntries[i], true);
                             SaveBank();
                         }
                         
                     }
                     if (GUILayout.Button("Load", GUILayout.MaxWidth(60),GUILayout.MaxHeight(25)))
                     {
-                        LoadPreset(presetEntries[i]);
+                        LoadPreset(presetEntries[i], true);
                     }
 
                     i++;
@@ -1413,25 +1596,109 @@ namespace Bordercities
                     {
                         if (IsValidFilename(presetEntries[i]))
                         {
-                            SavePreset(presetEntries[i]);
+                            SavePreset(presetEntries[i], true);
                         }
                     }
                     if (GUILayout.Button("Load", GUILayout.MaxWidth(60), GUILayout.MaxHeight(25)))
                     {
-                        LoadPreset(presetEntries[i]);
+                        LoadPreset(presetEntries[i], true);
                     }
-
+                    
                     GUILayout.EndHorizontal();  
                 }
 
                 GUILayout.Label("Support for presets is sort of thrown together for the moment. The name of the input field must match the filename, and is case sensitive.  Having a nicer preset browser is on the todo list.");
 
+                if (GUILayout.Button("Reset Bank (This will save!)"))
+                {
+                    ResetBank();
+                }
+
             }
             #endregion
+            #region View Modes
+            if (tab == Config.Tab.ViewModes)
+            {
+                ResizeWindow(600, 900);
+
+                ViewModeGUI(inputInfoBuildingLevel, infoBuildingLevel, "Building Level", "BuildingLevel", existBuildingLevel);
+                ViewModeGUI(inputInfoConnections, infoConnections, "Connections", existBuildingLevel);
+                ViewModeGUI(inputInfoCrime, infoCrime, "Crime", existCrimeRate);
+                ViewModeGUI(inputInfoDensity, infoDensity, "Density", existDensity);
+                ViewModeGUI(inputInfoDistricts, infoDistricts, "Districts", existDistricts);
+                ViewModeGUI(inputInfoEducation, infoEducation, "Education", existEducation);
+                ViewModeGUI(inputInfoElectricity, infoElectricity, "Electricity", existElectricity);
+                ViewModeGUI(inputInfoEntertainment, infoEntertainment, "Entertainment", existEntertainment);
+                ViewModeGUI(inputInfoFireSafety, infoFireSafety, "Fire Safety", "FireSafety", existFireSafety);
+                ViewModeGUI(inputInfoGarbage, infoGarbage, "Garbage", existGarbage);
+                ViewModeGUI(inputInfoHappiness, infoHappiness, "Happiness", existHappiness);
+                ViewModeGUI(inputInfoHealth, infoHealth, "Health", existHealth);
+                ViewModeGUI(inputInfoLandValue, infoLandValue, "Land Value", "LandValue", existLandValue);
+                ViewModeGUI(inputInfoNaturalResources, infoNaturalResources, "Natural Resources", "NaturalResources", existNaturalResources);
+                ViewModeGUI(inputInfoNoisePollution, infoNoisePollution, "Noise Pollution","NoisePollution", existNoisePollution);
+                ViewModeGUI(inputInfoPollution, infoPollution, "Pollution", existPollution);
+                ViewModeGUI(inputInfoTerrainHeight, infoTerrainHeight, "Terrain Height", "TerrainHeight", existTerrainHeight);
+                ViewModeGUI(inputInfoTraffic, infoTraffic, "Traffic", existTraffic);
+                ViewModeGUI(inputInfoTransport, infoTransport, "Transport", existTransport);
+                ViewModeGUI(inputInfoWater, infoWater, "Water", existWater);
+                ViewModeGUI(inputInfoWind, infoWind, "Wind", existWind);
+
+                GUILayout.Space(2);
+                GUILayout.Label("Any Info Mode preset is generated and saved to disk ('steamapps/common/Cities_Skylines/BordercitiesPresets/InfoModes') in its own dedicated XML file, performed upon any click of a Info Mode's respective 'Set' button.  When generated/updated, whichever settings are currently on-screen will be the settings saved to your desired Info Mode's preset -- regardless of whether or not you had first pressed 'Save Settings'.  For ease of understanding, know that your main config is entirely separate from the Info-Mode-specific presets assignable here as well as separate from the general-purpose-presets located in the 'Presets' tab.  The 'Main Config' (the one that auto-loads when you start the game via 'Save Settings') is the configuration that will be automatically loaded upon exiting an Info Mode (if you are also not using 'Effect Enabled in Info Modes Only.')");
+
+                if (infoManager.CurrentMode != InfoManager.InfoMode.None)
+                {
+                    if (GUILayout.Button("Quick-Set currently displayed settings to this Info Mode ("+GetCurrentInfoModeString()+")"))
+                    {
+                        QuicksaveActiveViewMode();
+                    }
+                }
+                else
+                {
+                    if (GUILayout.Button("Enter an Info Mode to quicksave for it, or, set above!"))
+                    {
+
+                    }
+                }
+
+                GUILayout.Space(4);
+                if (GUILayout.Button("Return to configuration tab"))
+                {
+                    tab = Config.Tab.EdgeDetection;
+                }
+                GUILayout.Space(30);
+
+
+            }
+
+
+
+
+
+            #endregion
+
             #region Bottom Navigation
             if (!firstTime)
             {
+                if (tab == Config.Tab.EdgeDetection && isOn)
+                {
+                    subViewOnly = GUILayout.Toggle(subViewOnly, "Optional: Effect enabled within 'Info Modes' only. (Auto-disables/enables accordingly)");
+                    useInfoModeSpecific = GUILayout.Toggle(useInfoModeSpecific, "Optional: Use 'Info-Mode'-specific Presets (upon activation, 'Info Modes' tab will appear above.)");
+                    if (automaticMode)
+                    {
+                        GUILayout.Space(5);
 
+                        GUILayout.Label("Info-Mode presets must first be created in 'Advanced Mode,' or downloaded from the web and placed in the appropriate folder (see tab), in order to function in 'Plug & Play' mode.  Coming soon: Stock-provided Info-Mode styles (with optional overriding of your own/downloaded!)!");
+                        GUILayout.Space(5);
+                    }
+                    if (isOn)
+                    {
+                        if (GUILayout.Button("Disable Bordered Skylines"))
+                        {
+                            ToggleBorderedSkylines(false);
+                        }
+                    }
+                }
                 GUILayout.BeginHorizontal();
                 if (tab != Config.Tab.Hotkey)
                 {
@@ -1477,15 +1744,24 @@ namespace Bordercities
                 }
 
                 GUILayout.EndHorizontal();
+
+                
             }
             #endregion
+            dragBar.width = windowRect.width;
+            windowLoc.x = windowRect.x;
+            windowLoc.y = windowRect.y;
+
         }
 
        
-        bool LoadPreset(string name)
+        bool LoadPreset(string name, bool falseIfInfoMode)
         {
             Preset presetToLoad;
-            presetToLoad = Preset.Deserialize(name);
+            if (falseIfInfoMode)
+                presetToLoad = Preset.Deserialize(name);
+            else
+                presetToLoad = Preset.DeserializeInfoMode(name);
             if (presetToLoad == null)
             {
                 return false;
@@ -1496,7 +1772,6 @@ namespace Bordercities
                 edge.sensitivityNormals = presetToLoad.sensNorm;
                 edge.sensitivityDepth = presetToLoad.sensDepth;
                 edge.edgeExp = presetToLoad.edgeExpo;
-                tempExp = edge.edgeExp;
                 edge.edgesOnly = presetToLoad.edgeOnly;
                 edge.sampleDist = presetToLoad.edgeSamp;
                 autoEdge = presetToLoad.autoEdge;
@@ -1536,7 +1811,110 @@ namespace Bordercities
             windowRect.height = defaultHeight;
         }
 
-        
+        void QuicksaveActiveViewMode()
+        {
+            string saveName = GetCurrentInfoModeString();
+            SavePreset(saveName, false);
+        }
+
+        string GetCurrentInfoModeString()
+        {
+            switch (infoManager.CurrentMode)
+            {
+                case InfoManager.InfoMode.BuildingLevel:
+                    return "BuildingLevel";
+                case InfoManager.InfoMode.Connections:
+                    return "Connections";
+                case InfoManager.InfoMode.CrimeRate:
+                    return "CrimeRate";
+                case InfoManager.InfoMode.Density:
+                    return "Density";
+                case InfoManager.InfoMode.Districts:
+                    return "Districts";
+                case InfoManager.InfoMode.Education:
+                    return "Education";
+                case InfoManager.InfoMode.Electricity:
+                    return "Electricity";
+                case InfoManager.InfoMode.Entertainment:
+                    return "Entertainment";
+                case InfoManager.InfoMode.FireSafety:
+                    return "FireSafety";
+                case InfoManager.InfoMode.Garbage:
+                    return "Garbage";
+                case InfoManager.InfoMode.Happiness:
+                    return "Happiness";
+                case InfoManager.InfoMode.Health:
+                    return "Health";
+                case InfoManager.InfoMode.LandValue:
+                    return "LandValue";
+                case InfoManager.InfoMode.NaturalResources:
+                    return "NaturalResources";
+                case InfoManager.InfoMode.NoisePollution:
+                    return "NoisePollution";
+                case InfoManager.InfoMode.None:
+                    return "None";
+                case InfoManager.InfoMode.Pollution:
+                    return "Pollution";
+                case InfoManager.InfoMode.TerrainHeight:
+                    return "TerrainHeight";
+                case InfoManager.InfoMode.Traffic:
+                    return "Traffic";
+                case InfoManager.InfoMode.Transport:
+                    return "Transport";
+                case InfoManager.InfoMode.Water:
+                    return "Water";
+                case InfoManager.InfoMode.Wind:
+                    return "Wind";
+                default:
+                    return "Default";
+            }
+        }
+
+        private bool existBuildingLevel = false;
+        private bool existConnections = false;
+        private bool existCrimeRate = false;
+        private bool existDensity = false;
+        private bool existDistricts = false;
+        private bool existEducation = false;
+        private bool existElectricity = false;
+        private bool existEntertainment = false;
+        private bool existFireSafety = false;
+        private bool existGarbage = false;
+        private bool existHappiness = false;
+        private bool existHealth = false;
+        private bool existLandValue = false;
+        private bool existNaturalResources = false;
+        private bool existNoisePollution = false;
+        private bool existPollution = false;
+        private bool existTerrainHeight = false;
+        private bool existTraffic = false;
+        private bool existTransport = false;
+        private bool existWater = false;
+        private bool existWind = false;
+        void InitializeExistBools()
+        {
+            existBuildingLevel = Preset.CheckIfExists("BuildingLevel");
+            existConnections = Preset.CheckIfExists("Connections");
+            existCrimeRate = Preset.CheckIfExists("CrimeRate");
+            existDensity = Preset.CheckIfExists("Density");
+            existDistricts = Preset.CheckIfExists("Districts");
+            existEducation = Preset.CheckIfExists("Education");
+            existElectricity = Preset.CheckIfExists("Electricity");
+            existEntertainment = Preset.CheckIfExists("Entertainment");
+            existFireSafety = Preset.CheckIfExists("FireSafety");
+            existGarbage = Preset.CheckIfExists("Garbage");
+            existHappiness = Preset.CheckIfExists("Happiness");
+            existHealth = Preset.CheckIfExists("Health");
+            existLandValue = Preset.CheckIfExists("LandValue");
+            existNaturalResources = Preset.CheckIfExists("NaturalResources");
+            existNoisePollution = Preset.CheckIfExists("NoisePollution");
+            existPollution = Preset.CheckIfExists("Pollution");
+            existTerrainHeight = Preset.CheckIfExists("TerrainHeight");
+            existTraffic = Preset.CheckIfExists("Traffic");
+            existTransport = Preset.CheckIfExists("Transport");
+            existWater = Preset.CheckIfExists("Water");
+            existWind = Preset.CheckIfExists("Wind");
+        }
 
         void ResetTonemapper()
         {
@@ -1612,6 +1990,7 @@ namespace Bordercities
                 windowRect.height = height;
             if (windowRect.width != width)
                 windowRect.width = width;
+           
         }
 
         bool CheckTonemapper()
@@ -1627,12 +2006,183 @@ namespace Bordercities
         }
 
 
+        void SetActiveLookToTemporary()
+        {
+            userIsPreviewing = true;
+            tempAutoEdge = autoEdge;
+            tempEdgeBgrdColor = mixCurrentColor;
+            tempEdgeColor = currentColor;
+            tempEdgeExpo = edge.edgeExp;
+            tempEdgeMode = edge.mode;
+            tempEdgeOnly = edge.edgesOnly;
+            tempEdgeSamp = edge.sampleDist;
+            tempSensDepth = edge.sensitivityDepth;
+            tempSensNorm = edge.sensitivityNormals;
+            tempToneMapBoost = toneMapBoost;
+            tempToneMapGamma = toneMapGamma;
+        }
 
+        void RestoreFromTemporary()
+        {
+            if (userIsPreviewing)
+            {
+                autoEdge = tempAutoEdge;
+                mixCurrentColor = tempEdgeBgrdColor;
+                currentColor = tempEdgeColor;
+                edge.edgeExp = tempEdgeExpo;
+                edge.mode = tempEdgeMode;
+                edge.edgesOnly = tempEdgeOnly;
+                edge.sampleDist = tempEdgeSamp;
+                edge.sensitivityDepth = tempSensDepth;
+                edge.sensitivityNormals = tempSensNorm;
+                toneMapBoost = tempToneMapBoost;
+                toneMapGamma = tempToneMapGamma;
+            }
+            userIsPreviewing = false;
+        }
+
+
+        void ViewModeGUI(string inputField, string presetName, string label, bool exists)
+        {
+            GUILayout.BeginHorizontal();
+            if (GUILayout.Button("Set " + label, GUILayout.MaxWidth(180), GUILayout.MinWidth(180)))
+            {
+                SavePreset(label, false);
+                InitializeExistBools();
+            }
+            if (exists)
+            {
+                if (GUILayout.Button("Activate " + label, GUILayout.MaxWidth(180), GUILayout.MinWidth(180)))
+                {
+                    LoadPreset(label, false);
+                }
+            }
+            else
+            {
+                if (GUILayout.Button("No " + label + " found!", GUILayout.MaxWidth(180), GUILayout.MinWidth(180)))
+                {
+                    
+                }
+            }
+            GUILayout.EndHorizontal();
+        }
+        void ViewModeGUI(string inputField, string presetName, string label, string doubleWord, bool exists)
+        {
+            GUILayout.BeginHorizontal();
+            if (GUILayout.Button("Set " + label, GUILayout.MaxWidth(180), GUILayout.MinWidth(180)))
+            {
+                SavePreset(doubleWord, false);
+                InitializeExistBools();
+            }
+            if (exists)
+            {
+                if (GUILayout.Button("Activate " + label, GUILayout.MaxWidth(180), GUILayout.MinWidth(180)))
+                {
+                    LoadPreset(doubleWord, false);
+                }
+            }
+            else
+            {
+                if (GUILayout.Button("No " + label + " found!", GUILayout.MaxWidth(180), GUILayout.MinWidth(180)))
+                {
+
+                }
+            }
+            GUILayout.EndHorizontal();
+        }
+
+        bool ShouldWeExitPreview(Preset infoModePreset)
+        {
+            if (config.toneMapBoost != infoModePreset.toneMapBoost)
+                return false;
+            if (config.toneMapGamma != infoModePreset.toneMapGamma)
+                return false;
+            if (config.autoEdge != infoModePreset.autoEdge)
+                return false;
+            if (config.edgeExpo != infoModePreset.edgeExpo)
+                return false;
+            if (config.edgeMode != infoModePreset.edgeMode)
+                return false;
+            if (config.edgeOnly != infoModePreset.edgeOnly)
+                return false;
+            if (config.edgeSamp != infoModePreset.edgeSamp)
+                return false;
+            if (config.sensDepth != infoModePreset.sensDepth)
+                return false;
+            if (config.sensNorm != infoModePreset.sensNorm)
+                return false;
+            return true;
+        }
+
+        public float tempToneMapBoost;
+        public float tempToneMapGamma;
+        public bool tempAutoEdge;
+        public float tempEdgeExpo;
+        public EdgeDetection.EdgeDetectMode tempEdgeMode;
+        public float tempEdgeOnly;
+        public float tempEdgeSamp;
+        public float tempSensDepth;
+        public float tempSensNorm;
+        public Color tempEdgeColor;
+        public Color tempEdgeBgrdColor;
+        
+
+
+        void InfoModes()
+        {
+
+            if (infoManager.CurrentMode != currentInfoMode)
+            {
+                if (infoManager.CurrentMode == InfoManager.InfoMode.None)
+                {
+                    currentInfoMode = infoManager.CurrentMode;
+                    LoadConfig(true);
+                    return;
+                }
+                ViewModeCheckAndSet(InfoManager.InfoMode.BuildingLevel, "BuildingLevel");
+                ViewModeCheckAndSet(InfoManager.InfoMode.Connections, "Connections");
+                ViewModeCheckAndSet(InfoManager.InfoMode.CrimeRate, "Crime");
+                ViewModeCheckAndSet(InfoManager.InfoMode.Density, "Density");
+                ViewModeCheckAndSet(InfoManager.InfoMode.Districts, "Districts");
+                ViewModeCheckAndSet(InfoManager.InfoMode.Education, "Education");
+                ViewModeCheckAndSet(InfoManager.InfoMode.Electricity, "Electricity");
+                ViewModeCheckAndSet(InfoManager.InfoMode.Entertainment, "Entertainment");
+                ViewModeCheckAndSet(InfoManager.InfoMode.FireSafety, "Fire Safety");
+                ViewModeCheckAndSet(InfoManager.InfoMode.Garbage, "Garbage");
+                ViewModeCheckAndSet(InfoManager.InfoMode.Happiness, "Happiness");
+                ViewModeCheckAndSet(InfoManager.InfoMode.Health, "Health");
+                ViewModeCheckAndSet(InfoManager.InfoMode.LandValue, "LandValue");
+                ViewModeCheckAndSet(InfoManager.InfoMode.NaturalResources, "NaturalResources");
+                ViewModeCheckAndSet(InfoManager.InfoMode.NoisePollution, "Noise Pollution");
+                ViewModeCheckAndSet(InfoManager.InfoMode.Pollution, "Pollution");
+                ViewModeCheckAndSet(InfoManager.InfoMode.TerrainHeight, "TerrainHeight");
+                ViewModeCheckAndSet(InfoManager.InfoMode.Traffic, "Traffic");
+                ViewModeCheckAndSet(InfoManager.InfoMode.Transport, "Transport");
+                ViewModeCheckAndSet(InfoManager.InfoMode.Water, "Water");
+                ViewModeCheckAndSet(InfoManager.InfoMode.Wind, "Wind");
+                GUILayout.Space(10);
+                if (GUILayout.Button("Load Main Panel Configuration"))
+                {
+                    LoadConfig(true);
+                }
+                GUILayout.Space(10);
+            }
+        }
+
+        void ViewModeCheckAndSet(InfoManager.InfoMode infoMode, string preset)
+        {
+            if (infoManager.CurrentMode == infoMode)
+            {
+                currentInfoMode = infoManager.CurrentMode;
+                LoadPreset(preset, false);
+            }
+        }
 
         public void Update()
         {
             EffectState();
-
+            if (useInfoModeSpecific)
+                InfoModes();
             if (isOn)
             {
                 tonem.m_ToneMappingBoostFactor = toneMapBoost;
@@ -1712,6 +2262,7 @@ namespace Bordercities
             {
                 if (subViewOnly)
                 {
+
                     if (infoManager.CurrentMode == InfoManager.InfoMode.None)
                     {
                         edge.enabled = false;
@@ -1721,12 +2272,11 @@ namespace Bordercities
                         edge.enabled = true;
                     }
                 }
+                else
+                    if (!edge.enabled)
+                        edge.enabled = true;
+
             }
-            /*else
-            {
-                if (edge.enabled)
-                    edge.enabled = false;
-            }*/
         }
 
         void SizeCheck(bool value, float min, float max, float depthLimit)

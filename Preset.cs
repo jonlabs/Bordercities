@@ -8,7 +8,8 @@ namespace Bordercities
     
     public class Preset
     {
-        private const string presetPath = "BordercitiesPresets";
+        private const string presetPath = "BordercitiesPresets/";
+        private const string infoModePath = "BordercitiesPresets/InfoModes/";
 
         public string presetName;
         
@@ -51,6 +52,16 @@ namespace Bordercities
             }
         }
 
+        public static void SerializeInfoMode(string filename, Preset preset)
+        {
+            var serializer = new XmlSerializer(typeof(Preset));
+
+            using (var writer = new StreamWriter(infoModePath + "/" + filename + ".xml"))
+            {
+                serializer.Serialize(writer, preset);
+            }
+        }
+
         public static Preset Deserialize(string filename)
         {
             var serializer = new XmlSerializer(typeof(Preset));
@@ -67,9 +78,37 @@ namespace Bordercities
             return null;
         }
 
+        public static Preset DeserializeInfoMode(string filename)
+        {
+            var serializer = new XmlSerializer(typeof(Preset));
+
+            try
+            {
+                using (var reader = new StreamReader(infoModePath + "/" + filename + ".xml"))
+                {
+                    var preset = (Preset)serializer.Deserialize(reader);
+                    return preset;
+                }
+            }
+            catch { }
+            return null;
+        }
+
         public static void MakeFolderIfNonexistent()
         {
             DirectoryInfo di = Directory.CreateDirectory("BordercitiesPresets");
+            DirectoryInfo dir = Directory.CreateDirectory(@"BordercitiesPresets/InfoModes/");
+            
+            Debug.Log(dir.FullName);
+        }
+
+        public static bool CheckIfExists(string infoMode)
+        {
+            string thePath = infoModePath + infoMode + @".xml";
+            if (File.Exists(thePath))
+                return true;
+            else
+                return false;
         }
     }
 }
