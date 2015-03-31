@@ -1249,7 +1249,9 @@ namespace Bordercities
 
                             GUILayout.Space(5f);
                             GUILayout.Label("Pick a preset!  Or, jump into Advanced Mode down below to start tweaking for yourself!");
-                            GUILayout.Space(5f);
+                            GUILayout.Space(10f);
+                            wantsToneMapper = GUILayout.Toggle(wantsToneMapper, "A large part of the immersion of the below presets is their usage of the internal brightness/gamma settings.  They can be reset at any time via the below 'Reset Brightness' button.  Use these settings??");
+                            GUILayout.Space(10f);
                             
                             GUILayout.BeginHorizontal();
                             if (GUILayout.Button("Low End PC",GUILayout.MaxWidth(120f)))
@@ -1275,9 +1277,8 @@ namespace Bordercities
                                 CartoonAltAutomatic();
                             }
                             GUILayout.EndHorizontal();
-                            GUILayout.Space(5f);
-                            if (!wantsToneMapper)
-                                GUILayout.Label("Bordercities presets differ by stock tonemapper settings!  Enable from the toggle below!");
+                            
+                            
                             GUILayout.BeginHorizontal();
                             if (GUILayout.Button("Bordercities|Classic", GUILayout.MaxWidth(160f)))
                             {
@@ -1307,7 +1308,6 @@ namespace Bordercities
                                 RandomAutomatic();
                             }
                             GUILayout.Space(10f);
-                            wantsToneMapper = GUILayout.Toggle(wantsToneMapper, "Apply Tonemapping settings for above presets? (Re-enter desired mode to apply!)");
 
 
                             GUILayout.Space(10f);
