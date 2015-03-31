@@ -1250,7 +1250,11 @@ namespace Bordercities
                             GUILayout.Space(5f);
                             GUILayout.Label("Pick a preset!  Or, jump into Advanced Mode down below to start tweaking for yourself!");
                             GUILayout.Space(10f);
-                            wantsToneMapper = GUILayout.Toggle(wantsToneMapper, "A large part of the immersion of the below presets is their usage of the internal brightness/gamma settings.  They can be reset at any time via the below 'Reset Brightness' button.  Use these settings??");
+                            if (!wantsToneMapper)
+                            {
+                                GUILayout.Label("A large part of the immersion of the below presets is their usage of the internal brightness/gamma settings.  They can be reset at any time via the below 'Reset Brightness' button.");
+                            }
+                            wantsToneMapper = GUILayout.Toggle(wantsToneMapper, "Use brightness/gamma settings for presets?");
                             GUILayout.Space(10f);
                             
                             GUILayout.BeginHorizontal();
