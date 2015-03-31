@@ -52,6 +52,14 @@ namespace Bordercities
         public Color edgesOnlyBgColor;
         private Material edgeDetectMaterial = null;
         public Color edgeColor;
+        public float depthsDiagonal = 1.0f;
+        public float depthsAxis = 1.0f;
+        public float diagonalVsCenter = 1.0f;
+        public float axisVsCenter = 1.0f;
+        public float mult1 = 1.0f;
+        public float mult2 = 1.0f;
+        public float mult3 = 1.0f;
+        public float mult4 = 1.0f;
 
 
 
@@ -62,7 +70,7 @@ namespace Bordercities
 
 
 
-            edgeDetectMaterial = CreateMaterialFromString(edgeDetectMaterial, HiddenShaderText.edgeDetectShaderTwo);// This is where you'll want to plug the string in.
+            edgeDetectMaterial = CreateMaterialFromString(edgeDetectMaterial, HiddenShaderText.realCoolEdge);// This is where you'll want to plug the string in.
 
 
 
@@ -113,6 +121,15 @@ namespace Bordercities
             edgeDetectMaterial.SetFloat("_Exponent", edgeExp);
             edgeDetectMaterial.SetFloat("_Threshold", lumThreshold);
             edgeDetectMaterial.SetColor("_Color", edgeColor);
+            edgeDetectMaterial.SetFloat("_Open1", depthsDiagonal);
+            edgeDetectMaterial.SetFloat("_Open2", depthsAxis);
+            edgeDetectMaterial.SetFloat("_Open3", diagonalVsCenter);
+            edgeDetectMaterial.SetFloat("_Open4", axisVsCenter);
+            edgeDetectMaterial.SetFloat("_Multiplier1", mult1);
+            edgeDetectMaterial.SetFloat("_Multiplier2", mult2);
+            edgeDetectMaterial.SetFloat("_Multiplier3", mult3);
+            edgeDetectMaterial.SetFloat("_Multiplier4", mult4);
+
             Graphics.Blit(source, destination, edgeDetectMaterial, (int)mode);
             UnityEngine.Object shadTrash = edgeDetectMaterial.shader;
             UnityEngine.Object matTrash = edgeDetectMaterial;

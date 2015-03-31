@@ -10,11 +10,21 @@ namespace Bordercities
     {
         public EdgeDetection.EdgeDetectMode edgeMode;
         public bool edgeEnabled;
-        public float sensNorm;
-        public float sensDepth;
-        public float edgeExpo;
         public float edgeSamp;
         public float edgeOnly;
+
+        //Triangle/Roberts
+        public float sensNorm;
+        public float sensDepth;
+        
+        //Sobel
+        public float edgeExpo;
+        public float depthsDiagonal;
+        public float depthsAxis;
+        public float sobelMult1;
+        public float sobelMult2;
+        public float sobelMult3;
+        public float sobelMult4;
 
         public float oldBoost;
         public float toneMapBoost;
@@ -53,6 +63,8 @@ namespace Bordercities
 
         public Color cartoonMixColor;
         public Vector2 windowLoc;
+
+        
 
         public EffectController.ActiveStockPreset activeStockPreset;
 

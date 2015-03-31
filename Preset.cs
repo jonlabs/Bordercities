@@ -16,13 +16,20 @@ namespace Bordercities
         public EdgeDetection.EdgeDetectMode edgeMode;
         public float sensNorm;
         public float sensDepth;
-        public float edgeExpo;
         public float edgeSamp;
         public float edgeOnly;
         public float toneMapBoost;
         public float toneMapGamma;
         public bool subViewOnly;
         public bool autoEdge;
+
+        public float edgeExpo;
+        public float depthsDiagonal;
+        public float depthsAxis;
+        public float sobelMult1;
+        public float sobelMult2;
+        public float sobelMult3;
+        public float sobelMult4;
 
         public bool bloomEnabled;
         public float bloomThresh;

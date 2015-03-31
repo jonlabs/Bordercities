@@ -67,6 +67,8 @@ namespace Bordercities
 
         private bool automaticMode;
 
+        private bool showAdvanced = false;
+
 
         public Color currentColor;
         public float setR;
@@ -157,12 +159,14 @@ namespace Bordercities
         private bool isOn;
         private bool userIsPreviewing = false;
 
+        
 
         void InitializeColors()
         {
             cartoonEdgeC = new Color(0.04f, 0.04f, 0.04f);
             lowEndEdgeC = new Color(0.08f, 0.08f, 0.06f);
             realismEdgeC = new Color(0.17f,0.17f,0.17f);
+           
         }
 
         void Awake()
@@ -195,11 +199,22 @@ namespace Bordercities
                 config.automaticMode = true;
                 config.edgeEnabled = false;
                 config.edgeMode = EdgeDetection.EdgeDetectMode.SobelDepthThin;
-                config.sensNorm = 1.63f;
-                config.sensDepth = 2.12f;
-                config.edgeExpo = 0.09f;
                 config.edgeSamp = 1.0f;
                 config.edgeOnly = 0;
+                //TriangleRoberts
+                config.sensNorm = 1.63f;
+                config.sensDepth = 2.12f;
+
+                //Sobel
+                config.edgeExpo = 0.09f;
+                config.depthsAxis = 0.100f;
+                config.depthsDiagonal = 1.000f;
+                config.sobelMult1 = 1.000f;
+                config.sobelMult2 = 1.000f;
+                config.sobelMult3 = 1.000f;
+                config.sobelMult4 = 1.000f;
+
+
                 config.autoEdge = true;
                 config.firstTime = true;
 
@@ -225,6 +240,8 @@ namespace Bordercities
                 config.cartoonMixColor = Color.white;
                 config.activeStockPreset = ActiveStockPreset.LowEndAlt;
                 config.windowLoc = new Vector2(32, 32);
+
+                
                 
                 #endregion
             }
@@ -237,16 +254,35 @@ namespace Bordercities
                     config.edgeEnabled = false;
                 if (IsNull(config.edgeMode))
                     config.edgeMode = EdgeDetection.EdgeDetectMode.SobelDepthThin;
-                if (IsNull(config.sensNorm))
-                    config.sensNorm = 1.63f;
-                if (IsNull(config.sensDepth))
-                    config.sensDepth = 2.12f;
-                if (IsNull(config.edgeExpo))
-                    config.edgeExpo = 0.09f;
                 if (IsNull(config.edgeSamp))
                     config.edgeSamp = 1.0f;
                 if (IsNull(config.edgeOnly))
                     config.edgeOnly = 0;
+
+
+                if (IsNull(config.sensNorm))
+                    config.sensNorm = 1.63f;
+                if (IsNull(config.sensDepth))
+                    config.sensDepth = 2.12f;
+
+
+                if (IsNull(config.edgeExpo))
+                    config.edgeExpo = 0.09f;
+                if (IsNull(config.depthsDiagonal))
+                    config.depthsDiagonal = 1.0f;
+                if (IsNull(config.depthsAxis))
+                    config.depthsAxis = 1.0f;
+                if (IsNull(config.sobelMult1))
+                    config.sobelMult1 = 1.000f;
+                if (IsNull(config.sobelMult2))
+                    config.sobelMult2 = 1.000f;
+                if (IsNull(config.sobelMult3))
+                    config.sobelMult3 = 1.000f;
+                if (IsNull(config.sobelMult4))
+                    config.sobelMult4 = 1.000f;
+
+
+
                 if (IsNull(config.autoEdge))
                     config.autoEdge = true;
                 if (IsNull(config.firstTime))
@@ -288,6 +324,7 @@ namespace Bordercities
                     config.cartoonMixColor = new Color(1, 1, 1, 0);
                 if (IsNull(config.windowLoc))
                     config.windowLoc = new Vector2(32,32);
+                
                 #endregion
 
             }
@@ -428,11 +465,19 @@ namespace Bordercities
             cartoonMixC = config.cartoonMixColor;
             activeStockPreset = config.activeStockPreset;
             edge.mode = config.edgeMode;
-            edge.sensitivityNormals = config.sensNorm;
-            edge.sensitivityDepth = config.sensDepth;
-            edge.edgeExp = config.edgeExpo;
             edge.edgesOnly = config.edgeOnly;
             edge.sampleDist = config.edgeSamp;
+            //TriangleRoberts
+            edge.sensitivityNormals = config.sensNorm;
+            edge.sensitivityDepth = config.sensDepth;
+            //Sobel
+            edge.edgeExp = config.edgeExpo;
+            edge.depthsDiagonal = config.depthsDiagonal;
+            edge.depthsAxis = config.depthsAxis;
+            edge.mult1 = config.sobelMult1;
+            edge.mult2 = config.sobelMult2;
+            edge.mult3 = config.sobelMult3;
+            edge.mult4 = config.sobelMult4;
             autoEdge = config.autoEdge;
             currentColor = config.currentColor;
             edge.edgeColor = currentColor;
@@ -450,7 +495,7 @@ namespace Bordercities
             bloom.threshold = config.bloomThresh;
             bloom.intensity = config.bloomIntens;
             bloom.blurSize = config.bloomBlurSize;
-
+            
 
             if (automaticMode && !firstTime)
             {
@@ -497,12 +542,20 @@ namespace Bordercities
             config.automaticMode = automaticMode;
             config.edgeEnabled = edge.enabled;
             config.edgeMode = edge.mode;
-            config.sensNorm = edge.sensitivityNormals;
-            config.sensDepth = edge.sensitivityDepth;
-            config.edgeExpo = edge.edgeExp;
             config.edgeOnly = edge.edgesOnly;
             config.edgeSamp = edge.sampleDist;
             config.autoEdge = autoEdge;
+            //TriangleRobert
+            config.sensNorm = edge.sensitivityNormals;
+            config.sensDepth = edge.sensitivityDepth;
+            //Sobel
+            config.edgeExpo = edge.edgeExp;
+            config.depthsDiagonal = edge.depthsDiagonal;
+            config.depthsAxis = edge.depthsAxis;
+            config.sobelMult1 = edge.mult1;
+            config.sobelMult2 = edge.mult2;
+            config.sobelMult3 = edge.mult3;
+            config.sobelMult4 = edge.mult4;
 
             config.subViewOnly = subViewOnly;
             config.useInfoModeSpecific = useInfoModeSpecific;
@@ -570,7 +623,7 @@ namespace Bordercities
             bloom.threshold = 0.27f;
             bloom.intensity = 0.39f;
             bloom.blurSize = 5.50f;
-            displayText = "Suited for users of low-end hardware who cannot afford the performance hit of supersampling via nlight's Dynamic Resolution.  This mode was fine-tuned in 720p with all settings as low as possible.  NOTE: Coming soon, I'll be modifying the algorithm for this:  there is too little effect at close to mid-range, and too much effect on distance objects, most notably distant mountain-ranges when zoomed all the way in. ";
+            displayText = "Suited for users of low-end hardware who cannot afford the performance hit of supersampling via nlight's Dynamic Resolution.  This mode was fine-tuned in 720p with all settings as low as possible. NOTE 3/30:  Coming soon (likely later tonight/early-morning), a 'Part 2' update with an algorithm to keep the effect balanced at all zoom levels!";
             mixSetR = edge.edgesOnlyBgColor.r;
             mixSetG = edge.edgesOnlyBgColor.g;
             mixSetB = edge.edgesOnlyBgColor.b;
@@ -579,10 +632,16 @@ namespace Bordercities
             setB = edge.edgeColor.b;
             mixColorMultiplier = 1.0f;
             colorMultiplier = 1.0f;
+            edge.depthsDiagonal = 1f;
+            edge.axisVsCenter = 0.1f;
+            edge.mult1 = 0.850f;
+            edge.mult3 = 0.752f;
+            edge.mult2 = 0.501f;
+            edge.mult4 = 2.437f;
             if (!subViewOnly)
             {
-                toneMapGamma = 1.505f;
-                toneMapBoost = 2.580f;
+                toneMapGamma = defaultGamma;
+                toneMapBoost = defaultBoost;
             }
             else
             {
@@ -620,8 +679,8 @@ namespace Bordercities
             colorMultiplier = 1.0f;
             if (!subViewOnly)
             {
-                toneMapGamma = 1.505f;
-                toneMapBoost = 2.580f;
+                toneMapGamma = defaultGamma;
+                toneMapBoost = defaultBoost;
             }
             else
             {
@@ -638,7 +697,7 @@ namespace Bordercities
             edge.mode = EdgeDetection.EdgeDetectMode.RobertsCrossDepthNormals;
             edge.edgeExp = 0.5f;
             edge.sampleDist = 1.0f;
-            edge.edgesOnly = 0.044f;
+            edge.edgesOnly = 0f;
             autoEdge = true;
             edge.edgeColor = Color.black;
             edge.edgesOnlyBgColor = Color.white;
@@ -698,8 +757,8 @@ namespace Bordercities
             colorMultiplier = 1.0f;
             if (!subViewOnly)
             {
-                toneMapGamma = 1.128f;
-                toneMapBoost = 4.031f;
+                toneMapGamma = 1.123f;
+                toneMapBoost = 3.061f;
             }
             else
             {
@@ -752,10 +811,16 @@ namespace Bordercities
             displayTitle = "Realism - REQUIRES 1920x1080 AND DYNAMIC RESOLUTION 175-250% FOR INTENDED LOOK.";
             activeStockPreset = ActiveStockPreset.Realism;
             automaticMode = true;
-            edge.mode = EdgeDetection.EdgeDetectMode.SobelDepth;
+            edge.mode = EdgeDetection.EdgeDetectMode.SobelDepthThin;
             edge.sampleDist = 1;
             edge.edgesOnly = 0;
             edge.edgeExp = 0.5f;
+            edge.depthsDiagonal = 1.0f;
+            edge.axisVsCenter = 0.1f;
+            edge.mult1 = 0.018f;
+            edge.mult3 = 0.501f;
+            edge.mult2 = 2.580f;
+            edge.mult4 = 1.451f;
             edge.edgeColor = Color.black;
             edge.edgesOnlyBgColor = Color.white;
             if (!CheckTonemapper())
@@ -764,7 +829,7 @@ namespace Bordercities
             bloom.threshold = 0.27f;
             bloom.intensity = 0.39f;
             bloom.blurSize = 5.50f;
-            displayText = "(THIS MODE IS UNDER CONSTRUCTION.)  There is currently an over-emphasis of distant lines and a lack of emphasis on close to mid-range lines.  When fully integrated, this mode will exist for users who wish to use Edge Detection strictly for subtle visual enhancement and not as a style-defining 'effect.' ala Borderlands and XIII.";
+            displayText = "This preset is designed for those who wish to use 'Edge Detection' for use as a visual enhancement tool, not an effect.  As an enhancement tool, 'Edge Detection' maintains the visual detection of distant shapes which would otherwise be lost by the renderer at a distance - such as street lamps.  Of course, nature doesn't draw lines around everything, nor may your monitor look like mine, thus, you may need to tweak this further to your own satisfaction.  I strongly recommend using 'Mix' to your benefit so that you can dial in the right amount of settings. Regardless, do keep in mind that Bordered Skylines is not an ambient occlusion mod.  If you are looking for -shadowing- at -edge intersections-, try Ulysius' Ambient Occlusion.  NOTE 3/30:  Coming soon (likely later tonight/early-morning), a 'Part 2' update with an algorithm to keep the effect balanced at all zoom levels!";
             mixSetR = edge.edgesOnlyBgColor.r;
             mixSetG = edge.edgesOnlyBgColor.g;
             mixSetB = edge.edgesOnlyBgColor.b;
@@ -1033,11 +1098,13 @@ namespace Bordercities
             presetToSave.edgeMode = edge.mode;
             presetToSave.sensNorm = edge.sensitivityNormals;
             presetToSave.sensDepth = edge.sensitivityDepth;
-            presetToSave.edgeExpo = edge.edgeExp;
             presetToSave.edgeOnly = edge.edgesOnly;
             presetToSave.edgeSamp = edge.sampleDist;
             presetToSave.autoEdge = autoEdge;
             presetToSave.subViewOnly = subViewOnly;
+
+            presetToSave.edgeExpo = edge.edgeExp;
+
 
             presetToSave.currentColor = currentColor;
             presetToSave.setR = setR;
@@ -1274,12 +1341,12 @@ namespace Bordercities
                                     }
                                 case EdgeDetection.EdgeDetectMode.SobelDepth:
                                     {
-                                        GUILayout.Label("Edge mode: Sobel Depth");
+                                        GUILayout.Label("Edge mode: Legacy 'Sobel Depth'");
                                         break;
                                     }
                                 case EdgeDetection.EdgeDetectMode.SobelDepthThin:
                                     {
-                                        GUILayout.Label("Edge mode: Sobel Depth Thin");
+                                        GUILayout.Label("Edge mode: 'Sobel Skylines' (Upgrades & combines both old Sobels into one)");
                                         break;
                                     }
                                 default:
@@ -1301,12 +1368,12 @@ namespace Bordercities
                                 edge.mode = EdgeDetection.EdgeDetectMode.RobertsCrossDepthNormals;
                                 edge.SetCameraFlag();
                             }
-                            if (GUILayout.Button("Sobel Depth"))
+                            if (GUILayout.Button("Legacy Sobel"))
                             {
                                 edge.mode = EdgeDetection.EdgeDetectMode.SobelDepth;
                                 edge.SetCameraFlag();
                             }
-                            if (GUILayout.Button("Sobel Depth Thin"))
+                            if (GUILayout.Button("'Sobel Skylines' (New)"))
                             {
                                 edge.mode = EdgeDetection.EdgeDetectMode.SobelDepthThin;
                                 edge.SetCameraFlag();
@@ -1335,11 +1402,44 @@ namespace Bordercities
                                 autoEdge = GUILayout.Toggle(autoEdge, "Automatic Sensitivity");
 
                             }
-                            if (edge.mode == EdgeDetection.EdgeDetectMode.SobelDepthThin || edge.mode == EdgeDetection.EdgeDetectMode.SobelDepth)
+                            if (edge.mode == EdgeDetection.EdgeDetectMode.SobelDepthThin)
+                            {
+                                showAdvanced = GUILayout.Toggle(showAdvanced, "Show advanced settings (NOTE: THESE SETTINGS WILL NOT YET SAVE TO CUSTOM-MADE PRESETS!!  They will however save to your main configuration.  I just wanted to get the main chunk 'begone ugly mountains' out so people could enjoy it before going to bed tonight, as its already getting late");
+                                if (showAdvanced)
+                                {
+                                    
+                                    GUILayout.Label("Diagonal Depth: " + edge.depthsDiagonal.ToString());
+                                    edge.depthsDiagonal = GUILayout.HorizontalSlider(edge.depthsDiagonal, 0.000f, 1.000f, GUILayout.Width(570));
+                                    
+                                    GUILayout.Label("Axis/Center: " + edge.axisVsCenter.ToString());
+                                    edge.axisVsCenter = GUILayout.HorizontalSlider(edge.axisVsCenter, 0.001f, 0.100f, GUILayout.Width(570));
+                                    GUILayout.Space(10f);
+                                    GUILayout.BeginHorizontal();
+                                    GUILayout.Label("Horizontal:" + edge.mult1.ToString());
+                                    edge.mult1 = GUILayout.HorizontalSlider(edge.mult1, 0.000f, 10.100f, GUILayout.Width(570));
+                                    GUILayout.EndHorizontal();
+                                    GUILayout.BeginHorizontal();
+                                    GUILayout.Label("Fine-tune H:" + edge.mult3.ToString());
+                                    edge.mult3 = GUILayout.HorizontalSlider(edge.mult3, 0.000f, 10.000f, GUILayout.Width(570));
+                                    GUILayout.EndHorizontal();
+                                    GUILayout.BeginHorizontal();
+                                    GUILayout.Label("Vertical:" + edge.mult2.ToString());
+                                    edge.mult2 = GUILayout.HorizontalSlider(edge.mult2, 0.000f, 10.000f, GUILayout.Width(570));
+                                    GUILayout.EndHorizontal();
+                                    GUILayout.BeginHorizontal();
+                                    GUILayout.Label("Fine-tune V:" + edge.mult4.ToString());
+                                    edge.mult4 = GUILayout.HorizontalSlider(edge.mult4, 0.000f, 10.000f, GUILayout.Width(570));
+                                    //edge.diagonalVsCenter = GUILayout.HorizontalSlider(edge.diagonalVsCenter, 0.000f, 2.000f, GUILayout.Width(570)); 
+                                    GUILayout.EndHorizontal();
+                                }
+                                
+                               
+
+                            }
+                            if (edge.mode == EdgeDetection.EdgeDetectMode.SobelDepth)
                             {
                                 GUILayout.Label("Edge exponent: " + edge.edgeExp.ToString());
                                 edge.edgeExp = GUILayout.HorizontalSlider(edge.edgeExp, 0.004f, 1.000f, GUILayout.Width(570));
-                                
                             }
 
                             GUILayout.Label("Edge Coloring: (0,0,0 for default black)");
@@ -1684,7 +1784,7 @@ namespace Bordercities
                 {
                     subViewOnly = GUILayout.Toggle(subViewOnly, "Optional: Effect enabled within 'Info Modes' only. (Auto-disables/enables accordingly)");
                     useInfoModeSpecific = GUILayout.Toggle(useInfoModeSpecific, "Optional: Use 'Info-Mode'-specific Presets (upon activation, 'Info Modes' tab will appear above.)");
-                    if (automaticMode)
+                    if (automaticMode && useInfoModeSpecific)
                     {
                         GUILayout.Space(5);
 
@@ -2180,6 +2280,10 @@ namespace Bordercities
 
         public void Update()
         {
+            if (edge.depthsAxis != 1.000f)
+            {
+                edge.depthsAxis = 1;
+            }
             EffectState();
             if (useInfoModeSpecific)
                 InfoModes();
