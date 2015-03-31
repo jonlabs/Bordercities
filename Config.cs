@@ -41,6 +41,7 @@ namespace Bordercities
 
 
         public bool autoEdge;
+        public bool wantsTonemapper;
 
         public bool bloomEnabled;
         public float bloomThresh;

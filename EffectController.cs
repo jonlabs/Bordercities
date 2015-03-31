@@ -68,8 +68,10 @@ namespace Bordercities
         private bool automaticMode;
 
         private bool showAdvanced = false;
+        private bool showEdgeColors = false;
+        private bool showMixColors = false;
 
-
+        public bool wantsToneMapper = false;
         public Color currentColor;
         public float setR;
         public float setG;
@@ -107,7 +109,6 @@ namespace Bordercities
 
         private ActiveStockPreset activeStockPreset;
 
-        private bool uniqueUtilities;
 
         private string infoBuildingLevel = "";
         private string infoConnections = "";
@@ -153,12 +154,11 @@ namespace Bordercities
         private string inputInfoWater = "";
         private string inputInfoWind = "";
 
-        private bool hasSetUtility;
         private InfoManager.InfoMode currentInfoMode;
 
         private bool isOn;
         private bool userIsPreviewing = false;
-
+      
         
 
         void InitializeColors()
@@ -214,6 +214,7 @@ namespace Bordercities
                 config.sobelMult3 = 1.000f;
                 config.sobelMult4 = 1.000f;
 
+                config.wantsTonemapper = false;
 
                 config.autoEdge = true;
                 config.firstTime = true;
@@ -259,6 +260,8 @@ namespace Bordercities
                 if (IsNull(config.edgeOnly))
                     config.edgeOnly = 0;
 
+                if (IsNull(config.wantsTonemapper))
+                    config.wantsTonemapper = false;
 
                 if (IsNull(config.sensNorm))
                     config.sensNorm = 1.63f;
@@ -457,8 +460,7 @@ namespace Bordercities
                 windowLoc = config.windowLoc;
                 windowRect.x = windowLoc.x;
                 windowRect.y = windowRect.y;
-                //toneMapGamma = config.toneMapGamma;
-               // toneMapBoost = config.toneMapBoost;
+                wantsToneMapper = config.wantsTonemapper;
             }
             toneMapGamma = config.toneMapGamma;
             toneMapBoost = config.toneMapBoost;
@@ -539,6 +541,7 @@ namespace Bordercities
             config.subViewOnly = subViewOnly;
             config.useInfoModeSpecific = useInfoModeSpecific;
 
+            config.wantsTonemapper = wantsToneMapper;
             config.automaticMode = automaticMode;
             config.edgeEnabled = edge.enabled;
             config.edgeMode = edge.mode;
@@ -638,16 +641,20 @@ namespace Bordercities
             edge.mult3 = 0.752f;
             edge.mult2 = 0.501f;
             edge.mult4 = 2.437f;
-            if (!subViewOnly)
+            if (wantsToneMapper)
             {
-                toneMapGamma = defaultGamma;
-                toneMapBoost = defaultBoost;
+                if (!subViewOnly)
+                {
+                    toneMapGamma = defaultGamma;
+                    toneMapBoost = defaultBoost;
+                }
+                else
+                {
+                    toneMapGamma = defaultGamma;
+                    toneMapBoost = defaultBoost;
+                }
             }
-            else
-            {
-                toneMapGamma = defaultGamma;
-                toneMapBoost = defaultBoost;
-            }
+            
         }
 
         void LowEndAltAutomatic()
@@ -677,16 +684,20 @@ namespace Bordercities
             setB = edge.edgeColor.b;
             mixColorMultiplier = 1.0f;
             colorMultiplier = 1.0f;
-            if (!subViewOnly)
+            if (wantsToneMapper)
             {
-                toneMapGamma = defaultGamma;
-                toneMapBoost = defaultBoost;
+                if (!subViewOnly)
+                {
+                    toneMapGamma = defaultGamma;
+                    toneMapBoost = defaultBoost;
+                }
+                else
+                {
+                    toneMapGamma = defaultGamma;
+                    toneMapBoost = defaultBoost;
+                }
             }
-            else
-            {
-                toneMapGamma = defaultGamma;
-                toneMapBoost = defaultBoost;
-            }
+            
         }
 
         void BordercitiesAutomatic()
@@ -716,16 +727,20 @@ namespace Bordercities
             setB = edge.edgeColor.b;
             mixColorMultiplier = 1.0f;
             colorMultiplier = 1.0f;
-            if (!subViewOnly)
+            if (wantsToneMapper)
             {
-                toneMapGamma = defaultGamma;
-                toneMapBoost = defaultBoost;
+                if (!subViewOnly)
+                {
+                    toneMapGamma = defaultGamma;
+                    toneMapBoost = defaultBoost;
+                }
+                else
+                {
+                    toneMapGamma = defaultGamma;
+                    toneMapBoost = defaultBoost;
+                }
             }
-            else
-            {
-                toneMapGamma = defaultGamma;
-                toneMapBoost = defaultBoost;
-            }
+            
         }
 
         void BordercitiesGrittyAutomatic()
@@ -755,16 +770,20 @@ namespace Bordercities
             setB = edge.edgeColor.b;
             mixColorMultiplier = 1.0f;
             colorMultiplier = 1.0f;
-            if (!subViewOnly)
+            if (wantsToneMapper)
             {
-                toneMapGamma = 1.123f;
-                toneMapBoost = 3.061f;
+                if (!subViewOnly)
+                {
+                    toneMapGamma = 1.123f;
+                    toneMapBoost = 3.061f;
+                }
+                else
+                {
+                    toneMapGamma = defaultGamma;
+                    toneMapBoost = defaultBoost;
+                }
             }
-            else
-            {
-                toneMapGamma = defaultGamma;
-                toneMapBoost = defaultBoost;
-            }
+            
         }
 
         void BordercitiesBrightAutomatic()
@@ -794,16 +813,20 @@ namespace Bordercities
             setB = edge.edgeColor.b;
             mixColorMultiplier = 1.0f;
             colorMultiplier = 1.0f;
-            if (!subViewOnly)
+            if (wantsToneMapper)
             {
-                toneMapGamma = 1.881f;
-                toneMapBoost = 2.849f;
+                if (!subViewOnly)
+                {
+                    toneMapGamma = 1.881f;
+                    toneMapBoost = 2.849f;
+                }
+                else
+                {
+                    toneMapGamma = defaultGamma;
+                    toneMapBoost = defaultBoost;
+                }
             }
-            else
-            {
-                toneMapGamma = defaultGamma;
-                toneMapBoost = defaultBoost;
-            }
+            
         }
 
         void RealismAutomatic()
@@ -838,21 +861,25 @@ namespace Bordercities
             setB = edge.edgeColor.b;
             mixColorMultiplier = 1.0f;
             colorMultiplier = 1.0f;
-            if (!subViewOnly)
+            if (wantsToneMapper)
             {
-                toneMapGamma = defaultGamma;
-                toneMapBoost = defaultBoost;
+                if (!subViewOnly)
+                {
+                    toneMapGamma = defaultGamma;
+                    toneMapBoost = defaultBoost;
+                }
+                else
+                {
+                    toneMapGamma = defaultGamma;
+                    toneMapBoost = defaultBoost;
+                }
             }
-            else
-            {
-                toneMapGamma = defaultGamma;
-                toneMapBoost = defaultBoost;
-            }
+            
         }
 
         void CartoonAutomatic()
         {
-            displayTitle = "Cartoon|Classic REQUIRES 1920x1080 AND DYNAMIC RESOLUTION 175-250% FOR INTENDED LOOK.";
+            displayTitle = "Cartoon|Retro REQUIRES 1920x1080 AND DYNAMIC RESOLUTION 175-250% FOR INTENDED LOOK.";
             activeStockPreset = ActiveStockPreset.Cartoon;
             automaticMode = true;
             edge.mode = EdgeDetection.EdgeDetectMode.RobertsCrossDepthNormals;
@@ -876,16 +903,20 @@ namespace Bordercities
             setB = edge.edgeColor.b;
             mixColorMultiplier = 1.0f;
             colorMultiplier = 1.0f;
-            if (!subViewOnly)
+            if (wantsToneMapper)
             {
-                toneMapGamma = 3.064f;
-                toneMapBoost = 0.537f;
+                if (!subViewOnly)
+                {
+                    toneMapGamma = 3.064f;
+                    toneMapBoost = 0.537f;
+                }
+                else
+                {
+                    toneMapGamma = defaultGamma;
+                    toneMapBoost = defaultBoost;
+                }
             }
-            else
-            {
-                toneMapGamma = defaultGamma;
-                toneMapBoost = defaultBoost;
-            }
+            
         }
 
         void CartoonAltAutomatic()
@@ -914,16 +945,20 @@ namespace Bordercities
             setB = edge.edgeColor.b;
             mixColorMultiplier = 1.0f;
             colorMultiplier = 1.0f;
-            if (!subViewOnly)
+            if (wantsToneMapper)
             {
-                toneMapGamma = 5.376f;
-                toneMapBoost = 0.128f;
+                if (!subViewOnly)
+                {
+                    toneMapGamma = 5.376f;
+                    toneMapBoost = 0.128f;
+                }
+                else
+                {
+                    toneMapGamma = defaultGamma;
+                    toneMapBoost = defaultBoost;
+                }
             }
-            else
-            {
-                toneMapGamma = defaultGamma;
-                toneMapBoost = defaultBoost;
-            }
+            
         }
         void CartoonThreeAutomatic()
         {
@@ -951,16 +986,20 @@ namespace Bordercities
             setB = edge.edgeColor.b;
             mixColorMultiplier = 1.0f;
             colorMultiplier = 1.0f;
-            if (!subViewOnly)
+            if (wantsToneMapper)
             {
-                toneMapGamma = 3.978f;
-                toneMapBoost = 0.376f;
+                if (!subViewOnly)
+                {
+                    toneMapGamma = 3.978f;
+                    toneMapBoost = 0.376f;
+                }
+                else
+                {
+                    toneMapGamma = defaultGamma;
+                    toneMapBoost = defaultBoost;
+                }
             }
-            else
-            {
-                toneMapGamma = defaultGamma;
-                toneMapBoost = defaultBoost;
-            }
+            
         }
 
         void RandomAutomatic()
@@ -995,16 +1034,20 @@ namespace Bordercities
             edge.edgesOnlyBgColor = Color.white;
             MatchColorsOnGUI();
             bloom.enabled = false;
-            if (!subViewOnly)
+            if (wantsToneMapper)
             {
-                toneMapBoost = defaultBoost;
-                toneMapGamma = defaultGamma;
+                if (!subViewOnly)
+                {
+                    toneMapBoost = defaultBoost;
+                    toneMapGamma = defaultGamma;
+                }
+                else
+                {
+                    toneMapGamma = defaultGamma;
+                    toneMapBoost = defaultBoost;
+                }
             }
-            else
-            {
-                toneMapGamma = defaultGamma;
-                toneMapBoost = defaultBoost;
-            }
+            
             
 
 
@@ -1104,7 +1147,12 @@ namespace Bordercities
             presetToSave.subViewOnly = subViewOnly;
 
             presetToSave.edgeExpo = edge.edgeExp;
-
+            presetToSave.depthsAxis = edge.depthsAxis;
+            presetToSave.depthsDiagonal = edge.depthsDiagonal;
+            presetToSave.sobelMult1 = edge.mult1;
+            presetToSave.sobelMult2 = edge.mult2;
+            presetToSave.sobelMult3 = edge.mult3;
+            presetToSave.sobelMult4 = edge.mult4;
 
             presetToSave.currentColor = currentColor;
             presetToSave.setR = setR;
@@ -1197,11 +1245,12 @@ namespace Bordercities
 
                         if (automaticMode)
                         {
-                            ResizeWindow(803, 580);
+                            ResizeWindow(803, 690);
 
                             GUILayout.Space(5f);
                             GUILayout.Label("Pick a preset!  Or, jump into Advanced Mode down below to start tweaking for yourself!");
                             GUILayout.Space(5f);
+                            
                             GUILayout.BeginHorizontal();
                             if (GUILayout.Button("Low End PC",GUILayout.MaxWidth(120f)))
                             {
@@ -1211,7 +1260,13 @@ namespace Bordercities
                             {
                                 LowEndAltAutomatic();
                             }
-                            if (GUILayout.Button("Cartoon|Classic", GUILayout.MaxWidth(110f)))
+                            GUILayout.EndHorizontal();
+                            GUILayout.BeginHorizontal();
+                            if (GUILayout.Button("Cartoon|Clean", GUILayout.MaxWidth(110f)))
+                            {
+                                CartoonThreeAutomatic();
+                            }
+                            if (GUILayout.Button("Cartoon|Retro", GUILayout.MaxWidth(110f)))
                             {
                                 CartoonAutomatic();
                             }
@@ -1219,19 +1274,16 @@ namespace Bordercities
                             {
                                 CartoonAltAutomatic();
                             }
-                            if (GUILayout.Button("Cartoon|Clean", GUILayout.MaxWidth(110f)))
-                            {
-                                CartoonThreeAutomatic();
-                            }
-
-
                             GUILayout.EndHorizontal();
+                            GUILayout.Space(5f);
+                            if (!wantsToneMapper)
+                                GUILayout.Label("Bordercities presets differ by stock tonemapper settings!  Enable from the toggle below!");
                             GUILayout.BeginHorizontal();
                             if (GUILayout.Button("Bordercities|Classic", GUILayout.MaxWidth(160f)))
                             {
                                 BordercitiesAutomatic();
                             }
-                            if (GUILayout.Button("Bordercities|Bright", GUILayout.MaxWidth(160f)))
+                            if (GUILayout.Button("Bordercities|Bright", GUILayout.MaxWidth(270f)))
                             {
                                 BordercitiesBrightAutomatic();
                             }
@@ -1239,6 +1291,8 @@ namespace Bordercities
                             {
                                 BordercitiesGrittyAutomatic();
                             }
+                            GUILayout.EndHorizontal();
+                            GUILayout.BeginHorizontal();
                             if (GUILayout.Button("Realism", GUILayout.MaxWidth(160f)))
                             {
                                 RealismAutomatic();
@@ -1252,6 +1306,11 @@ namespace Bordercities
                             {
                                 RandomAutomatic();
                             }
+                            GUILayout.Space(10f);
+                            wantsToneMapper = GUILayout.Toggle(wantsToneMapper, "Apply Tonemapping settings for above presets? (Re-enter desired mode to apply!)");
+
+
+                            GUILayout.Space(10f);
                             if (displayText != null && displayTitle != null)
                             {
                                 GUILayout.Label("CURRENT MODE: "+displayTitle);
@@ -1318,14 +1377,8 @@ namespace Bordercities
                         else
                         {
                             GUILayout.Space(10f);
-                            ResizeWindow(803, 875);
-                            
-
-
-
-
-                            GUILayout.Space(10f);
-
+                            ResizeWindow(803, 1000);
+                            GUILayout.Label("Sigh.. the GUI is a wreck.  Housecleaning is ever more-so a top priority with each update!");
 
                             switch (edge.mode)
                             {
@@ -1355,7 +1408,6 @@ namespace Bordercities
                                         break;
                                     }
                             }
-                            GUILayout.Space(5f);
                             GUILayout.BeginHorizontal();
                             if (GUILayout.Button("Triangle Depth Normals"))
                             {
@@ -1383,7 +1435,6 @@ namespace Bordercities
                             edge.sampleDist = GUILayout.HorizontalSlider(edge.sampleDist, 1, 5, GUILayout.MaxWidth(100));
                             GUILayout.Label("Mix: " + edge.edgesOnly.ToString());
                             edge.edgesOnly = GUILayout.HorizontalSlider(edge.edgesOnly, 0.000f, 1.000f, GUILayout.MaxWidth(500));                            
-                            GUILayout.Space(5f);
                             
 
                             if (edge.mode == EdgeDetection.EdgeDetectMode.TriangleDepthNormals || edge.mode == EdgeDetection.EdgeDetectMode.RobertsCrossDepthNormals)
@@ -1404,7 +1455,7 @@ namespace Bordercities
                             }
                             if (edge.mode == EdgeDetection.EdgeDetectMode.SobelDepthThin)
                             {
-                                showAdvanced = GUILayout.Toggle(showAdvanced, "Show advanced settings (NOTE: THESE SETTINGS WILL NOT YET SAVE TO CUSTOM-MADE PRESETS!!  They will however save to your main configuration.  I just wanted to get the main chunk 'begone ugly mountains' out so people could enjoy it before going to bed tonight, as its already getting late");
+                                showAdvanced = GUILayout.Toggle(showAdvanced, "Show advanced settings");
                                 if (showAdvanced)
                                 {
                                     
@@ -1441,98 +1492,107 @@ namespace Bordercities
                                 GUILayout.Label("Edge exponent: " + edge.edgeExp.ToString());
                                 edge.edgeExp = GUILayout.HorizontalSlider(edge.edgeExp, 0.004f, 1.000f, GUILayout.Width(570));
                             }
-
-                            GUILayout.Label("Edge Coloring: (0,0,0 for default black)");
-                            GUILayout.Space(5f);
-
-
-                            GUILayout.BeginHorizontal();
-                            roundedR = Mathf.Round(setR * 100f) / 100f;
-                            GUILayout.Label("R " + roundedR.ToString());
-
-                            setR = GUILayout.HorizontalSlider(setR, 0.000f, 3.000f, GUILayout.Width(570));
-                            GUILayout.EndHorizontal();
+                            showEdgeColors = GUILayout.Toggle(showEdgeColors, "Show edge colors");
+                            if (showEdgeColors)
+                            {
+                                GUILayout.Label("Edge Coloring: (0,0,0 for default black)");
+                                GUILayout.Space(5f);
 
 
-                            GUILayout.BeginHorizontal();
-                            roundedG = Mathf.Round(setG * 100f) / 100f;
-                            GUILayout.Label("G " + roundedG.ToString());
+                                GUILayout.BeginHorizontal();
+                                roundedR = Mathf.Round(setR * 100f) / 100f;
+                                GUILayout.Label("R " + roundedR.ToString());
 
-                            setG = GUILayout.HorizontalSlider(setG, 0.000f, 3.000f, GUILayout.Width(570));
-                            GUILayout.EndHorizontal();
-
-
-                            GUILayout.BeginHorizontal();
-                            roundedB = Mathf.Round(setB * 100f) / 100f;
-                            GUILayout.Label("B " + roundedB.ToString());
-
-                            setB = GUILayout.HorizontalSlider(setB, 0.000f, 3.000f, GUILayout.Width(570));
-                            GUILayout.EndHorizontal();
+                                setR = GUILayout.HorizontalSlider(setR, 0.000f, 3.000f, GUILayout.Width(570));
+                                GUILayout.EndHorizontal();
 
 
+                                GUILayout.BeginHorizontal();
+                                roundedG = Mathf.Round(setG * 100f) / 100f;
+                                GUILayout.Label("G " + roundedG.ToString());
 
+                                setG = GUILayout.HorizontalSlider(setG, 0.000f, 3.000f, GUILayout.Width(570));
+                                GUILayout.EndHorizontal();
+
+
+                                GUILayout.BeginHorizontal();
+                                roundedB = Mathf.Round(setB * 100f) / 100f;
+                                GUILayout.Label("B " + roundedB.ToString());
+
+                                setB = GUILayout.HorizontalSlider(setB, 0.000f, 3.000f, GUILayout.Width(570));
+                                GUILayout.EndHorizontal();
+
+                                GUILayout.BeginHorizontal();
+                                roundedMult = Mathf.Round(colorMultiplier * 100f) / 100f;
+                                GUILayout.Label("Color multiplier: " + roundedMult.ToString());
+                                colorMultiplier = GUILayout.HorizontalSlider(colorMultiplier, 0.0f, 10.0f, GUILayout.Width(570));
+                                GUILayout.EndHorizontal();
+                                
+                                if (GUILayout.Button("Apply Edge Color"))
+                                {
+                                    EdgeColor(setR, setG, setB);
+                                    EdgeColor(setR, setG, setB); // double entry here is intentional, I am too in shock over how cool this is to do it totally right but this is acceptable enough for now
+                                }
+                            }
+                            
                             GUILayout.Space(10f);
 
-                            GUILayout.BeginHorizontal();
-                            roundedMult = Mathf.Round(colorMultiplier * 100f) / 100f;
-                            GUILayout.Label("Color multiplier: " + roundedMult.ToString());
-
-                            colorMultiplier = GUILayout.HorizontalSlider(colorMultiplier, 0.0f, 10.0f, GUILayout.Width(570));
-                            GUILayout.EndHorizontal();
-
-
-                            if (GUILayout.Button("Apply Edge Color"))
+                            showMixColors = GUILayout.Toggle(showMixColors, "Show mix colors");
+                            if (showMixColors)
                             {
-                                EdgeColor(setR, setG, setB);
-                                EdgeColor(setR, setG, setB); // double entry here is intentional, I am too in shock over how cool this is to do it totally right but this is acceptable enough for now
+                                GUILayout.Label("Mix Coloring: (1,1,1 for default white)");
+                                GUILayout.Space(5f);
+
+
+                                GUILayout.BeginHorizontal();
+                                mixRoundedR = Mathf.Round(mixSetR * 100f) / 100f;
+                                GUILayout.Label("R " + mixRoundedR.ToString());
+
+                                mixSetR = GUILayout.HorizontalSlider(mixSetR, 0.001f, 3.000f, GUILayout.Width(570));
+                                GUILayout.EndHorizontal();
+
+
+                                GUILayout.BeginHorizontal();
+                                mixRoundedG = Mathf.Round(mixSetG * 100f) / 100f;
+                                GUILayout.Label("G " + mixRoundedG.ToString());
+
+                                mixSetG = GUILayout.HorizontalSlider(mixSetG, 0.000f, 3.000f, GUILayout.Width(570));
+                                GUILayout.EndHorizontal();
+
+
+                                GUILayout.BeginHorizontal();
+                                mixRoundedB = Mathf.Round(mixSetB * 100f) / 100f;
+                                GUILayout.Label("B " + mixRoundedB.ToString());
+
+                                mixSetB = GUILayout.HorizontalSlider(mixSetB, 0.000f, 3.000f, GUILayout.Width(570));
+                                GUILayout.EndHorizontal();
+
+
+
+                                GUILayout.Space(10f);
+
+                                GUILayout.BeginHorizontal();
+                                mixRoundedMult = Mathf.Round(mixColorMultiplier * 100f) / 100f;
+                                GUILayout.Label("Color multiplier: " + mixRoundedMult.ToString());
+
+                                mixColorMultiplier = GUILayout.HorizontalSlider(mixColorMultiplier, 0.0f, 10.0f, GUILayout.Width(570));
+                                GUILayout.EndHorizontal();
+
+
+                                if (GUILayout.Button("Apply Edge Mix Color"))
+                                {
+                                    MixColor(mixSetR, mixSetG, mixSetB);
+                                    MixColor(mixSetR, mixSetG, mixSetB); // double entry here is intentional, I am too in shock over how cool this is to do it totally right but this is acceptable enough for now
+                                }
                             }
+                            
+
+
+                            
 
 
 
-                            GUILayout.Label("Mix Coloring: (1,1,1 for default white)");
-                            GUILayout.Space(5f);
-
-
-                            GUILayout.BeginHorizontal();
-                            mixRoundedR = Mathf.Round(mixSetR * 100f) / 100f;
-                            GUILayout.Label("R " + mixRoundedR.ToString());
-
-                            mixSetR = GUILayout.HorizontalSlider(mixSetR, 0.001f, 3.000f, GUILayout.Width(570));
-                            GUILayout.EndHorizontal();
-
-
-                            GUILayout.BeginHorizontal();
-                            mixRoundedG = Mathf.Round(mixSetG * 100f) / 100f;
-                            GUILayout.Label("G " + mixRoundedG.ToString());
-
-                            mixSetG = GUILayout.HorizontalSlider(mixSetG, 0.000f, 3.000f, GUILayout.Width(570));
-                            GUILayout.EndHorizontal();
-
-
-                            GUILayout.BeginHorizontal();
-                            mixRoundedB = Mathf.Round(mixSetB * 100f) / 100f;
-                            GUILayout.Label("B " + mixRoundedB.ToString());
-
-                            mixSetB = GUILayout.HorizontalSlider(mixSetB, 0.000f, 3.000f, GUILayout.Width(570));
-                            GUILayout.EndHorizontal();
-
-
-
-                            GUILayout.Space(10f);
-
-                            GUILayout.BeginHorizontal();
-                            mixRoundedMult = Mathf.Round(mixColorMultiplier * 100f) / 100f;
-                            GUILayout.Label("Color multiplier: " + mixRoundedMult.ToString());
-
-                            mixColorMultiplier = GUILayout.HorizontalSlider(mixColorMultiplier, 0.0f, 10.0f, GUILayout.Width(570));
-                            GUILayout.EndHorizontal();
-
-
-                            if (GUILayout.Button("Apply Edge Mix Color"))
-                            {
-                                MixColor(mixSetR, mixSetG, mixSetB);
-                                MixColor(mixSetR, mixSetG, mixSetB); // double entry here is intentional, I am too in shock over how cool this is to do it totally right but this is acceptable enough for now
-                            }
+                           
                             if (infoManager.CurrentMode == InfoManager.InfoMode.None)
                             {
                                 GUILayout.Label("Gamma: " + toneMapGamma.ToString());
@@ -1802,14 +1862,15 @@ namespace Bordercities
                 GUILayout.BeginHorizontal();
                 if (tab != Config.Tab.Hotkey)
                 {
+
+                    if (GUILayout.Button("Reset Brightness (Tonemapper)") && tab != Config.Tab.Presets)
+                    {
+                        ResetTonemapper();
+                    }
                     if (!automaticMode)
                     {
                         if (tab != Config.Tab.Presets)
                         {
-                            if (GUILayout.Button("Reset Brightness") && !automaticMode)
-                            {
-                                ResetTonemapper();
-                            }
                             if (GUILayout.Button("Load Settings"))
                             {
                                 LoadConfig(true);
@@ -1823,7 +1884,7 @@ namespace Bordercities
                             GUILayout.Space(40f);
                         if (GUILayout.Button("Save Settings"))
                         {
-                            SaveConfig(); // TO DO... SAVE PRESET LIST SEPARATELY FROM REGULAR CONFIG
+                            SaveConfig(); 
                         }
                     }
                     else
@@ -1831,7 +1892,7 @@ namespace Bordercities
                         
                         if (GUILayout.Button("Save Visible to Main Save"))
                         {
-                            SaveConfig(); // TO DO... SAVE PRESET LIST SEPARATELY FROM REGULAR CONFIG
+                            SaveConfig(); 
                         }
                     }
                 }
@@ -1872,6 +1933,12 @@ namespace Bordercities
                 edge.sensitivityNormals = presetToLoad.sensNorm;
                 edge.sensitivityDepth = presetToLoad.sensDepth;
                 edge.edgeExp = presetToLoad.edgeExpo;
+                edge.depthsAxis = presetToLoad.depthsAxis;
+                edge.depthsDiagonal = presetToLoad.depthsDiagonal;
+                edge.mult1 = presetToLoad.sobelMult1;
+                edge.mult2 = presetToLoad.sobelMult2;
+                edge.mult3 = presetToLoad.sobelMult3;
+                edge.mult4 = presetToLoad.sobelMult4;
                 edge.edgesOnly = presetToLoad.edgeOnly;
                 edge.sampleDist = presetToLoad.edgeSamp;
                 autoEdge = presetToLoad.autoEdge;
