@@ -168,7 +168,6 @@ namespace Bordercities
         private bool userIsPreviewing = false;
         private Color sobeCitiesC;
 
-        public GUIStyle style;
 
         void InitializeColors()
         {
@@ -182,7 +181,6 @@ namespace Bordercities
         void Awake()
         {
             InitializeColors();
-            style = new GUIStyle(GUI.skin.button);
 
             cameraController = GetComponent<CameraController>();
             infoManager = InfoManager.instance;
@@ -1388,6 +1386,7 @@ namespace Bordercities
                         {
                             ResizeWindow(803, 530);
 
+                            GUILayout.Label("PRESETS (NOTE: Recommended viewing resolutions are merely suggestions based upon the need to scale up the effect as resolution increases. There are no performance differences -- use whichever preset looks best to your eyes.  Note that if a preset is tuned for a particular resolution, there is a chance that you might experience severe artifacts if using it at a lower resolution.  This will cause no harm, but it will look pretty terrible.");
                             GUILayout.Space(6f);
                             GUILayout.BeginHorizontal();
                             GUILayout.Label("720p-1080p + NO DR:", GUILayout.Width(150));
@@ -1482,7 +1481,7 @@ namespace Bordercities
                                     setG = edge.edgeColor.g;
                                     setB = edge.edgeColor.b;
                                     mixColorMultiplier = 1.0f;
-                                    colorMultiplier = 1.0f;
+                                    colorMultiplier = 1.0f; 
                                 }
                                 if (GUILayout.Button("Reset Cartoon Color"))
                                 {
