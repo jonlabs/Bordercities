@@ -168,6 +168,7 @@ namespace Bordercities
         private bool userIsPreviewing = false;
         private Color sobeCitiesC;
 
+        public GUIStyle style;
 
         void InitializeColors()
         {
@@ -181,7 +182,8 @@ namespace Bordercities
         void Awake()
         {
             InitializeColors();
-            
+            style = new GUIStyle(GUI.skin.button);
+
             cameraController = GetComponent<CameraController>();
             infoManager = InfoManager.instance;
             currentInfoMode = infoManager.CurrentMode;
@@ -929,7 +931,7 @@ namespace Bordercities
             edge.edgesOnly = 0f;
             autoSobelEdge = true;
             edge.depthsDiagonal = 0.779f;
-            edge.mult1 = 4.000f;
+            edge.mult1 = 1.637f;
             edge.mult2 = 10.0f;
 
             edge.edgeColor = sobeCitiesC;
@@ -1320,7 +1322,7 @@ namespace Bordercities
 
         void SettingsPanel(int wnd)
         {
-            
+           
             GUI.DragWindow(dragBar);
             #region Top Navigation Buttons
             GUILayout.BeginHorizontal();
@@ -1386,7 +1388,6 @@ namespace Bordercities
                         {
                             ResizeWindow(803, 530);
 
-                            GUILayout.Label("PRESETS (NOTE: Recommended viewing resolutions are merely suggestions based upon the need to scale up the effect as resolution increases. There are no performance differences -- use whichever preset looks best to your eyes.");
                             GUILayout.Space(6f);
                             GUILayout.BeginHorizontal();
                             GUILayout.Label("720p-1080p + NO DR:", GUILayout.Width(150));
@@ -1654,7 +1655,7 @@ namespace Bordercities
                                     edge.mult4 = GUILayout.HorizontalSlider(edge.mult4, 0.000f, 10.000f);
                                 }
                                 GUILayout.EndHorizontal();
-                                if (GUILayout.Button("Reset Multipliers"))
+                                if (GUILayout.Button("Reset SobelSkylines-specfic parameters"))
                                 {
                                     edge.mult1 = 1.0f;
                                     edge.mult2 = 10.0f;
