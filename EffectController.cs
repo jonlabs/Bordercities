@@ -1386,7 +1386,6 @@ namespace Bordercities
                         {
                             ResizeWindow(803, 530);
 
-                            GUILayout.Label("PRESETS");
                             GUILayout.Space(6f);
                             GUILayout.BeginHorizontal();
                             GUILayout.Label("720p-1080p + NO DR:", GUILayout.Width(150));
