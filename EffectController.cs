@@ -1538,7 +1538,6 @@ namespace Bordercities
                             {
                                 GUILayout.BeginHorizontal();
                                 showAdvanced = GUILayout.Toggle(showAdvanced, "Show advanced settings");
-                                GUILayout.Label(cameraController.m_currentSize.ToString());
                                 GUILayout.EndHorizontal();
                                 if (showAdvanced)
                                 {
