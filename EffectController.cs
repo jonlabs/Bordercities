@@ -903,7 +903,7 @@ namespace Bordercities
 
         void RealismAutomatic()
         {
-            displayTitle = "Realism - REQUIRES 1920x1080 AND DYNAMIC RESOLUTION 200-250% FOR INTENDED LOOK.";
+            displayTitle = "Realism - REQUIRES 1920x1080 AND DYNAMIC RESOLUTION 175-250% FOR INTENDED LOOK.";
             activeStockPreset = ActiveStockPreset.Realism;
             automaticMode = true;
             autoSobelEdge = true;
@@ -921,7 +921,7 @@ namespace Bordercities
             bloom.threshold = 0.27f;
             bloom.intensity = 0.39f;
             bloom.blurSize = 5.50f;
-            displayText = "This preset is designed for those who wish to use 'Edge Detection' for use as a visual enhancement tool, not an effect.  As an enhancement tool, 'Edge Detection' maintains the visual detection of distant shapes which would otherwise be lost by the renderer at a distance - such as street lamps.  Of course, nature doesn't draw lines around everything, nor may your monitor look like mine, thus, you may need to tweak this further to your own satisfaction.  I strongly recommend using 'Mix' to your benefit so that you can dial in the right amount of settings. Regardless, do keep in mind that Bordered Skylines is not an ambient occlusion mod.  If you are looking for -shadowing- at -edge intersections-, try Ulysius' Ambient Occlusion.";
+            displayText = "HIGHLY RECOMMENDED to use DLAA AA from MazK's 'PostProcessFX'!  DLAA provides the 'knock-out punch' to the intended role of Bordered Skylines when aiming to use 'Realism', or, 'Edge Detection' as a visual enhancement tool and not as an effect.  When used in this manner, 'Edge Detection' maintains the visual detection of distant shapes which would otherwise be lost by the renderer at a distance - such as street lamps.  I must say again, as it makes that much of a difference - do combine this preset with DLAA.  The performance loss is neglible for that finishing touch it provides.  Do keep in mind that Bordered Skylines is not an ambient occlusion mod.  If you are looking for -shadowing- at -edge intersections-, try Ulysius' Ambient Occlusion.";
             mixSetR = edge.edgesOnlyBgColor.r;
             mixSetG = edge.edgesOnlyBgColor.g;
             mixSetB = edge.edgesOnlyBgColor.b;
