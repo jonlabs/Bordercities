@@ -1386,6 +1386,7 @@ namespace Bordercities
                         {
                             ResizeWindow(803, 530);
 
+                            GUILayout.Label("PRESETS (NOTE: Recommended viewing resolutions are merely suggestions based upon the need to scale up the effect as resolution increases. There are no performance differences -- use whichever preset looks best to your eyes.");
                             GUILayout.Space(6f);
                             GUILayout.BeginHorizontal();
                             GUILayout.Label("720p-1080p + NO DR:", GUILayout.Width(150));
@@ -1806,7 +1807,7 @@ namespace Bordercities
                 if (!firstTime)
                 {
                     ResizeWindow(538, 600);
-                    GUILayout.Label("WARNING: HOTKEY BUTTONS WILL SAVE UPON CLICK.  THIS INCLUDES YOUR EFFECTS SETTINGS.  If you wish to create a safe backup of your active Effect, navigate to the 'Presets' tab above and create a permanent copy before selecting a hotkey here.  This will not be like this for much longer.");
+                    GUILayout.Label("WARNING: HOTKEY BUTTONS WILL SAVE UPON CLICK.  THIS INCLUDES YOUR EFFECTS SETTINGS.  If you wish to create a safe backup of your active Effect, navigate to the 'XML' tab above and create a permanent copy before selecting a hotkey here.  This will not be like this for much longer.");
 
                 }
                 KeyboardGrid(0);
@@ -1846,7 +1847,6 @@ namespace Bordercities
             if (tab == Config.Tab.Presets)
             {
                 ResizeWindow(600, 750);
-                GUILayout.Label("Coming soon: Fourth 'Preset Bind' tab where you can allocate these assigned entries to Info Modes and/or hotkeys!");
                 GUILayout.Label("NOTE: Your preset bank list is saved automatically, and as a whole, upon either saving any of your fields, or, proper exit of the game.  Note that your changes to this list will NOT be saved in the event of an Alt-F4 or other similarly graceless exit.  You will the preset files stored within steamapps/common/Cities_Skylines/BordercitiesPresets.");
 
                 GUILayout.Space(2f);
@@ -1861,6 +1861,7 @@ namespace Bordercities
                     {
                         if (IsValidFilename(presetEntries[i]))
                         {
+                            SavePreset(presetEntries[i], true);
                             SavePreset(presetEntries[i], true);
                             SaveBank();
                         }
@@ -1880,6 +1881,8 @@ namespace Bordercities
                         if (IsValidFilename(presetEntries[i]))
                         {
                             SavePreset(presetEntries[i], true);
+                            SavePreset(presetEntries[i], true);
+
                         }
                     }
                     if (GUILayout.Button("Load", GUILayout.MaxWidth(60), GUILayout.MaxHeight(25)))
@@ -1890,7 +1893,7 @@ namespace Bordercities
                     GUILayout.EndHorizontal();  
                 }
 
-                GUILayout.Label("Support for presets is sort of thrown together for the moment. The name of the input field must match the filename, and is case sensitive.  Having a nicer preset browser is on the todo list.");
+                GUILayout.Label("Support for custom presets is sort of thrown together for the moment. The name of the input field must match the filename, and is case sensitive.  Having a nicer preset browser is on the todo list.");
 
                 if (GUILayout.Button("Reset Bank (This will save!)"))
                 {
@@ -1902,54 +1905,120 @@ namespace Bordercities
             #region View Modes
             if (tab == Config.Tab.ViewModes)
             {
-                ResizeWindow(600, 900);
+                ResizeWindow(800, 755);
 
-                ViewModeGUI(inputInfoBuildingLevel, infoBuildingLevel, "Building Level", "BuildingLevel", existBuildingLevel);
-                ViewModeGUI(inputInfoConnections, infoConnections, "Connections", existBuildingLevel);
-                ViewModeGUI(inputInfoCrime, infoCrime, "Crime", existCrimeRate);
-                ViewModeGUI(inputInfoDensity, infoDensity, "Density", existDensity);
-                ViewModeGUI(inputInfoDistricts, infoDistricts, "Districts", existDistricts);
-                ViewModeGUI(inputInfoEducation, infoEducation, "Education", existEducation);
-                ViewModeGUI(inputInfoElectricity, infoElectricity, "Electricity", existElectricity);
-                ViewModeGUI(inputInfoEntertainment, infoEntertainment, "Entertainment", existEntertainment);
-                ViewModeGUI(inputInfoFireSafety, infoFireSafety, "Fire Safety", "FireSafety", existFireSafety);
-                ViewModeGUI(inputInfoGarbage, infoGarbage, "Garbage", existGarbage);
-                ViewModeGUI(inputInfoHappiness, infoHappiness, "Happiness", existHappiness);
-                ViewModeGUI(inputInfoHealth, infoHealth, "Health", existHealth);
-                ViewModeGUI(inputInfoLandValue, infoLandValue, "Land Value", "LandValue", existLandValue);
-                ViewModeGUI(inputInfoNaturalResources, infoNaturalResources, "Natural Resources", "NaturalResources", existNaturalResources);
-                ViewModeGUI(inputInfoNoisePollution, infoNoisePollution, "Noise Pollution","NoisePollution", existNoisePollution);
-                ViewModeGUI(inputInfoPollution, infoPollution, "Pollution", existPollution);
-                ViewModeGUI(inputInfoTerrainHeight, infoTerrainHeight, "Terrain Height", "TerrainHeight", existTerrainHeight);
-                ViewModeGUI(inputInfoTraffic, infoTraffic, "Traffic", existTraffic);
-                ViewModeGUI(inputInfoTransport, infoTransport, "Transport", existTransport);
-                ViewModeGUI(inputInfoWater, infoWater, "Water", existWater);
-                ViewModeGUI(inputInfoWind, infoWind, "Wind", existWind);
+                ViewModeGUI("Building Level", "BuildingLevel", existBuildingLevel, "Connections", "Connections", existConnections);
+                ViewModeGUI("Crime Rate", "CrimeRate", existCrimeRate, "Density", "Density", existDensity);
+                ViewModeGUI("Districts","Districts",existDistricts,"Education","Education",existEducation);
+                ViewModeGUI("Electricity","Electricity",existElectricity,"Entertainment","Entertainment",existEntertainment);
+                ViewModeGUI("Fire Safety", "FireSafety", existFireSafety,"Garbage","Garbage",existGarbage);
+                ViewModeGUI("Happiness","Happiness",existHappiness,"Health","Health",existHealth);
+                ViewModeGUI("Land Value","LandValue",existLandValue,"Natural Resources","NaturalResources",existNaturalResources);
+                ViewModeGUI("Noise Pollution","NoisePollution",existNoisePollution,"Pollution","Pollution",existPollution);
+                ViewModeGUI("Terrain Height","TerrainHeight",existTerrainHeight,"Traffic","Traffic",existTraffic);
+                ViewModeGUI("Transport","Transport",existTransport,"Water","Water",existWater);
+                ViewModeGUI("Wind", "Wind", existWind);
 
-                GUILayout.Space(2);
-                GUILayout.Label("Any Info Mode preset is generated and saved to disk ('steamapps/common/Cities_Skylines/BordercitiesPresets/InfoModes') in its own dedicated XML file, performed upon any click of a Info Mode's respective 'Set' button.  When generated/updated, whichever settings are currently on-screen will be the settings saved to your desired Info Mode's preset -- regardless of whether or not you had first pressed 'Save Settings'.  For ease of understanding, know that your main config is entirely separate from the Info-Mode-specific presets assignable here as well as separate from the general-purpose-presets located in the 'Presets' tab.  The 'Main Config' (the one that auto-loads when you start the game via 'Save Settings') is the configuration that will be automatically loaded upon exiting an Info Mode (if you are also not using 'Effect Enabled in Info Modes Only.')");
+                
+                GUILayout.Space(15);
+                if (automaticMode)
+                    GUILayout.Label("Dial in custom colors! You'll want to go easy on 'Mix' so that blue<->red gameplay info remains discernible.");
+                else
+                    GUILayout.Label("Advanced Mode detected: For clarity, these are the exact same color sliders from the main page.  You can technically mix and match all possible settings, and per info mode, if you so desire.  The colors are here as a shortcut, as it is assumed that you'll want to use very different colors for each Info Mode.");
 
+                GUILayout.Space(5);
+                GUILayout.Label("Mix: " + edge.edgesOnly.ToString("F2"));
+                edge.edgesOnly = GUILayout.HorizontalSlider(edge.edgesOnly, 0.000f, 1.000f, GUILayout.MaxWidth(500));  
+                GUILayout.BeginHorizontal();
+                GUILayout.Label("R " + setR.ToString("F2"), GUILayout.MaxWidth(10f));
+                setR = GUILayout.HorizontalSlider(setR, 0.000f, 3.000f, GUILayout.Width(90));
+
+
+                GUILayout.Label("G " + setG.ToString("F2"), GUILayout.MaxWidth(10f));
+                setG = GUILayout.HorizontalSlider(setG, 0.000f, 3.000f, GUILayout.Width(90));
+
+
+                GUILayout.Label("B " + setB.ToString("F2"), GUILayout.MaxWidth(10f));
+                setB = GUILayout.HorizontalSlider(setB, 0.000f, 3.000f, GUILayout.Width(90));
+
+                GUILayout.Label("x" + colorMultiplier.ToString("F1"), GUILayout.MaxWidth(20f));
+                colorMultiplier = GUILayout.HorizontalSlider(colorMultiplier, 0.0f, 10.0f, GUILayout.Width(90));
+
+                if (GUILayout.Button("Apply Edge Color", GUILayout.MaxWidth(120)))
+                {
+                    EdgeColor(setR, setG, setB);
+                    EdgeColor(setR, setG, setB);
+                }
+                if (GUILayout.Button("Black", GUILayout.MaxWidth(55)))
+                {
+                    setR = 0.0f;
+                    setG = 0.0f;
+                    setB = 0.0f;
+                    colorMultiplier = 1.0f;
+                    EdgeColor(0.0f, 0.0f, 0.0f);
+                    EdgeColor(0.0f, 0.0f, 0.0f);
+                }
+                GUILayout.EndHorizontal();
+
+
+
+
+                GUILayout.BeginHorizontal();
+                GUILayout.Label("R " + mixSetR.ToString("F2"), GUILayout.MaxWidth(10f));
+                mixSetR = GUILayout.HorizontalSlider(mixSetR, 0.000f, 3.000f, GUILayout.Width(90));
+
+
+                GUILayout.Label("G " + mixSetG.ToString("F2"), GUILayout.MaxWidth(10f));
+                mixSetG = GUILayout.HorizontalSlider(mixSetG, 0.000f, 3.000f, GUILayout.Width(90));
+
+
+                GUILayout.Label("B " + mixSetB.ToString("F2"), GUILayout.MaxWidth(10f));
+                mixSetB = GUILayout.HorizontalSlider(mixSetB, 0.000f, 3.000f, GUILayout.Width(90));
+
+                GUILayout.Label("x" + mixColorMultiplier.ToString("F2"), GUILayout.MaxWidth(20f));
+                mixColorMultiplier = GUILayout.HorizontalSlider(mixColorMultiplier, 0.0f, 10.0f, GUILayout.Width(90));
+
+                if (GUILayout.Button("Apply Mix Color", GUILayout.MaxWidth(120)))
+                {
+                    MixColor(mixSetR, mixSetG, mixSetB);
+                    MixColor(mixSetR, mixSetG, mixSetB);
+                }
+                if (GUILayout.Button("White", GUILayout.MaxWidth(55)))
+                {
+                    mixSetR = 1.0f;
+                    mixSetG = 1.0f;
+                    mixSetB = 1.0f;
+                    mixColorMultiplier = 1.0f;
+                    MixColor(1.0f, 1.0f, 1.0f);
+                    MixColor(1.0f, 1.0f, 1.0f);
+                }
+                GUILayout.EndHorizontal();
                 if (infoManager.CurrentMode != InfoManager.InfoMode.None)
                 {
-                    if (GUILayout.Button("Quick-Set currently displayed settings to this Info Mode ("+GetCurrentInfoModeString()+")"))
+                    if (GUILayout.Button("Shortcut for 'Set " + GetCurrentInfoModeString() + "'! (Current info mode)"))
                     {
                         QuicksaveActiveViewMode();
                     }
                 }
                 else
                 {
-                    if (GUILayout.Button("Enter an Info Mode to quicksave for it, or, set above!"))
+                    if (GUILayout.Button("Shortcut for 'Set [InfoMode].'  Enter an info mode to use!"))
                     {
-
+                        QuicksaveActiveViewMode();
                     }
                 }
-
-                GUILayout.Space(4);
+                GUILayout.Space(10f);
                 if (GUILayout.Button("Return to configuration tab"))
                 {
                     tab = Config.Tab.EdgeDetection;
                 }
-                GUILayout.Space(30);
+                GUILayout.Space(3f);
+                
+
+                GUILayout.Label("Any 'Set' for a given Info Mode is generated and saved to disk ('steamapps/common/Cities_Skylines/BordercitiesPresets/InfoModes') in its own dedicated XML file (IE 'Wind.xml' 'Water.xml'), and only upon clicking will the file be created, if not already existing.  Your main config will be loaded in the absence of a custom 'Info Mode' XML.  When clicking 'Set', whichever settings are currently on-screen will be the settings saved to your desired Info Mode's XML file -- regardless of whether or not you had first pressed 'Save Settings'.  For ease of understanding, know that your main config is entirely separate from the Info-Mode XML database here, as well as separate from the general 'Custom' XML config-saves located in the 'Custom' tab.  Your primary config (the one that auto-loads when you start the game via 'Save Settings') is the configuration that will be automatically loaded upon exiting an Info Mode (if you are also not using 'Effect Enabled in Info Modes Only.')");
+
+                GUILayout.Space(4);
+                
 
 
             }
@@ -2137,6 +2206,7 @@ namespace Bordercities
         {
             string saveName = GetCurrentInfoModeString();
             SavePreset(saveName, false);
+            SavePreset(saveName, false);
         }
 
         string GetCurrentInfoModeString()
@@ -2236,6 +2306,46 @@ namespace Bordercities
             existTransport = Preset.CheckIfExists("Transport");
             existWater = Preset.CheckIfExists("Water");
             existWind = Preset.CheckIfExists("Wind");
+        }
+        void InfoModes()
+        {
+
+            if (infoManager.CurrentMode != currentInfoMode)
+            {
+                if (infoManager.CurrentMode == InfoManager.InfoMode.None)
+                {
+                    currentInfoMode = infoManager.CurrentMode;
+                    LoadConfig(true);
+                    return;
+                }
+                ViewModeCheckAndSet(InfoManager.InfoMode.BuildingLevel, "BuildingLevel");
+                ViewModeCheckAndSet(InfoManager.InfoMode.Connections, "Connections");
+                ViewModeCheckAndSet(InfoManager.InfoMode.CrimeRate, "CrimeRate");
+                ViewModeCheckAndSet(InfoManager.InfoMode.Density, "Density");
+                ViewModeCheckAndSet(InfoManager.InfoMode.Districts, "Districts");
+                ViewModeCheckAndSet(InfoManager.InfoMode.Education, "Education");
+                ViewModeCheckAndSet(InfoManager.InfoMode.Electricity, "Electricity");
+                ViewModeCheckAndSet(InfoManager.InfoMode.Entertainment, "Entertainment");
+                ViewModeCheckAndSet(InfoManager.InfoMode.FireSafety, "FireSafety");
+                ViewModeCheckAndSet(InfoManager.InfoMode.Garbage, "Garbage");
+                ViewModeCheckAndSet(InfoManager.InfoMode.Happiness, "Happiness");
+                ViewModeCheckAndSet(InfoManager.InfoMode.Health, "Health");
+                ViewModeCheckAndSet(InfoManager.InfoMode.LandValue, "LandValue");
+                ViewModeCheckAndSet(InfoManager.InfoMode.NaturalResources, "NaturalResources");
+                ViewModeCheckAndSet(InfoManager.InfoMode.NoisePollution, "NoisePollution");
+                ViewModeCheckAndSet(InfoManager.InfoMode.Pollution, "Pollution");
+                ViewModeCheckAndSet(InfoManager.InfoMode.TerrainHeight, "TerrainHeight");
+                ViewModeCheckAndSet(InfoManager.InfoMode.Traffic, "Traffic");
+                ViewModeCheckAndSet(InfoManager.InfoMode.Transport, "Transport");
+                ViewModeCheckAndSet(InfoManager.InfoMode.Water, "Water");
+                ViewModeCheckAndSet(InfoManager.InfoMode.Wind, "Wind");
+                GUILayout.Space(10);
+                if (GUILayout.Button("Load Main Panel Configuration"))
+                {
+                    LoadConfig(true);
+                }
+                GUILayout.Space(10);
+            }
         }
 
         void ResetTonemapper()
@@ -2369,12 +2479,39 @@ namespace Bordercities
         }
 
 
-        void ViewModeGUI(string inputField, string presetName, string label, bool exists)
+        void ViewModeGUI(string label, string filename, bool exists)
         {
             GUILayout.BeginHorizontal();
             if (GUILayout.Button("Set " + label, GUILayout.MaxWidth(180), GUILayout.MinWidth(180)))
             {
-                SavePreset(label, false);
+                SavePreset(filename, false);
+                SavePreset(filename, false);
+                InitializeExistBools();
+            }
+            if (exists)
+            {
+                if (GUILayout.Button("Activate " + label, GUILayout.MaxWidth(180), GUILayout.MinWidth(180)))
+                {
+                    LoadPreset(filename, false);
+                }
+            }
+            else
+            {
+                if (GUILayout.Button("No " + label + " found!", GUILayout.MaxWidth(180), GUILayout.MinWidth(180)))
+                {
+
+                }
+            }
+            GUILayout.EndHorizontal();
+        }
+
+            void ViewModeGUI(string label, string filename, bool exists, string label2, string filename2, bool exists2)
+        {
+            GUILayout.BeginHorizontal();
+            if (GUILayout.Button("Set " + label, GUILayout.MaxWidth(180), GUILayout.MinWidth(180)))
+            {
+                SavePreset(filename, false);
+                SavePreset(filename, false);
                 InitializeExistBools();
             }
             if (exists)
@@ -2391,6 +2528,31 @@ namespace Bordercities
                     
                 }
             }
+
+            GUILayout.Space(30f);
+
+
+            if (GUILayout.Button("Set " + label2, GUILayout.MaxWidth(180), GUILayout.MinWidth(180)))
+            {
+                SavePreset(filename2, false);
+                SavePreset(filename2, false);
+                InitializeExistBools();
+            }
+            if (exists2)
+            {
+                if (GUILayout.Button("Activate " + label2, GUILayout.MaxWidth(180), GUILayout.MinWidth(180)))
+                {
+                    LoadPreset(filename2, false);
+                }
+            }
+            else
+            {
+                if (GUILayout.Button("No " + label2 + " found!", GUILayout.MaxWidth(180), GUILayout.MinWidth(180)))
+                {
+
+                }
+            }
+
             GUILayout.EndHorizontal();
         }
         void ViewModeGUI(string inputField, string presetName, string label, string doubleWord, bool exists)
@@ -2398,6 +2560,7 @@ namespace Bordercities
             GUILayout.BeginHorizontal();
             if (GUILayout.Button("Set " + label, GUILayout.MaxWidth(180), GUILayout.MinWidth(180)))
             {
+                SavePreset(doubleWord, false);
                 SavePreset(doubleWord, false);
                 InitializeExistBools();
             }
@@ -2458,46 +2621,7 @@ namespace Bordercities
         
 
 
-        void InfoModes()
-        {
-
-            if (infoManager.CurrentMode != currentInfoMode)
-            {
-                if (infoManager.CurrentMode == InfoManager.InfoMode.None)
-                {
-                    currentInfoMode = infoManager.CurrentMode;
-                    LoadConfig(true);
-                    return;
-                }
-                ViewModeCheckAndSet(InfoManager.InfoMode.BuildingLevel, "BuildingLevel");
-                ViewModeCheckAndSet(InfoManager.InfoMode.Connections, "Connections");
-                ViewModeCheckAndSet(InfoManager.InfoMode.CrimeRate, "Crime");
-                ViewModeCheckAndSet(InfoManager.InfoMode.Density, "Density");
-                ViewModeCheckAndSet(InfoManager.InfoMode.Districts, "Districts");
-                ViewModeCheckAndSet(InfoManager.InfoMode.Education, "Education");
-                ViewModeCheckAndSet(InfoManager.InfoMode.Electricity, "Electricity");
-                ViewModeCheckAndSet(InfoManager.InfoMode.Entertainment, "Entertainment");
-                ViewModeCheckAndSet(InfoManager.InfoMode.FireSafety, "Fire Safety");
-                ViewModeCheckAndSet(InfoManager.InfoMode.Garbage, "Garbage");
-                ViewModeCheckAndSet(InfoManager.InfoMode.Happiness, "Happiness");
-                ViewModeCheckAndSet(InfoManager.InfoMode.Health, "Health");
-                ViewModeCheckAndSet(InfoManager.InfoMode.LandValue, "LandValue");
-                ViewModeCheckAndSet(InfoManager.InfoMode.NaturalResources, "NaturalResources");
-                ViewModeCheckAndSet(InfoManager.InfoMode.NoisePollution, "Noise Pollution");
-                ViewModeCheckAndSet(InfoManager.InfoMode.Pollution, "Pollution");
-                ViewModeCheckAndSet(InfoManager.InfoMode.TerrainHeight, "TerrainHeight");
-                ViewModeCheckAndSet(InfoManager.InfoMode.Traffic, "Traffic");
-                ViewModeCheckAndSet(InfoManager.InfoMode.Transport, "Transport");
-                ViewModeCheckAndSet(InfoManager.InfoMode.Water, "Water");
-                ViewModeCheckAndSet(InfoManager.InfoMode.Wind, "Wind");
-                GUILayout.Space(10);
-                if (GUILayout.Button("Load Main Panel Configuration"))
-                {
-                    LoadConfig(true);
-                }
-                GUILayout.Space(10);
-            }
-        }
+        
 
         void ViewModeCheckAndSet(InfoManager.InfoMode infoMode, string preset)
         {
