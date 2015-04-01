@@ -1209,7 +1209,7 @@ namespace Bordercities
             setG = edge.edgeColor.g;
             setB = edge.edgeColor.b;
             mixColorMultiplier = 1.0f;
-            colorMultiplier = 1.0f;
+            colorMultiplier = 1.0f; 
         }
         string KeyToString(KeyCode kc)
         {
@@ -2628,7 +2628,10 @@ namespace Bordercities
             if (infoManager.CurrentMode == infoMode)
             {
                 currentInfoMode = infoManager.CurrentMode;
-                LoadPreset(preset, false);
+                if (!LoadPreset(preset, false))
+                {
+                    LoadConfig(false);
+                }
             }
         }
 
@@ -2646,7 +2649,7 @@ namespace Bordercities
                 if (wantsToneMapper)
                 {
                     tonem.m_ToneMappingBoostFactor = toneMapBoost;
-                    tonem.m_ToneMappingGamma = toneMapGamma;
+                    tonem.m_ToneMappingGamma = toneMapGamma; 
                 }
             }
             if (Input.GetKeyUp(config.keyCode))
