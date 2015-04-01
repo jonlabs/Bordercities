@@ -13,7 +13,6 @@ namespace Bordercities
             Bordercities,
             BordercitiesGritty,
             BordercitiesBright,
-            Sobelcities,
             Cartoon,
             Realism,
             HighEndPC,
@@ -45,7 +44,6 @@ namespace Bordercities
 
         public Config.Tab tab;
         public bool autoEdge;
-        public bool autoSobelEdge;
         public bool firstTime;
         private string displayTitle;
         private string displayText;
@@ -61,7 +59,6 @@ namespace Bordercities
         public float toneMapGamma;
 
         private bool autoEdgeActive;
-        private bool autoSobelEdgeActive;
         public bool subViewOnly;
         public bool useInfoModeSpecific;
 
@@ -161,7 +158,7 @@ namespace Bordercities
 
         private bool isOn;
         private bool userIsPreviewing = false;
-        private Color sobeCitiesC;
+      
         
 
         void InitializeColors()
@@ -169,7 +166,6 @@ namespace Bordercities
             cartoonEdgeC = new Color(0.04f, 0.04f, 0.04f);
             lowEndEdgeC = new Color(0.08f, 0.08f, 0.06f);
             realismEdgeC = new Color(0.17f,0.17f,0.17f);
-            sobeCitiesC = new Color(0.32f, 0.33f, 0.32f);
            
         }
 
@@ -208,22 +204,19 @@ namespace Bordercities
                 //TriangleRoberts
                 config.sensNorm = 1.63f;
                 config.sensDepth = 2.12f;
-                config.autoEdge = true;
 
                 //Sobel
                 config.edgeExpo = 0.09f;
                 config.depthsAxis = 0.100f;
                 config.depthsDiagonal = 1.000f;
-                config.axisVsCenter = 0.100f;
                 config.sobelMult1 = 1.000f;
                 config.sobelMult2 = 1.000f;
                 config.sobelMult3 = 1.000f;
                 config.sobelMult4 = 1.000f;
-                config.autoSobelEdge = true;
 
                 config.wantsTonemapper = false;
 
-                config.autoSobelEdge = true;
+                config.autoEdge = true;
                 config.firstTime = true;
 
                 config.subViewOnly = false;
@@ -282,8 +275,6 @@ namespace Bordercities
                     config.depthsDiagonal = 1.0f;
                 if (IsNull(config.depthsAxis))
                     config.depthsAxis = 1.0f;
-                if (IsNull(config.depthsAxis))
-                    config.axisVsCenter = 0.100f;
                 if (IsNull(config.sobelMult1))
                     config.sobelMult1 = 1.000f;
                 if (IsNull(config.sobelMult2))
@@ -297,8 +288,6 @@ namespace Bordercities
 
                 if (IsNull(config.autoEdge))
                     config.autoEdge = true;
-                if (IsNull(config.autoSobelEdge))
-                    config.autoSobelEdge = true;
                 if (IsNull(config.firstTime))
                     config.firstTime = true;
                 if (IsNull(config.subViewOnly))
@@ -487,13 +476,11 @@ namespace Bordercities
             edge.edgeExp = config.edgeExpo;
             edge.depthsDiagonal = config.depthsDiagonal;
             edge.depthsAxis = config.depthsAxis;
-            edge.axisVsCenter = config.axisVsCenter;
             edge.mult1 = config.sobelMult1;
             edge.mult2 = config.sobelMult2;
             edge.mult3 = config.sobelMult3;
             edge.mult4 = config.sobelMult4;
             autoEdge = config.autoEdge;
-            autoSobelEdge = config.autoSobelEdge;
             currentColor = config.currentColor;
             edge.edgeColor = currentColor;
             colorMultiplier = config.colorMultiplier;
@@ -516,17 +503,8 @@ namespace Bordercities
             {
                 switch (activeStockPreset)
                 {
-                    case ActiveStockPreset.HighEndPC:
-                        UltraAutomatic();
-                        break;
-                    case ActiveStockPreset.CartoonAlt:
-                        CartoonAltAutomatic();
-                        break;
                     case ActiveStockPreset.Cartoon:
                         CartoonAutomatic();
-                        break;
-                    case ActiveStockPreset.CartoonThree:
-                        CartoonThreeAutomatic();
                         break;
                     case ActiveStockPreset.Bordercities:
                        BordercitiesAutomatic();
@@ -536,9 +514,6 @@ namespace Bordercities
                         break;
                     case ActiveStockPreset.BordercitiesBright:
                         BordercitiesGrittyAutomatic();
-                        break;
-                    case ActiveStockPreset.Sobelcities:
-                        SobelcitiesAutomatic();
                         break;
                     case ActiveStockPreset.LowEndMain:
                         LowEndAutomatic();
@@ -572,16 +547,14 @@ namespace Bordercities
             config.edgeMode = edge.mode;
             config.edgeOnly = edge.edgesOnly;
             config.edgeSamp = edge.sampleDist;
-            //TriangleRobert
             config.autoEdge = autoEdge;
+            //TriangleRobert
             config.sensNorm = edge.sensitivityNormals;
             config.sensDepth = edge.sensitivityDepth;
             //Sobel
-            config.autoSobelEdge = autoSobelEdge;
             config.edgeExpo = edge.edgeExp;
             config.depthsDiagonal = edge.depthsDiagonal;
             config.depthsAxis = edge.depthsAxis;
-            config.axisVsCenter = edge.axisVsCenter;
             config.sobelMult1 = edge.mult1;
             config.sobelMult2 = edge.mult2;
             config.sobelMult3 = edge.mult3;
@@ -641,15 +614,11 @@ namespace Bordercities
             displayTitle = "Low End PC - REQUIRES (1280x720)-(1920x1080) AND (NO DR)-(150% DR) FOR INTENDED LOOK.";
             activeStockPreset = ActiveStockPreset.LowEndMain;
             automaticMode = true;
-            autoSobelEdge = true;
-            edge.depthsDiagonal = 1.0f;
-            edge.mult1 = 1.0f;
-            edge.mult2 = 10.0f;
             edge.mode = EdgeDetection.EdgeDetectMode.SobelDepthThin;
             edge.sampleDist = 1f;
             edge.edgesOnly = 0.01f;
             edge.edgeExp = 0.43f;
-            edge.edgeColor = realismEdgeC;
+            edge.edgeColor = Color.black;
             edge.edgesOnlyBgColor = Color.white;
             if (!CheckTonemapper())
                 ResetTonemapper();
@@ -657,7 +626,7 @@ namespace Bordercities
             bloom.threshold = 0.27f;
             bloom.intensity = 0.39f;
             bloom.blurSize = 5.50f;
-            displayText = "Suited for users of low-end hardware who cannot afford the performance hit of supersampling via nlight's Dynamic Resolution.  This mode was fine-tuned in 720p with all settings as low as possible.";
+            displayText = "Suited for users of low-end hardware who cannot afford the performance hit of supersampling via nlight's Dynamic Resolution.  This mode was fine-tuned in 720p with all settings as low as possible. NOTE 3/30:  Coming soon (likely later tonight/early-morning), a 'Part 2' update with an algorithm to keep the effect balanced at all zoom levels!";
             mixSetR = edge.edgesOnlyBgColor.r;
             mixSetG = edge.edgesOnlyBgColor.g;
             mixSetB = edge.edgesOnlyBgColor.b;
@@ -666,6 +635,12 @@ namespace Bordercities
             setB = edge.edgeColor.b;
             mixColorMultiplier = 1.0f;
             colorMultiplier = 1.0f;
+            edge.depthsDiagonal = 1f;
+            edge.axisVsCenter = 0.1f;
+            edge.mult1 = 0.850f;
+            edge.mult3 = 0.752f;
+            edge.mult2 = 0.501f;
+            edge.mult4 = 2.437f;
             if (wantsToneMapper)
             {
                 if (!subViewOnly)
@@ -854,66 +829,22 @@ namespace Bordercities
             
         }
 
-        void SobelcitiesAutomatic()
-        {
-            displayTitle = "Sobelcities - REQUIRES 1920x1080 AND DYNAMIC RESOLUTION 175-250% FOR INTENDED LOOK.";
-            activeStockPreset = ActiveStockPreset.Sobelcities;
-            automaticMode = true;
-            edge.mode = EdgeDetection.EdgeDetectMode.SobelDepthThin;
-            edge.edgeExp = 0.5f;
-            edge.sampleDist = 1.77f;
-            edge.edgesOnly = 0f;
-            autoSobelEdge = true;
-            edge.depthsDiagonal = 0.779f;
-            edge.mult1 = 4.000f;
-            edge.mult2 = 10.0f;
-
-            edge.edgeColor = sobeCitiesC;
-            edge.edgesOnlyBgColor = Color.white;
-            if (!CheckTonemapper())
-                ResetTonemapper();
-            displayText = "NEW!  Sobelcities puts the newly improved Sobel detection method to the test!  Of these four 'Borderlands'-styled presets, I find this one to resemble Borderlands the closest!!  NOTE 3/31:  There is currently an issue where the off-distance horizon appears as a huge thick line.  I was literally just about to send this to the workshop and then I noticed it.  This is normal, I am just too spent for the day to tweak the algorithm further (after 8 hours of straight programming).  Coming soon!";
-            bloom.enabled = false;
-            bloom.threshold = 0.27f;
-            bloom.intensity = 0.39f;
-            bloom.blurSize = 5.50f;
-            mixSetR = edge.edgesOnlyBgColor.r;
-            mixSetG = edge.edgesOnlyBgColor.g;
-            mixSetB = edge.edgesOnlyBgColor.b;
-            setR = edge.edgeColor.r;
-            setG = edge.edgeColor.g;
-            setB = edge.edgeColor.b;
-            mixColorMultiplier = 1.0f;
-            colorMultiplier = 1.0f;
-            if (wantsToneMapper)
-            {
-                if (!subViewOnly)
-                {
-                    toneMapGamma = 2.2f;
-                    toneMapBoost = 1.365f;
-                }
-                else
-                {
-                    toneMapGamma = defaultGamma;
-                    toneMapBoost = defaultBoost;
-                }
-            }
-
-        }
-
         void RealismAutomatic()
         {
-            displayTitle = "Realism - REQUIRES 1920x1080 AND DYNAMIC RESOLUTION 200-250% FOR INTENDED LOOK.";
+            displayTitle = "Realism - REQUIRES 1920x1080 AND DYNAMIC RESOLUTION 175-250% FOR INTENDED LOOK.";
             activeStockPreset = ActiveStockPreset.Realism;
             automaticMode = true;
-            autoSobelEdge = true;
-            edge.mult1 = 0.162f;
-            edge.mult2 = 1.683f;
             edge.mode = EdgeDetection.EdgeDetectMode.SobelDepthThin;
             edge.sampleDist = 1;
             edge.edgesOnly = 0;
             edge.edgeExp = 0.5f;
-            edge.edgeColor = realismEdgeC;
+            edge.depthsDiagonal = 1.0f;
+            edge.axisVsCenter = 0.1f;
+            edge.mult1 = 0.018f;
+            edge.mult3 = 0.501f;
+            edge.mult2 = 2.580f;
+            edge.mult4 = 1.451f;
+            edge.edgeColor = Color.black;
             edge.edgesOnlyBgColor = Color.white;
             if (!CheckTonemapper())
                 ResetTonemapper();
@@ -921,7 +852,7 @@ namespace Bordercities
             bloom.threshold = 0.27f;
             bloom.intensity = 0.39f;
             bloom.blurSize = 5.50f;
-            displayText = "This preset is designed for those who wish to use 'Edge Detection' for use as a visual enhancement tool, not an effect.  As an enhancement tool, 'Edge Detection' maintains the visual detection of distant shapes which would otherwise be lost by the renderer at a distance - such as street lamps.  Of course, nature doesn't draw lines around everything, nor may your monitor look like mine, thus, you may need to tweak this further to your own satisfaction.  I strongly recommend using 'Mix' to your benefit so that you can dial in the right amount of settings. Regardless, do keep in mind that Bordered Skylines is not an ambient occlusion mod.  If you are looking for -shadowing- at -edge intersections-, try Ulysius' Ambient Occlusion.";
+            displayText = "This preset is designed for those who wish to use 'Edge Detection' for use as a visual enhancement tool, not an effect.  As an enhancement tool, 'Edge Detection' maintains the visual detection of distant shapes which would otherwise be lost by the renderer at a distance - such as street lamps.  Of course, nature doesn't draw lines around everything, nor may your monitor look like mine, thus, you may need to tweak this further to your own satisfaction.  I strongly recommend using 'Mix' to your benefit so that you can dial in the right amount of settings. Regardless, do keep in mind that Bordered Skylines is not an ambient occlusion mod.  If you are looking for -shadowing- at -edge intersections-, try Ulysius' Ambient Occlusion.  NOTE 3/30:  Coming soon (likely later tonight/early-morning), a 'Part 2' update with an algorithm to keep the effect balanced at all zoom levels!";
             mixSetR = edge.edgesOnlyBgColor.r;
             mixSetG = edge.edgesOnlyBgColor.g;
             mixSetB = edge.edgesOnlyBgColor.b;
@@ -1083,7 +1014,6 @@ namespace Bordercities
             edge.edgeColor = new Color(Random.Range(0.0f,5.0f),Random.Range(0.0f,5.0f), Random.Range(0.0f,5.0f));
             edge.edgesOnly = Random.Range(0.00f, 1.00f);
             autoEdge = true;
-            autoSobelEdge = true;
             edge.edgeExp = 0.5f;
             displayText = "This preset was generated randomly.  Enter Advanced Mode below to tweak further.   Note that you will lose this effect if you fail to save it before returning to 'Plug & Play' mode.";
             bloom.enabled = false;
@@ -1214,13 +1144,11 @@ namespace Bordercities
             presetToSave.edgeOnly = edge.edgesOnly;
             presetToSave.edgeSamp = edge.sampleDist;
             presetToSave.autoEdge = autoEdge;
-            presetToSave.autoSobelEdge = autoSobelEdge;
             presetToSave.subViewOnly = subViewOnly;
 
             presetToSave.edgeExpo = edge.edgeExp;
             presetToSave.depthsAxis = edge.depthsAxis;
             presetToSave.depthsDiagonal = edge.depthsDiagonal;
-            presetToSave.depthsAxis = edge.axisVsCenter;
             presetToSave.sobelMult1 = edge.mult1;
             presetToSave.sobelMult2 = edge.mult2;
             presetToSave.sobelMult3 = edge.mult3;
@@ -1356,21 +1284,17 @@ namespace Bordercities
                             
                             
                             GUILayout.BeginHorizontal();
-                            if (GUILayout.Button("Bordercities|Classic", GUILayout.MaxWidth(190f)))
+                            if (GUILayout.Button("Bordercities|Classic", GUILayout.MaxWidth(160f)))
                             {
                                 BordercitiesAutomatic();
                             }
-                            if (GUILayout.Button("Bordercities|Bright", GUILayout.MaxWidth(190f)))
+                            if (GUILayout.Button("Bordercities|Bright", GUILayout.MaxWidth(270f)))
                             {
                                 BordercitiesBrightAutomatic();
                             }
-                            if (GUILayout.Button("Bordercities|Gritty", GUILayout.MaxWidth(190f)))
+                            if (GUILayout.Button("Bordercities|Gritty", GUILayout.MaxWidth(160f)))
                             {
                                 BordercitiesGrittyAutomatic();
-                            }
-                            if (GUILayout.Button("Bordercities|Sobelcities(NEW)", GUILayout.MaxWidth(190f)))
-                            {
-                                SobelcitiesAutomatic();
                             }
                             GUILayout.EndHorizontal();
                             GUILayout.BeginHorizontal();
@@ -1394,9 +1318,8 @@ namespace Bordercities
                             if (displayText != null && displayTitle != null)
                             {
                                 GUILayout.Label("CURRENT MODE: "+displayTitle);
-                                GUILayout.Space(6f);
+                                GUILayout.Space(3f);
                                 GUILayout.Label(displayText);
-                                GUILayout.Space(15f);
                             }
                             if (activeStockPreset == ActiveStockPreset.Cartoon || activeStockPreset == ActiveStockPreset.CartoonAlt)
                             {
@@ -1520,8 +1443,7 @@ namespace Bordercities
 
                             if (edge.mode == EdgeDetection.EdgeDetectMode.TriangleDepthNormals || edge.mode == EdgeDetection.EdgeDetectMode.RobertsCrossDepthNormals)
                             {
-                                GUILayout.Space(15f);
-                                autoEdge = GUILayout.Toggle(autoEdge, "Automatic zoom-level compensation?");
+                                
 
 
                                 GUILayout.Label("Depth sensitivity: " + edge.sensitivityDepth.ToString());
@@ -1530,83 +1452,40 @@ namespace Bordercities
                                 GUILayout.Label("Normal sensitivity: " + edge.sensitivityNormals.ToString());
                                 if (!autoEdge)
                                     edge.sensitivityNormals = GUILayout.HorizontalSlider(edge.sensitivityNormals, 0.000f, 5.000f, GUILayout.Width(570));
-                                GUILayout.Space(15f);
 
+
+                                autoEdge = GUILayout.Toggle(autoEdge, "Automatic Sensitivity");
 
                             }
                             if (edge.mode == EdgeDetection.EdgeDetectMode.SobelDepthThin)
                             {
-                                GUILayout.BeginHorizontal();
                                 showAdvanced = GUILayout.Toggle(showAdvanced, "Show advanced settings");
-                                GUILayout.Label(cameraController.m_currentSize.ToString());
-                                GUILayout.EndHorizontal();
                                 if (showAdvanced)
                                 {
-                                    GUILayout.Space(15f);
-                                    autoSobelEdge = GUILayout.Toggle(autoSobelEdge, "Automatic zoom-level compensation?");
-
+                                    
                                     GUILayout.Label("Diagonal Depth: " + edge.depthsDiagonal.ToString());
-                                    //if (!autoSobelEdge)
                                     edge.depthsDiagonal = GUILayout.HorizontalSlider(edge.depthsDiagonal, 0.000f, 1.000f, GUILayout.Width(570));
-
-                                    if (!autoSobelEdge)
-                                    {
-                                        GUILayout.Label("Axis/Center: " + edge.axisVsCenter.ToString());
-                                        edge.axisVsCenter = GUILayout.HorizontalSlider(edge.axisVsCenter, 0.001f, 1.000f, GUILayout.Width(570));
-                                    }
-                                    else
-                                        GUILayout.Label("Auto Axis/Center: " + edge.axisVsCenter.ToString());
-                                        
                                     
-                                    
+                                    GUILayout.Label("Axis/Center: " + edge.axisVsCenter.ToString());
+                                    edge.axisVsCenter = GUILayout.HorizontalSlider(edge.axisVsCenter, 0.001f, 0.100f, GUILayout.Width(570));
                                     GUILayout.Space(10f);
-
-                                    
-                                    
                                     GUILayout.BeginHorizontal();
-                                    
-                                    if (autoSobelEdge)
-                                        GUILayout.Label("Horizontal Offset:" + edge.mult1.ToString());
-                                    else
-                                        GUILayout.Label("Horizontal:" + edge.mult1.ToString());
+                                    GUILayout.Label("Horizontal:" + edge.mult1.ToString());
                                     edge.mult1 = GUILayout.HorizontalSlider(edge.mult1, 0.000f, 10.100f, GUILayout.Width(570));
                                     GUILayout.EndHorizontal();
                                     GUILayout.BeginHorizontal();
-                                    
-                                    if (!autoSobelEdge)
-                                    {
-                                        GUILayout.Label("Fine-tune H:" + edge.mult3.ToString());
-                                        edge.mult3 = GUILayout.HorizontalSlider(edge.mult3, 0.000f, 10.000f, GUILayout.Width(570));
-                                    }
-                                    
+                                    GUILayout.Label("Fine-tune H:" + edge.mult3.ToString());
+                                    edge.mult3 = GUILayout.HorizontalSlider(edge.mult3, 0.000f, 10.000f, GUILayout.Width(570));
                                     GUILayout.EndHorizontal();
                                     GUILayout.BeginHorizontal();
-                                    
-                                    if (autoSobelEdge)
-                                        GUILayout.Label("Vertical Offset:" + edge.mult2.ToString());
-                                    else
-                                        GUILayout.Label("Vertical:" + edge.mult2.ToString());
-
-                                    edge.mult2 = GUILayout.HorizontalSlider(edge.mult2, 0.000f, 20.000f, GUILayout.Width(570));
+                                    GUILayout.Label("Vertical:" + edge.mult2.ToString());
+                                    edge.mult2 = GUILayout.HorizontalSlider(edge.mult2, 0.000f, 10.000f, GUILayout.Width(570));
                                     GUILayout.EndHorizontal();
                                     GUILayout.BeginHorizontal();
-                                    if (!autoSobelEdge)
-                                    {
-                                        GUILayout.Label("Fine-tune V: " + edge.mult4.ToString());
-                                        edge.mult4 = GUILayout.HorizontalSlider(edge.mult4, 0.000f, 10.000f, GUILayout.Width(570));
-                                    }
-                                    else
-                                        GUILayout.Label("Automatic V: " + edge.mult4.ToString());
+                                    GUILayout.Label("Fine-tune V:" + edge.mult4.ToString());
+                                    edge.mult4 = GUILayout.HorizontalSlider(edge.mult4, 0.000f, 10.000f, GUILayout.Width(570));
+                                    //edge.diagonalVsCenter = GUILayout.HorizontalSlider(edge.diagonalVsCenter, 0.000f, 2.000f, GUILayout.Width(570)); 
                                     GUILayout.EndHorizontal();
-                                    if (GUILayout.Button("Reset Multipliers"))
-                                    {
-                                        edge.mult1 = 1.0f;
-                                        edge.mult2 = 10.0f;
-                                        edge.mult3 = 1.0f;
-                                        edge.mult4 = 1.0f;
-                                    }
-
-                                    GUILayout.Space(15f);
                                 }
                                 
                                
@@ -2060,7 +1939,6 @@ namespace Bordercities
                 edge.edgeExp = presetToLoad.edgeExpo;
                 edge.depthsAxis = presetToLoad.depthsAxis;
                 edge.depthsDiagonal = presetToLoad.depthsDiagonal;
-                edge.axisVsCenter = presetToLoad.axisVsCenter;
                 edge.mult1 = presetToLoad.sobelMult1;
                 edge.mult2 = presetToLoad.sobelMult2;
                 edge.mult3 = presetToLoad.sobelMult3;
@@ -2068,7 +1946,6 @@ namespace Bordercities
                 edge.edgesOnly = presetToLoad.edgeOnly;
                 edge.sampleDist = presetToLoad.edgeSamp;
                 autoEdge = presetToLoad.autoEdge;
-                autoSobelEdge = presetToLoad.autoSobelEdge;
                 currentColor = presetToLoad.currentColor;
                 edge.edgeColor = currentColor;
                 colorMultiplier = presetToLoad.colorMultiplier;
@@ -2304,7 +2181,6 @@ namespace Bordercities
         {
             userIsPreviewing = true;
             tempAutoEdge = autoEdge;
-            tempAutoSobelEdge = autoSobelEdge;
             tempEdgeBgrdColor = mixCurrentColor;
             tempEdgeColor = currentColor;
             tempEdgeExpo = edge.edgeExp;
@@ -2322,7 +2198,6 @@ namespace Bordercities
             if (userIsPreviewing)
             {
                 autoEdge = tempAutoEdge;
-                autoSobelEdge = tempAutoSobelEdge;
                 mixCurrentColor = tempEdgeBgrdColor;
                 currentColor = tempEdgeColor;
                 edge.edgeExp = tempEdgeExpo;
@@ -2395,8 +2270,6 @@ namespace Bordercities
                 return false;
             if (config.autoEdge != infoModePreset.autoEdge)
                 return false;
-            if (config.autoSobelEdge != infoModePreset.autoSobelEdge)
-                return false;
             if (config.edgeExpo != infoModePreset.edgeExpo)
                 return false;
             if (config.edgeMode != infoModePreset.edgeMode)
@@ -2415,7 +2288,6 @@ namespace Bordercities
         public float tempToneMapBoost;
         public float tempToneMapGamma;
         public bool tempAutoEdge;
-        public bool tempAutoSobelEdge;
         public float tempEdgeExpo;
         public EdgeDetection.EdgeDetectMode tempEdgeMode;
         public float tempEdgeOnly;
@@ -2600,16 +2472,6 @@ namespace Bordercities
             }
         }
 
-        void SobelVerticalCheck(bool value, float min, float max, float depthLimit)
-        {
-            float size = cameraController.m_currentSize;
-            if (min < size && max > size)
-            {
-              edge.mult4 = Mathf.Lerp(edge.mult4, depthLimit, 0.5f);
-            }
-        }
-        
-
         void AutomaticAlgorithms()
         {
             SizeCheck(true, 40f, 100f, 1.523f);
@@ -2656,59 +2518,6 @@ namespace Bordercities
             if (edge.sensitivityNormals <= 0.65f)
                 edge.sensitivityNormals = 0.65f;
         }
-
-
-        void SizeCheckInverted(bool value, float min, float max, float depthLimit)
-        {
-            float size = cameraController.m_currentSize;
-            if (min < size && max > size)
-            {
-                if (value)
-                {
-                    edge.axisVsCenter = Mathf.Lerp(edge.axisVsCenter, depthLimit, 0.5f);
-                }
-            }
-        }
-        void AutomaticSobelAlg()
-        {
-            SizeCheckInverted(true, 0, 109, 0.680f);
-            SizeCheckInverted(true, 110, 139, 0.620f);
-            SizeCheckInverted(true, 130, 169, 0.590f);
-            SizeCheckInverted(true, 170, 199, 0.470f);
-            SizeCheckInverted(true, 200, 249, 0.446f);
-            SizeCheckInverted(true, 250, 299, 0.346f);
-            SizeCheckInverted(true, 300, 349, 0.321f);
-            SizeCheckInverted(true, 350, 399, 0.271f);
-            SizeCheckInverted(true, 400, 459, 0.266f);
-            SizeCheckInverted(true, 460, 499, 0.216f);
-            SizeCheckInverted(true, 500, 629, 0.176f);
-            SizeCheckInverted(true, 630, 699, 0.152f);
-            SizeCheckInverted(true, 700, 799, 0.106f);
-            SizeCheckInverted(true, 850, 889, 0.099f);
-            SizeCheckInverted(true, 889, 919, 0.082f);
-            SizeCheckInverted(true, 920, 999, 0.072f);
-            SizeCheckInverted(true, 1000, 1119, 0.058f);
-            SizeCheckInverted(true, 1120, 1299, 0.035f);
-            SizeCheckInverted(true, 1300, 1499, 0.026f);
-            SizeCheckInverted(true, 1500, 1799, 0.016f);
-            SizeCheckInverted(true, 1800, 2099, 0.012f);
-            SizeCheckInverted(true, 2100, 2999, 0.010f);
-            SizeCheckInverted(true, 3000, 3699, 0.008f);
-            SizeCheckInverted(true, 3700, 4000, 0.007f);
-            SobelVerticalCheck(true, 0, 699, 1.953f);
-            SobelVerticalCheck(true, 700, 999, 0.663f);
-            SobelVerticalCheck(true, 1000, 1399, 0.483f);
-            SobelVerticalCheck(true, 1400, 1749, 0.394f);
-            SobelVerticalCheck(true, 1750, 4000, 0.268f);
-
-
-
-
-            if (edge.axisVsCenter <= 0.006f)
-                edge.axisVsCenter = 0.007f;
-            if (edge.axisVsCenter >= 0.591f)
-                edge.axisVsCenter = 0.590f;
-        }
         public void LateUpdate()
         {
             if (cameraController != null && autoEdge)
@@ -2721,19 +2530,7 @@ namespace Bordercities
             if (!autoEdge && autoEdgeActive)
             {
                 edge.sensitivityDepth = config.sensDepth;
-                edge.sensitivityNormals = config.sensNorm;
                 autoEdgeActive = false;
-            }
-
-
-            if (autoSobelEdge)
-            {
-                autoSobelEdgeActive = true;
-                AutomaticSobelAlg();
-            }
-            if (!autoSobelEdge && autoSobelEdgeActive)
-            {
-                autoSobelEdgeActive = false;
             }
         }
     }
