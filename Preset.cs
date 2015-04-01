@@ -22,10 +22,12 @@ namespace Bordercities
         public float toneMapGamma;
         public bool subViewOnly;
         public bool autoEdge;
+        public bool autoSobelEdge;
 
         public float edgeExpo;
         public float depthsDiagonal;
         public float depthsAxis;
+        public float axisVsCenter;
         public float sobelMult1;
         public float sobelMult2;
         public float sobelMult3;

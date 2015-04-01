@@ -21,6 +21,7 @@ namespace Bordercities
         public float edgeExpo;
         public float depthsDiagonal;
         public float depthsAxis;
+        public float axisVsCenter;
         public float sobelMult1;
         public float sobelMult2;
         public float sobelMult3;
@@ -41,6 +42,7 @@ namespace Bordercities
 
 
         public bool autoEdge;
+        public bool autoSobelEdge;
         public bool wantsTonemapper;
 
         public bool bloomEnabled;
