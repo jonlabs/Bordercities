@@ -1970,9 +1970,7 @@ namespace Bordercities
                     useInfoModeSpecific = GUILayout.Toggle(useInfoModeSpecific, "Optional: Use 'Info-Mode'-specific Presets? (upon activation, 'Info Modes' tab will appear above.)");
                     wantsToneMapper = GUILayout.Toggle(wantsToneMapper, "Optional: Incorporate brightness/gamma settings into Bordered Skylines' functionality? (Plug & Play/Advanced share this)");
                     if (wantsToneMapper)
-                    {
-                        if (automaticMode)
-                        {
+                    { 
                             GUILayout.BeginHorizontal();
                             GUILayout.Label("Gamma: " + toneMapGamma.ToString("F2"), GUILayout.MaxWidth(60));
                             toneMapGamma = GUILayout.HorizontalSlider(toneMapGamma, 0.0f, 30.0f, GUILayout.MaxWidth(100));
@@ -1980,7 +1978,6 @@ namespace Bordercities
                             GUILayout.Label("Boost: " + toneMapBoost.ToString("F2"), GUILayout.MaxWidth(60));
                             toneMapBoost = GUILayout.HorizontalSlider(toneMapBoost, 0.0f, 30.0f, GUILayout.MaxWidth(100));
                             GUILayout.EndHorizontal();
-                        }
                     }
                     if (isOn)
                     {
