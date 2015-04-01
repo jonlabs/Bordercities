@@ -20,6 +20,7 @@ namespace Bordercities
             LowEndMain,
             LowEndAlt,
             ClassicSobel,
+            ClassicTriangle,
             Random,
             CartoonAlt,
             CartoonThree,
@@ -166,7 +167,7 @@ namespace Bordercities
         private bool isOn;
         private bool userIsPreviewing = false;
         private Color sobeCitiesC;
-        
+
 
         void InitializeColors()
         {
@@ -174,7 +175,7 @@ namespace Bordercities
             lowEndEdgeC = new Color(0.08f, 0.08f, 0.06f);
             realismEdgeC = new Color(0.17f,0.17f,0.17f);
             sobeCitiesC = new Color(0.32f, 0.33f, 0.32f);
-           
+            
         }
 
         void Awake()
@@ -537,6 +538,9 @@ namespace Bordercities
                 case ActiveStockPreset.HighEndPC:
                     UltraAutomatic();
                     break;
+                case ActiveStockPreset.ClassicTriangle:
+                    ClassicTriangleAutomatic();
+                    break;
                 case ActiveStockPreset.CartoonAlt:
                     CartoonAltAutomatic();
                     break;
@@ -655,7 +659,7 @@ namespace Bordercities
 
         void LowEndAutomatic()
         {
-            displayTitle = "Low End PC - REQUIRES (1280x720)-(1920x1080) AND (NO DR)-(150% DR) FOR INTENDED LOOK.";
+            displayTitle = "(NEW 3/31) Sobel Skylines";
             activeStockPreset = ActiveStockPreset.LowEndMain;
             automaticMode = true;
             autoSobelEdge = true;
@@ -674,7 +678,7 @@ namespace Bordercities
             bloom.threshold = 0.27f;
             bloom.intensity = 0.39f;
             bloom.blurSize = 5.50f;
-            displayText = "Suited for users of low-end hardware who cannot afford the performance hit of supersampling via nlight's Dynamic Resolution.  This mode was fine-tuned in 720p with all settings as low as possible.";
+            displayText = "Suited for users of low-end hardware who cannot afford the performance hit of supersampling via nlight's Dynamic Resolution.  This is a balanced default look.  You can achieve more foreground subtlety (at the cost of distant line enlargement) in 'Auto-Sobel', or achieve more overall effect via 'Auto-Triangle'.  This mode was fine-tuned in 720p with all settings as low as possible.";
             mixSetR = edge.edgesOnlyBgColor.r;
             mixSetG = edge.edgesOnlyBgColor.g;
             mixSetB = edge.edgesOnlyBgColor.b;
@@ -686,30 +690,13 @@ namespace Bordercities
             
         }
 
-        void TriangleAutomatic()
-        {
-            automaticMode = true;
-            edge.mode = EdgeDetection.EdgeDetectMode.TriangleDepthNormals;
-            edge.sensitivityNormals = 0.63f;
-            edge.sensitivityDepth = 2.12f;
-            edge.edgeExp = 0.09f;
-            edge.sampleDist = 1.0f;
-            edge.edgesOnly = 0;
-            autoEdge = true;
-            edge.edgeColor = Color.black;
-            edge.edgesOnlyBgColor = Color.white;
-            if (!CheckTonemapper())
-                ResetTonemapper();
-            bloom.enabled = false;
-            bloom.threshold = 0.27f;
-            bloom.intensity = 0.39f;
-            bloom.blurSize = 5.50f;
-        }
+        
 
         void ClassicSobelAutomatic()
         {
-            displayTitle = "Ah, just like Classic Coke - It's Classic Sobel.";
+            displayTitle = "Classic Auto-Sobel";
             automaticMode = true;
+            activeStockPreset = ActiveStockPreset.ClassicSobel;
             edge.mode = EdgeDetection.EdgeDetectMode.SobelDepth;
             edge.sampleDist = 1.0f;
             edge.edgeExp = 0.44f;
@@ -736,9 +723,32 @@ namespace Bordercities
             displayText = "Same as it was way back when, you know, back when they called it 'Auto-Sobel.'  We didn't have a care in the world back then.  All it took was a simple press of the 'Toggle Plug & Play' button.  There, just like that, a stronger effect.  Click it again, back to how it was.  We didn't need supersampling or anything.  You either chose one.. or you chose the other.  How I miss those days.";
         }
 
+
+        void ClassicTriangleAutomatic()
+        {
+            displayTitle = "Classic Auto-Triangle";
+            automaticMode = true;
+            activeStockPreset = ActiveStockPreset.ClassicTriangle;
+            edge.mode = EdgeDetection.EdgeDetectMode.TriangleDepthNormals;
+            edge.sensitivityNormals = 0.63f;
+            edge.sensitivityDepth = 2.12f;
+            edge.edgeExp = 0.09f;
+            edge.sampleDist = 1.0f;
+            edge.edgesOnly = 0;
+            autoEdge = true;
+            edge.edgeColor = Color.black;
+            edge.edgesOnlyBgColor = Color.white;
+            if (!CheckTonemapper())
+                ResetTonemapper();
+            bloom.enabled = false;
+            bloom.threshold = 0.27f;
+            bloom.intensity = 0.39f;
+            bloom.blurSize = 5.50f;
+            displayText = "Slick, black, and an exact duplicate of the very first mode to be included in Bordered Skylines, and as well, the very first mode to receive a hand-tweaked algorithm for C:S compatibility.  A wise choice for those whose eyes can take it (likely because you're using at least 125%-150% DR, being just enough to ease the eyesore.";
+        }
         void LowEndAltAutomatic()
         {
-            displayTitle = "Low End Alternative - REQUIRES (1280x720)-(1920x1080) AND (NO DR)-(150% DR) FOR INTENDED LOOK.";
+            displayTitle = "Eyefriendly(er)";
             activeStockPreset = ActiveStockPreset.LowEndAlt;
             automaticMode = true;
             edge.mode = EdgeDetection.EdgeDetectMode.TriangleDepthNormals;
@@ -754,7 +764,7 @@ namespace Bordercities
             bloom.threshold = 0.27f;
             bloom.intensity = 0.39f;
             bloom.blurSize = 5.50f;
-            displayText = "Suited for low-end PC users who desire a greater effect than what 'Low End PC' provides, this mode is configured for appropriate line size at low resolutions.  This mode has been specifically tweaked while playing in 720p with the very possible lowest settings.  If edges appear to be too jagged and bothersome, try turning your graphics settings down and/or switching to 720p -- it will look cleaner as there are less lines to be picked up by the edge detection.";
+            displayText = "This preset attempts to get around the harshness of the 'Triangle' edge detection mode's edges when viewing at low resolutions.  It attempts this by adding a slight gray tint to detected edges.";
             mixSetR = edge.edgesOnlyBgColor.r;
             mixSetG = edge.edgesOnlyBgColor.g;
             mixSetB = edge.edgesOnlyBgColor.b;
@@ -781,7 +791,7 @@ namespace Bordercities
 
         void BordercitiesAutomatic()
         {
-            displayTitle = "Bordercities Classic - REQUIRES 1920x1080 AND DYNAMIC RESOLUTION 175-250% FOR INTENDED LOOK.";
+            displayTitle = "Bordercities";
             activeStockPreset = ActiveStockPreset.Bordercities;
             automaticMode = true;
             edge.mode = EdgeDetection.EdgeDetectMode.RobertsCrossDepthNormals;
@@ -793,7 +803,7 @@ namespace Bordercities
             edge.edgesOnlyBgColor = Color.white;
             if (!CheckTonemapper())
                 ResetTonemapper();
-            displayText = "Bordercities very specifically attempts to capture the vibe of Borderlands & XIII.  This is the original Bordercities preset, before the gamma/boost settings were set per preset.";
+            displayText = "This is where it all began.  The title says it all.";
             bloom.enabled = false;
             bloom.threshold = 0.27f;
             bloom.intensity = 0.39f;
@@ -824,7 +834,7 @@ namespace Bordercities
 
         void BordercitiesGrittyAutomatic()
         {
-            displayTitle = "Bordercities Gritty - REQUIRES 1920x1080 AND DYNAMIC RESOLUTION 175-250% FOR INTENDED LOOK.";
+            displayTitle = "Bordercities: Gritty";
             activeStockPreset = ActiveStockPreset.BordercitiesGritty;
             automaticMode = true;
             edge.mode = EdgeDetection.EdgeDetectMode.RobertsCrossDepthNormals;
@@ -836,7 +846,7 @@ namespace Bordercities
             edge.edgesOnlyBgColor = Color.white;
             if (!CheckTonemapper())
                 ResetTonemapper();
-            displayText = "Bordercities-Gritty adds a bit of extra grit over the normal Bordercities preset.";
+            displayText = "This preset uses the Tonemapper to achieve a grittier look.";
             bloom.enabled = false;
             bloom.threshold = 0.27f;
             bloom.intensity = 0.39f;
@@ -867,7 +877,7 @@ namespace Bordercities
 
         void BordercitiesBrightAutomatic()
         {
-            displayTitle = "Bordercities Bright - REQUIRES 1920x1080 AND DYNAMIC RESOLUTION 175-250% FOR INTENDED LOOK.";
+            displayTitle = "Bordercities: Bright";
             activeStockPreset = ActiveStockPreset.BordercitiesBright;
             automaticMode = true;
             edge.mode = EdgeDetection.EdgeDetectMode.RobertsCrossDepthNormals;
@@ -879,7 +889,7 @@ namespace Bordercities
             edge.edgesOnlyBgColor = Color.white;
             if (!CheckTonemapper())
                 ResetTonemapper();
-            displayText = "Bordercities-Bright brings a little bit more fun to the world than its vanilla-based and grittier counterparts.";
+            displayText = "This preset uses the Tonemapper to achieve a brighter & more pleasant look.";
             bloom.enabled = false;
             bloom.threshold = 0.27f;
             bloom.intensity = 0.39f;
@@ -910,7 +920,7 @@ namespace Bordercities
 
         void SobelcitiesAutomatic()
         {
-            displayTitle = "Sobelcities - REQUIRES 1920x1080 AND DYNAMIC RESOLUTION 175-250% FOR INTENDED LOOK.";
+            displayTitle = "Sobelcities";
             activeStockPreset = ActiveStockPreset.Sobelcities;
             automaticMode = true;
             edge.mode = EdgeDetection.EdgeDetectMode.SobelDepthThin;
@@ -926,7 +936,7 @@ namespace Bordercities
             edge.edgesOnlyBgColor = Color.white;
             if (!CheckTonemapper())
                 ResetTonemapper();
-            displayText = "NEW!  Sobelcities puts the newly improved Sobel detection method to the test!  NOTE 4/1: Needs a little bit more work.  Settings are more conservative then I'd like.  Ran into a last minute issue with over-effect due to the algorithm.  This will be smoothed over soon!";
+            displayText = "NEW 3/31!  Sobelcities puts the newly automated zoom-compensation into play while attempting to achieve a Borderlands effect.  (NOTE 4/1: The 'Sobel Skylines' edge detection mode was tuned around having the lowest degree of edging possible.  Thus, there are currently some issues with excessive line drawing in this mode from my attempt to amp it up a bit.  Will be worked on in the near future.)";
             bloom.enabled = false;
             bloom.threshold = 0.27f;
             bloom.intensity = 0.39f;
@@ -957,7 +967,7 @@ namespace Bordercities
 
         void RealismAutomatic()
         {
-            displayTitle = "Realism - REQUIRES 1920x1080 AND DYNAMIC RESOLUTION 175-250% FOR INTENDED LOOK.";
+            displayTitle = "Realism";
             activeStockPreset = ActiveStockPreset.Realism;
             automaticMode = true;
             autoSobelEdge = true;
@@ -975,7 +985,7 @@ namespace Bordercities
             bloom.threshold = 0.27f;
             bloom.intensity = 0.39f;
             bloom.blurSize = 5.50f;
-            displayText = "HIGHLY RECOMMENDED to use DLAA AA from MazK's 'PostProcessFX'!  DLAA provides the 'knock-out punch' to the intended role of Bordered Skylines when aiming to use 'Realism', or, 'Edge Detection' as a visual enhancement tool and not as an effect.  When used in this manner, 'Edge Detection' maintains the visual detection of distant shapes which would otherwise be lost by the renderer at a distance - such as street lamps.  I must say again, as it makes that much of a difference - do combine this preset with DLAA.  The performance loss is neglible for that finishing touch it provides.  Do keep in mind that Bordered Skylines is not an ambient occlusion mod.  If you are looking for -shadowing- at -edge intersections-, try Ulysius' Ambient Occlusion.";
+            displayText = "HIGHLY RECOMMENDED to use DLAA AA from MazK's 'PostProcessFX'!  DLAA provides the 'knock-out punch' to the intended role of Bordered Skylines when aiming to use 'Realism', or, 'Edge Detection' as a visual enhancement tool to maintain the visual detection of distant shapes which would otherwise be lost by the renderer at a distance such as street lamps. Do keep in mind that Bordered Skylines is not an ambient occlusion mod.  If you are looking for -shadowing- at -edge intersections-, try Ulysius' Ambient Occlusion.";
             mixSetR = edge.edgesOnlyBgColor.r;
             mixSetG = edge.edgesOnlyBgColor.g;
             mixSetB = edge.edgesOnlyBgColor.b;
@@ -1002,7 +1012,7 @@ namespace Bordercities
 
         void CartoonAutomatic()
         {
-            displayTitle = "Cartoon|Retro REQUIRES 1920x1080 AND DYNAMIC RESOLUTION 175-250% FOR INTENDED LOOK.";
+            displayTitle = "Retro";
             activeStockPreset = ActiveStockPreset.Cartoon;
             automaticMode = true;
             edge.mode = EdgeDetection.EdgeDetectMode.RobertsCrossDepthNormals;
@@ -1017,7 +1027,7 @@ namespace Bordercities
             if (!CheckTonemapper())
                 ResetTonemapper();
             bloom.enabled = false;
-            displayText = "No explanation required!  Optionally, add a random color theme by clicking the below button until satisfied.  Make sure to save your color once you've found it!  If you prefer to tweak this manually, simply convert your 'Plug & Play' into your own personalized preset by entering Advanced Mode via 'currently displayed settings', tweak to your liking, and save!";
+            displayText = "Add a very 50's cartoon look to your game.  Press the below button to generate a color theme (make sure to save it afterwards!)";
             mixSetR = edge.edgesOnlyBgColor.r;
             mixSetG = edge.edgesOnlyBgColor.g;
             mixSetB = edge.edgesOnlyBgColor.b;
@@ -1044,7 +1054,7 @@ namespace Bordercities
 
         void CartoonAltAutomatic()
         {
-            displayTitle = "Cartoon|Colorful - REQUIRES 1920x1080 AND DYNAMIC RESOLUTION 175-250% FOR INTENDED LOOK.";
+            displayTitle = "Colorful";
             activeStockPreset = ActiveStockPreset.CartoonAlt;
             automaticMode = true;
             edge.mode = EdgeDetection.EdgeDetectMode.RobertsCrossDepthNormals;
@@ -1059,7 +1069,7 @@ namespace Bordercities
             if (!CheckTonemapper())
                 ResetTonemapper();
             bloom.enabled = false;
-            displayText = "No explanation required!  Optionally, add a random color theme by clicking the below button until satisfied.  Make sure to save your color once you've found it!  If you prefer to tweak this manually, simply convert your 'Plug & Play' into your own personalized preset by entering Advanced Mode via 'currently displayed settings', tweak to your liking, and save!";
+            displayText = "A little bit more modern than 'Retro', yet still old-school looking.";
             mixSetR = edge.edgesOnlyBgColor.r;
             mixSetG = edge.edgesOnlyBgColor.g;
             mixSetB = edge.edgesOnlyBgColor.b;
@@ -1085,7 +1095,7 @@ namespace Bordercities
         }
         void CartoonThreeAutomatic()
         {
-            displayTitle = "Cartoon|Clean - REQUIRES 1920x1080 AND DYNAMIC RESOLUTION 175-250% FOR INTENDED LOOK.";
+            displayTitle = "Cartoon";
             activeStockPreset = ActiveStockPreset.CartoonThree;
             automaticMode = true;
             edge.mode = EdgeDetection.EdgeDetectMode.TriangleDepthNormals;
@@ -1100,7 +1110,7 @@ namespace Bordercities
             if (!CheckTonemapper())
                 ResetTonemapper();
             bloom.enabled = false;
-            displayText = "No explanation required!  Unlike the other cartoon presets, this one does not use a color theme.";
+            displayText = "No explanation required!  Unlike the other cartoonish presets, this one does not use a color theme.";
             mixSetR = edge.edgesOnlyBgColor.r;
             mixSetG = edge.edgesOnlyBgColor.g;
             mixSetB = edge.edgesOnlyBgColor.b;
@@ -1127,7 +1137,7 @@ namespace Bordercities
 
         void RandomAutomatic()
         {
-            displayTitle = "Random - NO SETTINGS PREFERENCE";
+            displayTitle = "Random";
             activeStockPreset = ActiveStockPreset.Random;
             automaticMode = true;
             edge.mode = (EdgeDetection.EdgeDetectMode)Random.Range(0, 3);
@@ -1148,7 +1158,7 @@ namespace Bordercities
         {
             automaticMode = true;
             displayTitle = "Ultra - REQUIRES 1920x1080 + DR 250-300% + 'AMBIENT OCC' + 'SUN SHAFTS' + 'POSTPROCESSFX' WITH BLOOM, MOTION BLUR, AND DLAA ANTI-ALIASING FOR INTENDED LOOK.";
-            displayText = "This mode looks AB-SO-FREAKING-LUTE-LY SPECTACULAR!!!!!!!!!!!!!  ..if you can actually run it.  Tweaked at 2FPS on 300%, this mode will lend itself to absolutely STELLAR screenshots,  though unless you've got 980s in SLI (random guess based on my 7970 GHz performance vs. benchmarks) is likely not going to be actually playable for the forseeable future.";
+            displayText = "This mode looks AB-SO-FREAKING-LUTE-LY SPECTACULAR!!!!!!!!!!!!!  ..if you can actually run it.";
             edge.sampleDist = 2.0f;
             activeStockPreset = ActiveStockPreset.HighEndPC;
             edge.mode = EdgeDetection.EdgeDetectMode.RobertsCrossDepthNormals;
@@ -1180,7 +1190,8 @@ namespace Bordercities
 
         void OnGUI()
         {
-            GUI.backgroundColor = Color.gray;
+            //GUI.skin = skin;
+            //GUI.backgroundColor = Color.gray;
             if (firstTime)
                 tab = Config.Tab.Hotkey;
             if (showSettingsPanel)
@@ -1375,70 +1386,80 @@ namespace Bordercities
                         {
                             ResizeWindow(803, 530);
 
-                            GUILayout.Label("PRESETS:");
-                            GUILayout.Space(3f);
-                            
+                            GUILayout.Label("PRESETS");
+                            GUILayout.Space(6f);
                             GUILayout.BeginHorizontal();
-                            if (GUILayout.Button("Low End PC",GUILayout.MaxWidth(110f)))
+                            GUILayout.Label("720p-1080p + NO DR:", GUILayout.Width(150));
+                            GUILayout.Space(5f);
+                            if (GUILayout.Button("Auto-SobelSkies(NEW)", GUILayout.MaxWidth(150f)))
                             {
                                 LowEndAutomatic();
                             }
-                            if (GUILayout.Button("Low End Alt.", GUILayout.MaxWidth(110f)))
-                            {
-                                LowEndAltAutomatic();
-                            }
-                            if (GUILayout.Button("Classic Sobel", GUILayout.MaxWidth(110f)))
+                            if (GUILayout.Button("Auto-Sobel", GUILayout.MaxWidth(150f)))
                             {
                                 ClassicSobelAutomatic();
                             }
-                            if (GUILayout.Button("Cartoon|Clean", GUILayout.MaxWidth(110f)))
+                            if (GUILayout.Button("Auto-Triangle", GUILayout.MaxWidth(150f)))
                             {
-                                CartoonThreeAutomatic();
+                                ClassicTriangleAutomatic();
                             }
-                            if (GUILayout.Button("Cartoon|Retro", GUILayout.MaxWidth(110f)))
+                            if (GUILayout.Button("Eyefriendly(er)", GUILayout.MaxWidth(150f)))
                             {
-                                CartoonAutomatic();
-                            }
-                            if (GUILayout.Button("Cartoon|Colorful", GUILayout.MaxWidth(110f)))
-                            {
-                                CartoonAltAutomatic();
+                                LowEndAltAutomatic();
                             }
                             GUILayout.EndHorizontal();
-                            
-                            
                             GUILayout.BeginHorizontal();
-                            if (GUILayout.Button("Bordercities|Classic", GUILayout.MaxWidth(150f)))
+                            GUILayout.Label("1080p + DR 175+", GUILayout.Width(150));
+                            if (GUILayout.Button("Bordercities", GUILayout.MaxWidth(150f)))
                             {
                                 BordercitiesAutomatic();
                             }
                             if (wantsToneMapper)
                             {
-                                if (GUILayout.Button("BC|Bright", GUILayout.MaxWidth(130f)))
+                                if (GUILayout.Button("BC|Bright", GUILayout.MaxWidth(150f)))
                                 {
                                     BordercitiesBrightAutomatic();
                                 }
-                                if (GUILayout.Button("BC|Gritty", GUILayout.MaxWidth(130f)))
+                                if (GUILayout.Button("BC|Gritty", GUILayout.MaxWidth(150f)))
                                 {
                                     BordercitiesGrittyAutomatic();
                                 }
                             }
-                            if (GUILayout.Button("Sobelcities", GUILayout.MaxWidth(130f)))
+                            if (GUILayout.Button("Sobelcities", GUILayout.MaxWidth(150f)))
                             {
                                 SobelcitiesAutomatic();
                             }
-                            if (GUILayout.Button("Realism", GUILayout.MaxWidth(130f)))
+                            if (GUILayout.Button("Realism", GUILayout.MaxWidth(150f)))
                             {
                                 RealismAutomatic();
                             }
+                            if (GUILayout.Button("Cartoon", GUILayout.MaxWidth(150f)))
+                            {
+                                CartoonThreeAutomatic();
+                            }
+                            if (GUILayout.Button("Retro", GUILayout.MaxWidth(150f)))
+                            {
+                                CartoonAutomatic();
+                            }
+                            if (GUILayout.Button("Colorful", GUILayout.MaxWidth(150f)))
+                            {
+                                CartoonAltAutomatic();
+                            }
+                            GUILayout.EndHorizontal();
+                            GUILayout.BeginHorizontal();
+                            GUILayout.Label("1080p/1440p + DR 250+:", GUILayout.Width(150));
                             if (GUILayout.Button("Ultra", GUILayout.MaxWidth(130f)))
                             {
                                 UltraAutomatic();
                             }
                             GUILayout.EndHorizontal();
+                            GUILayout.BeginHorizontal();
+                            GUILayout.Label("GIMMICKY:", GUILayout.Width(150));
                             if (GUILayout.Button("Random (WARNING: Could potentially be very bright!", GUILayout.MaxWidth(330)))
                             {
                                 RandomAutomatic();
                             }
+                            GUILayout.EndHorizontal();
                             GUILayout.Space(6f);
                             if (displayText != null && displayTitle != null)
                             {
@@ -1518,12 +1539,12 @@ namespace Bordercities
                                     }
                                 case EdgeDetection.EdgeDetectMode.SobelDepth:
                                     {
-                                        GUILayout.Label("Edge mode: Legacy 'Sobel Depth'");
+                                        GUILayout.Label("Edge mode: Classic 'Sobel Depth'");
                                         break;
                                     }
                                 case EdgeDetection.EdgeDetectMode.SobelDepthThin:
                                     {
-                                        GUILayout.Label("Edge mode: 'Sobel Skylines' (Upgrades & combines both old Sobels into one)");
+                                        GUILayout.Label("Edge mode: 'Sobel Skylines'");
                                         break;
                                     }
                                 default:
@@ -1544,7 +1565,7 @@ namespace Bordercities
                                 edge.mode = EdgeDetection.EdgeDetectMode.RobertsCrossDepthNormals;
                                 edge.SetCameraFlag();
                             }
-                            if (GUILayout.Button("Legacy Sobel"))
+                            if (GUILayout.Button("Classic Sobel"))
                             {
                                 edge.mode = EdgeDetection.EdgeDetectMode.SobelDepth;
                                 edge.SetCameraFlag();
@@ -1673,6 +1694,15 @@ namespace Bordercities
                                 EdgeColor(setR, setG, setB);
                                 EdgeColor(setR, setG, setB);
                             }
+                            if (GUILayout.Button("Black", GUILayout.MaxWidth(55)))
+                            {
+                                setR = 0.0f;
+                                setG = 0.0f;
+                                setB = 0.0f;
+                                colorMultiplier = 1.0f;
+                                EdgeColor(0.0f, 0.0f, 0.0f);
+                                EdgeColor(0.0f, 0.0f, 0.0f);
+                            }
                             GUILayout.EndHorizontal();
 
 
@@ -1697,6 +1727,15 @@ namespace Bordercities
                             {
                                 MixColor(mixSetR, mixSetG, mixSetB);
                                 MixColor(mixSetR, mixSetG, mixSetB);
+                            }
+                            if (GUILayout.Button("White", GUILayout.MaxWidth(55)))
+                            {
+                                mixSetR = 1.0f;
+                                mixSetG = 1.0f;
+                                mixSetB = 1.0f;
+                                mixColorMultiplier = 1.0f;
+                                MixColor(1.0f, 1.0f, 1.0f);
+                                MixColor(1.0f, 1.0f, 1.0f);
                             }
 
                             GUILayout.EndHorizontal();
