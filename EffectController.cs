@@ -72,10 +72,6 @@ namespace Bordercities
 
         private bool automaticMode;
 
-        private bool showAdvanced = false;
-        private bool showEdgeColors = false;
-        private bool showMixColors = false;
-
         public bool wantsToneMapper = false;
         public Color currentColor;
         public float setR;
@@ -83,10 +79,6 @@ namespace Bordercities
         public float setB;
         public float colorMultiplier = 1f;
         private Color newColor;
-        private float roundedR;
-        private float roundedG;
-        private float roundedB;
-        private float roundedMult;
 
         public Color mixCurrentColor;
         public float mixSetR;
@@ -94,18 +86,11 @@ namespace Bordercities
         public float mixSetB;
         public float mixColorMultiplier = 1f;
         private Color mixNewColor;
-        private float mixRoundedR;
-        private float mixRoundedG;
-        private float mixRoundedB;
-        private float mixRoundedMult;
 
         private float defaultGamma;
         private float defaultBoost;
         private float prevGamma;
         private float prevBoost;
-
-        private float displayGam;
-        private float displayBoost;
 
 
         public string[] presetEntries;
@@ -115,58 +100,76 @@ namespace Bordercities
         private Color lowEndEdgeC;
         private Color realismEdgeC;
 
+        private Color lightRed;
+        private Color lightGreen;
+        private Color lightYellow;
+        private Color lightBlue;
+        private Color darkRed;
+        private Color darkGreen;
+        private Color darkYellow;
+        private Color darkBlue;
+
         private ActiveStockPreset activeStockPreset;
-
-
-        private string infoBuildingLevel = "";
-        private string infoConnections = "";
-        private string infoCrime = "";
-        private string infoDensity = "";
-        private string infoDistricts = "";
-        private string infoEducation = "";
-        private string infoElectricity = "";
-        private string infoEntertainment = "";
-        private string infoFireSafety = "";
-        private string infoGarbage = "";
-        private string infoHappiness = "";
-        private string infoHealth = "";
-        private string infoLandValue = "";
-        private string infoNaturalResources = "";
-        private string infoNoisePollution = "";
-        private string infoPollution = "";
-        private string infoTerrainHeight = "";
-        private string infoTraffic = "";
-        private string infoTransport = "";
-        private string infoWater = "";
-        private string infoWind = "";
-
-        private string inputInfoBuildingLevel = "";
-        private string inputInfoConnections = "";
-        private string inputInfoCrime = "";
-        private string inputInfoDensity = "";
-        private string inputInfoDistricts = "";
-        private string inputInfoEducation = "";
-        private string inputInfoElectricity = "";
-        private string inputInfoEntertainment = "";
-        private string inputInfoFireSafety = "";
-        private string inputInfoGarbage = "";
-        private string inputInfoHappiness = "";
-        private string inputInfoHealth = "";
-        private string inputInfoLandValue = "";
-        private string inputInfoNaturalResources = "";
-        private string inputInfoNoisePollution = "";
-        private string inputInfoPollution = "";
-        private string inputInfoTerrainHeight = "";
-        private string inputInfoTraffic = "";
-        private string inputInfoTransport = "";
-        private string inputInfoWater = "";
-        private string inputInfoWind = "";
-
         private InfoManager.InfoMode currentInfoMode;
 
         private bool isOn;
         private bool userIsPreviewing = false;
         private Color sobeCitiesC;
+
+        public GUIStyle bordSkyStyle_header = null;
+        public GUIStyle greenButton;
+        public Texture2D greenTex;
+        public GUIStyle yellowButton;
+        public Texture2D yellowTex;
+        public GUIStyle redButton;
+        public Texture2D redTex;
+        public GUISkin bordSkySkin = null;
+        public float heightTester = 20f;
+
+        public Vector2 scrollPosition;
+
+        void OnGUI()
+        {
+            if (bordSkySkin == null)
+                bordSkySkin = new GUISkin();
+            if (greenButton == null)
+            {
+                greenButton = new GUIStyle(GUI.skin.button);
+                greenButton.normal.textColor = lightGreen;
+                //greenTex = new Texture2D(1, 1);
+                //greenTex.SetPixel(0, 0, darkGreen);
+                //greenTex.Apply();
+            }
+            if (redButton == null)
+            {
+                redButton = new GUIStyle(GUI.skin.button);
+                redButton.normal.textColor = lightRed;
+            }
+            if (yellowButton == null)
+            {
+                yellowButton = new GUIStyle(GUI.skin.button);
+                yellowButton.normal.textColor = lightYellow;
+            }
+            if (bordSkyStyle_header == null)
+                bordSkyStyle_header = new GUIStyle();
+            
+
+            bordSkySkin = GUI.skin;
+            
+            bordSkySkin.button.fixedHeight = 21;
+            bordSkyStyle_header.fontStyle = FontStyle.Bold;
+            bordSkyStyle_header.fontSize = 15;
+            bordSkyStyle_header.normal.textColor = lightYellow;
+            bordSkySkin.button.padding = new RectOffset(5,5,0,0);
+
+
+            if (firstTime)
+                tab = Config.Tab.Hotkey;
+            if (showSettingsPanel)
+            {
+                windowRect = GUI.Window(391435, windowRect, SettingsPanel, "Bordered Skylines (NEW: Draggable Window!)");
+            }
+        }
 
 
         void InitializeColors()
@@ -175,8 +178,851 @@ namespace Bordercities
             lowEndEdgeC = new Color(0.08f, 0.08f, 0.06f);
             realismEdgeC = new Color(0.17f,0.17f,0.17f);
             sobeCitiesC = new Color(0.32f, 0.33f, 0.32f);
+            lightRed = new Color(1.0f, 0.6f, 0.6f);
+            lightGreen = new Color(0.6f, 1.0f, 0.6f);
+            lightBlue = new Color(0.6f, 0.6f, 1.0f);
+            lightYellow = new Color(1.0f, 1.0f, 0.6f);
+            darkRed = new Color(0.4f, 0.0f, 0.0f);
+            darkGreen = new Color(0.0f, 0.4f, 0.0f);
+            darkBlue = new Color(0.0f, 0.0f, 0.4f);
+            darkYellow = new Color(0.4f, 0.4f, 0.0f);
             
         }
+
+
+
+        void SettingsPanel(int wnd)
+        {
+            //heightTester = GUILayout.HorizontalSlider(heightTester, 2f, 100f);
+           // GUILayout.Label(heightTester.ToString("F0"));
+            
+
+
+            GUI.DragWindow(dragBar);
+            #region Top Navigation Buttons
+            GUILayout.BeginHorizontal();
+            if (!firstTime || !automaticMode)
+            {
+                if (GUILayout.Button("Main"))
+                {
+                    tab = Config.Tab.EdgeDetection;
+                }
+                if (!automaticMode)
+                {
+                    if (GUILayout.Button("Bonus Effects"))
+                    {
+                        tab = Config.Tab.Bloom;
+                    }
+                    if (GUILayout.Button("Presets"))
+                    {
+                        LoadBank();
+                        tab = Config.Tab.Presets;
+
+                    }
+                }
+                if (useInfoModeSpecific)
+                {
+                    if (GUILayout.Button("Info Modes"))
+                    {
+                        tab = Config.Tab.ViewModes;
+                    }
+                }
+                if (GUILayout.Button("Hotkey Configuration"))
+                {
+                    tab = Config.Tab.Hotkey;
+                }
+
+            }
+
+            GUILayout.EndHorizontal();
+            GUILayout.Space(3f);
+            #endregion
+            #region Tab - Edge Detection
+            if (tab == Config.Tab.EdgeDetection)
+            {
+                ResizeDefaults();
+                if (edge != null)
+                {
+                    if (!isOn)
+                    {
+                        ResizeWindow(803, 190);
+                        GUILayout.Space(30f);
+                        if (GUILayout.Button("Enable Bordered Skylines", greenButton))
+                        {
+                            if (firstTime && automaticMode)
+                                LowEndAutomatic();
+                            ToggleBorderedSkylines(true);
+                        }
+                        GUILayout.Space(30f);
+
+                    }
+                    if (isOn)
+                    {
+
+                        if (automaticMode)
+                        {
+                            ResizeWindow(803, 690);
+
+                            GUILayout.BeginHorizontal();
+                            GUILayout.Label("PLUG & PLAY PRESETS:", bordSkyStyle_header);
+                            GUILayout.Label("Choose what looks best to you.  Listed screen resolutions are simply recommendations based on personal tweaking.  Know that the higher a suggested intended resolution, the thicker the edges in that preset will look at lower resolutions. Dynamic Resolution (DR) strongly recommended.");
+                            GUILayout.EndHorizontal();
+                            GUILayout.Space(6f);
+
+
+
+                            //scrollPosition = GUILayout.BeginScrollView(scrollPosition, GUILayout.Width(750), GUILayout.Height(200)); 
+
+                            GUILayout.BeginHorizontal();
+                            GUILayout.BeginVertical();
+                            GUILayout.Label("720p/1080p & NO DR:", bordSkyStyle_header, GUILayout.Width(165));
+                            GUILayout.Space(5f);
+                            if (GUILayout.Button("Auto-SobelSkies(NEW)", GUILayout.Width(165)))
+                            {
+                                LowEndAutomatic();
+                            }
+                            if (GUILayout.Button("Auto-Sobel", GUILayout.Width(165)))
+                            {
+                                ClassicSobelAutomatic();
+                            }
+                            if (GUILayout.Button("Auto-Triangle", GUILayout.Width(165)))
+                            {
+                                ClassicTriangleAutomatic();
+                            }
+                            if (GUILayout.Button("Eyefriendly(er)", GUILayout.Width(165)))
+                            {
+                                LowEndAltAutomatic();
+                                GUI.color = darkGreen;
+                            }
+                            GUILayout.EndVertical();
+
+
+                            GUILayout.BeginVertical();
+                            GUILayout.Label("1080p & 175+ DR", bordSkyStyle_header, GUILayout.Width(165));
+                            if (GUILayout.Button("Bordercities", GUILayout.Width(165)))
+                            {
+                                BordercitiesAutomatic();
+                            }
+                            if (wantsToneMapper)
+                            {
+                                if (GUILayout.Button("BC|Bright", GUILayout.Width(165)))
+                                {
+                                    BordercitiesBrightAutomatic();
+                                }
+                                if (GUILayout.Button("BC|Gritty", GUILayout.Width(165)))
+                                {
+                                    BordercitiesGrittyAutomatic();
+                                }
+                            }
+                            if (GUILayout.Button("Sobelcities", GUILayout.Width(165)))
+                            {
+                                SobelcitiesAutomatic();
+                            }
+                            if (GUILayout.Button("Realism", GUILayout.Width(165)))
+                            {
+                                RealismAutomatic();
+                            }
+                            if (GUILayout.Button("Cartoon", GUILayout.Width(165)))
+                            {
+                                CartoonThreeAutomatic();
+                            }
+                            if (GUILayout.Button("Retro", GUILayout.Width(165)))
+                            {
+                                CartoonAutomatic();
+                            }
+                            if (GUILayout.Button("Colorful", GUILayout.Width(165)))
+                            {
+                                CartoonAltAutomatic();
+                            }
+                            GUILayout.EndVertical();
+
+                            GUILayout.BeginVertical();
+                            GUILayout.Label("1080p & 250+ DR:", bordSkyStyle_header, GUILayout.Width(165));
+                            if (GUILayout.Button("Ultra", GUILayout.MaxWidth(165)))
+                            {
+                                UltraAutomatic();
+                            }
+                            GUILayout.EndVertical();
+
+                            GUILayout.BeginVertical();
+                            GUILayout.Label("ARTISTIC", bordSkyStyle_header, GUILayout.Width(165));
+                            if (GUILayout.Button("Random (WARNING:Bright)", GUILayout.MaxWidth(190)))
+                            {
+                                RandomAutomatic();
+                            }
+                            GUILayout.EndVertical();
+                            GUILayout.EndHorizontal();
+                            //GUILayout.EndScrollView();
+                            if (displayText != null && displayTitle != null)
+                            {
+                                GUILayout.Label("CURRENT MODE: " + displayTitle, bordSkyStyle_header);
+                                GUILayout.Space(6f);
+                                GUILayout.Label(displayText);
+                            }
+                            if (activeStockPreset == ActiveStockPreset.Cartoon || activeStockPreset == ActiveStockPreset.CartoonAlt)
+                            {
+                                GUILayout.Label("CARTOON SPECIFIC OPTIONS:", bordSkyStyle_header);
+                                if (GUILayout.Button("Randomize Color Theme)"))
+                                {
+                                    Color tempColor = new Color(Random.Range(0.00f, 1.00f), Random.Range(0.00f, 1.00f), Random.Range(0.00f, 1.00f));
+                                    cartoonMixC = tempColor;
+                                    edge.edgesOnlyBgColor = cartoonMixC;
+                                    mixSetR = edge.edgesOnlyBgColor.r;
+                                    mixSetG = edge.edgesOnlyBgColor.g;
+                                    mixSetB = edge.edgesOnlyBgColor.b;
+                                    setR = edge.edgeColor.r;
+                                    setG = edge.edgeColor.g;
+                                    setB = edge.edgeColor.b;
+                                    mixColorMultiplier = 1.0f;
+                                    colorMultiplier = 1.0f;
+                                }
+                                if (GUILayout.Button("Reset Color Theme"))
+                                {
+                                    cartoonMixC = Color.white;
+                                    edge.edgesOnlyBgColor = cartoonMixC;
+                                    mixSetR = 1.0f;
+                                    mixSetG = 1.0f;
+                                    mixSetB = 1.0f;
+                                    setR = 1.0f;
+                                    setG = 1.0f;
+                                    setB = 1.0f;
+                                    mixColorMultiplier = 1.0f;
+                                    colorMultiplier = 1.0f;
+                                }
+                            }
+                           
+                            GUILayout.Space(15f);
+                            GUILayout.Label("If you are unsatisfied with these stock presets, or wish to build from scratch:", bordSkyStyle_header);
+                            GUILayout.BeginHorizontal();
+                            if (GUILayout.Button("Enter Advanced Mode", yellowButton, GUILayout.Height(27)))
+                            {
+                                automaticMode = false;
+
+                            }
+                            GUILayout.EndHorizontal();
+                            if (!firstTime)
+                            {
+                                GUILayout.Space(2f);
+                                if (config.edgeToggleKeyCode == KeyCode.None)
+                                    GUILayout.Label("Did you know: you can set a hotkey for toggling the effect?  See 'Hotkey Config' tab!'");
+                                GUILayout.Space(2f);
+                            }
+                            else
+                                GUILayout.Space(6f);
+
+
+
+                        }
+                        else
+                        {
+                            GUILayout.Space(10f);
+                            ResizeWindow(803, 700);
+                            GUILayout.Label("ADVANCED MODE:", bordSkyStyle_header);
+                            switch (edge.mode)
+                            {
+                                case EdgeDetection.EdgeDetectMode.TriangleDepthNormals:
+                                    {
+                                        GUILayout.Label("Edge mode: Triangle Depth Normals");
+                                        break;
+                                    }
+                                case EdgeDetection.EdgeDetectMode.RobertsCrossDepthNormals:
+                                    {
+                                        GUILayout.Label("Edge mode: Roberts Cross Depth Normals");
+                                        break;
+                                    }
+                                case EdgeDetection.EdgeDetectMode.SobelDepth:
+                                    {
+                                        GUILayout.Label("Edge mode: Classic 'Sobel Depth'");
+                                        break;
+                                    }
+                                case EdgeDetection.EdgeDetectMode.SobelDepthThin:
+                                    {
+                                        GUILayout.Label("Edge mode: 'Sobel Skylines'");
+                                        break;
+                                    }
+                                default:
+                                    {
+                                        GUILayout.Label("Edge mode:");
+                                        break;
+                                    }
+                            }
+                            GUILayout.BeginHorizontal();
+                            if (GUILayout.Button("Triangle Depth Normals"))
+                            {
+
+                                edge.mode = EdgeDetection.EdgeDetectMode.TriangleDepthNormals;
+                                edge.SetCameraFlag();
+                            }
+                            if (GUILayout.Button("Roberts Cross Depth Normals"))
+                            {
+                                edge.mode = EdgeDetection.EdgeDetectMode.RobertsCrossDepthNormals;
+                                edge.SetCameraFlag();
+                            }
+                            if (GUILayout.Button("Classic Sobel"))
+                            {
+                                edge.mode = EdgeDetection.EdgeDetectMode.SobelDepth;
+                                edge.SetCameraFlag();
+                            }
+                            if (GUILayout.Button("'Sobel Skylines' (New)"))
+                            {
+                                edge.mode = EdgeDetection.EdgeDetectMode.SobelDepthThin;
+                                edge.SetCameraFlag();
+                            }
+                            GUILayout.EndHorizontal();
+                            GUILayout.Label("Edge distance: " + (edge.sampleDist - 0.5f).ToString("F0"));
+                            edge.sampleDist = GUILayout.HorizontalSlider(edge.sampleDist, 1, 5, GUILayout.MaxWidth(100));
+                            GUILayout.Label("Mix: " + edge.edgesOnly.ToString("F2"));
+                            edge.edgesOnly = GUILayout.HorizontalSlider(edge.edgesOnly, 0.000f, 1.000f, GUILayout.MaxWidth(500));
+
+
+                            if (edge.mode == EdgeDetection.EdgeDetectMode.TriangleDepthNormals || edge.mode == EdgeDetection.EdgeDetectMode.RobertsCrossDepthNormals)
+                            {
+                                autoEdge = GUILayout.Toggle(autoEdge, "Automatic zoom-level compensation?");
+                                GUILayout.Space(15f);
+                                GUILayout.BeginHorizontal();
+                                GUILayout.Label("Depth sensitivity: " + edge.sensitivityDepth.ToString("F2"), GUILayout.MaxWidth(300));
+                                if (!autoEdge)
+                                    edge.sensitivityDepth = GUILayout.HorizontalSlider(edge.sensitivityDepth, 0.000f, 50.000f, GUILayout.MaxWidth(125));
+                                GUILayout.EndHorizontal();
+                                GUILayout.BeginHorizontal();
+                                GUILayout.Label("Normal sensitivity: " + edge.sensitivityNormals.ToString("F2"), GUILayout.MaxWidth(300));
+                                if (!autoEdge)
+                                    edge.sensitivityNormals = GUILayout.HorizontalSlider(edge.sensitivityNormals, 0.000f, 5.000f, GUILayout.MaxWidth(125));
+                                GUILayout.EndHorizontal();
+                                GUILayout.Space(15f);
+
+                            }
+                            if (edge.mode == EdgeDetection.EdgeDetectMode.SobelDepthThin)
+                            {
+
+
+                                GUILayout.Space(5f);
+                                autoSobelEdge = GUILayout.Toggle(autoSobelEdge, "Automatic zoom-level compensation?");
+
+                                GUILayout.BeginHorizontal();
+                                GUILayout.Label("Diagonal Depth: " + edge.depthsDiagonal.ToString("F1"), GUILayout.MaxWidth(150));
+                                //if (!autoSobelEdge)
+                                edge.depthsDiagonal = GUILayout.HorizontalSlider(edge.depthsDiagonal, 0.000f, 1.000f);
+                                GUILayout.EndHorizontal();
+                                if (!autoSobelEdge)
+                                {
+                                    GUILayout.BeginHorizontal();
+                                    GUILayout.Label("Axis/Center: " + edge.axisVsCenter.ToString("F3"), GUILayout.MaxWidth(150));
+                                    edge.axisVsCenter = GUILayout.HorizontalSlider(edge.axisVsCenter, 0.001f, 1.000f);
+                                    GUILayout.EndHorizontal();
+                                }
+
+
+                                GUILayout.Space(5f);
+
+                                GUILayout.BeginHorizontal();
+                                if (autoSobelEdge)
+                                    GUILayout.Label("Horizontal Offset:" + edge.mult1.ToString("F3"), GUILayout.MaxWidth(150));
+                                else
+                                    GUILayout.Label("Horizontal:" + edge.mult1.ToString("F3"), GUILayout.MaxWidth(150));
+                                edge.mult1 = GUILayout.HorizontalSlider(edge.mult1, 0.000f, 10.100f);
+                                GUILayout.EndHorizontal();
+
+                                GUILayout.BeginHorizontal();
+                                if (!autoSobelEdge)
+                                {
+                                    GUILayout.Label("Fine-tune H:" + edge.mult3.ToString("F3"), GUILayout.MaxWidth(150));
+                                    edge.mult3 = GUILayout.HorizontalSlider(edge.mult3, 0.000f, 10.000f);
+                                }
+
+                                GUILayout.EndHorizontal();
+                                GUILayout.BeginHorizontal();
+
+                                if (autoSobelEdge)
+                                    GUILayout.Label("Vertical Offset:" + edge.mult2.ToString("F3"), GUILayout.MaxWidth(150));
+                                else
+                                    GUILayout.Label("Vertical:" + edge.mult2.ToString("F3"), GUILayout.MaxWidth(150));
+
+                                edge.mult2 = GUILayout.HorizontalSlider(edge.mult2, 0.000f, 20.000f);
+                                GUILayout.EndHorizontal();
+                                GUILayout.BeginHorizontal();
+                                if (!autoSobelEdge)
+                                {
+                                    GUILayout.Label("Fine-tune V: " + edge.mult4.ToString("F3"), GUILayout.MaxWidth(150));
+                                    edge.mult4 = GUILayout.HorizontalSlider(edge.mult4, 0.000f, 10.000f);
+                                }
+                                GUILayout.EndHorizontal();
+                                if (GUILayout.Button("Reset SobelSkylines-specfic parameters"))
+                                {
+                                    edge.mult1 = 1.0f;
+                                    edge.mult2 = 10.0f;
+                                    edge.mult3 = 1.0f;
+                                    edge.mult4 = 1.0f;
+                                }
+
+                                GUILayout.Space(3f);
+
+
+                            }
+                            if (edge.mode == EdgeDetection.EdgeDetectMode.SobelDepth)
+                            {
+                                GUILayout.BeginHorizontal();
+                                GUILayout.Label("Edge exponent: " + edge.edgeExp.ToString("F2"), GUILayout.MaxWidth(50));
+                                edge.edgeExp = GUILayout.HorizontalSlider(edge.edgeExp, 0.004f, 1.000f, GUILayout.MaxWidth(100));
+                                GUILayout.EndHorizontal();
+                            }
+
+                            GUILayout.BeginHorizontal();
+                            GUILayout.Label("R " + setR.ToString("F2"), GUILayout.MaxWidth(10f));
+                            setR = GUILayout.HorizontalSlider(setR, 0.000f, 3.000f, GUILayout.Width(90));
+
+
+                            GUILayout.Label("G " + setG.ToString("F2"), GUILayout.MaxWidth(10f));
+                            setG = GUILayout.HorizontalSlider(setG, 0.000f, 3.000f, GUILayout.Width(90));
+
+
+                            GUILayout.Label("B " + setB.ToString("F2"), GUILayout.MaxWidth(10f));
+                            setB = GUILayout.HorizontalSlider(setB, 0.000f, 3.000f, GUILayout.Width(90));
+
+                            GUILayout.Label("x" + colorMultiplier.ToString("F1"), GUILayout.MaxWidth(20f));
+                            colorMultiplier = GUILayout.HorizontalSlider(colorMultiplier, 0.0f, 10.0f, GUILayout.Width(90));
+
+                            if (GUILayout.Button("Apply Edge Color", GUILayout.MaxWidth(120)))
+                            {
+                                EdgeColor(setR, setG, setB);
+                                EdgeColor(setR, setG, setB);
+                            }
+                            if (GUILayout.Button("Black", GUILayout.MaxWidth(55)))
+                            {
+                                setR = 0.0f;
+                                setG = 0.0f;
+                                setB = 0.0f;
+                                colorMultiplier = 1.0f;
+                                EdgeColor(0.0f, 0.0f, 0.0f);
+                                EdgeColor(0.0f, 0.0f, 0.0f);
+                            }
+                            GUILayout.EndHorizontal();
+
+
+
+
+                            GUILayout.BeginHorizontal();
+                            GUILayout.Label("R " + mixSetR.ToString("F2"), GUILayout.MaxWidth(10f));
+                            mixSetR = GUILayout.HorizontalSlider(mixSetR, 0.000f, 3.000f, GUILayout.Width(90));
+
+
+                            GUILayout.Label("G " + mixSetG.ToString("F2"), GUILayout.MaxWidth(10f));
+                            mixSetG = GUILayout.HorizontalSlider(mixSetG, 0.000f, 3.000f, GUILayout.Width(90));
+
+
+                            GUILayout.Label("B " + mixSetB.ToString("F2"), GUILayout.MaxWidth(10f));
+                            mixSetB = GUILayout.HorizontalSlider(mixSetB, 0.000f, 3.000f, GUILayout.Width(90));
+
+                            GUILayout.Label("x" + mixColorMultiplier.ToString("F2"), GUILayout.MaxWidth(20f));
+                            mixColorMultiplier = GUILayout.HorizontalSlider(mixColorMultiplier, 0.0f, 10.0f, GUILayout.Width(90));
+
+                            if (GUILayout.Button("Apply Mix Color", GUILayout.MaxWidth(120)))
+                            {
+                                MixColor(mixSetR, mixSetG, mixSetB);
+                                MixColor(mixSetR, mixSetG, mixSetB);
+                            }
+                            if (GUILayout.Button("White", GUILayout.MaxWidth(55)))
+                            {
+                                mixSetR = 1.0f;
+                                mixSetG = 1.0f;
+                                mixSetB = 1.0f;
+                                mixColorMultiplier = 1.0f;
+                                MixColor(1.0f, 1.0f, 1.0f);
+                                MixColor(1.0f, 1.0f, 1.0f);
+                            }
+
+                            GUILayout.EndHorizontal();
+
+
+
+                            if (infoManager.CurrentMode == InfoManager.InfoMode.None)
+                            {
+
+
+                            }
+                            else
+                            {
+                                GUILayout.Label("Gamma and boost settings have no effect in View Modes.");
+                            }
+                            GUILayout.Space(5f);
+
+                            if (GUILayout.Button("Switch back to 'Plug & Play' Mode.", yellowButton))
+                            {
+                                automaticMode = true;
+                                DetermineMode();
+                            }
+
+                            GUILayout.Space(5);
+                        }
+                    }
+                }
+            }
+            #endregion
+            #region Tab - Bloom
+            if (tab == Config.Tab.Bloom)
+            {
+                ResizeWindow(803, 415);
+                GUILayout.Label("NOTE: There is already a Bloom effect in Cities Skylines, and it is quite better than what Bordercities provides here.  However, because they both achieve a different effect, the Bordercities Bloom has been maintained in the event you wish to stack the bloom effects.");
+                GUILayout.Space(5f);
+                if (!bloom.enabled)
+                    bloom.enabled = GUILayout.Toggle(bloom.enabled, "Click to enable Bloom.");
+                else
+                    bloom.enabled = GUILayout.Toggle(bloom.enabled, "Click to disable Bloom.");
+
+                if (bloom.enabled)
+                {
+                    GUILayout.Label("Threshold: " + bloom.threshold.ToString("F2"));
+                    bloom.threshold = GUILayout.HorizontalSlider(bloom.threshold, 0.00f, 1.50f, GUILayout.Width(570));
+                    GUILayout.Label("Intensity: " + bloom.intensity.ToString("F2"));
+                    bloom.intensity = GUILayout.HorizontalSlider(bloom.intensity, 0.00f, 2.50f, GUILayout.Width(570));
+                    GUILayout.Label("Blur size: " + bloom.blurSize.ToString("F2"));
+                    bloom.blurSize = GUILayout.HorizontalSlider(bloom.blurSize, 0.00f, 5.50f, GUILayout.Width(570));
+                }
+
+            }
+            #endregion
+            #region Tab - Hotkey
+            if (tab == Config.Tab.Hotkey)
+            {
+                if (firstTime)
+                {
+                    ResizeWindow(575, 400);
+                    GUILayout.Label("BORDERCITIES FIRST-TIME INITIALIZATION (Never popups again after choice)");
+                    GUILayout.Label("Choose and confirm your hotkey for Bordercities.  LeftBracket is default.");
+                    GUILayout.Label("NOTE: Bordercities will -never- automatically pop-up again as soon as you've confirmed your hotkey choice.   This initialization process ensures that all users, regardless of hardware, operating system, or current keyboard configuration, will be able to enjoy Bordercities.");
+
+
+                }
+
+
+                if (!firstTime)
+                {
+                    ResizeWindow(538, 600);
+                    GUILayout.Label("WARNING: HOTKEY BUTTONS WILL SAVE UPON CLICK.  THIS INCLUDES YOUR EFFECTS SETTINGS.  If you wish to create a safe backup of your active Effect, navigate to the 'XML' tab above and create a permanent copy before selecting a hotkey here.  This will not be like this for much longer.");
+
+                }
+                KeyboardGrid(0);
+
+
+
+
+                if (firstTime && config.keyCode != KeyCode.None)
+                {
+                    GUILayout.Space(3f);
+                    if (hasClicked)
+                        GUILayout.Label("Hotkey '" + KeyToString(config.keyCode) + "' has been chosen and is active.  Confirm it now by using the hotkey.");
+                    GUILayout.Space(10f);
+                    GUILayout.Label("NOTE: Hotkey can be changed at anytime via the 'Hotkey' window tab in the config panel.");
+                }
+
+                if (!firstTime)
+                {
+                    if (config.keyCode != KeyCode.None)
+                        GUILayout.Label("Current 'Config' hotkey: " + config.keyCode);
+                    else
+                        GUILayout.Label("No config hotkey is bound to Bordercities.");
+                    GUILayout.Space(45f);
+                    GUILayout.Label("Set edge toggle hotkey below: ");
+                    KeyboardGrid(1);
+                    if (config.edgeToggleKeyCode != KeyCode.None)
+                        GUILayout.Label("Current 'Edge Enable' hotkey: " + config.edgeToggleKeyCode);
+                    else
+                        GUILayout.Label("No edge enable hotkey is bound to Bordercities.");
+                    GUILayout.Space(5f);
+                    GUILayout.Label("More key options coming soon!");
+                }
+
+            }
+            #endregion
+            #region Tab - Presets
+            if (tab == Config.Tab.Presets)
+            {
+                ResizeWindow(600, 750);
+                GUILayout.Label("NOTE: Your preset bank list is saved automatically, and as a whole, upon either saving any of your fields, or, proper exit of the game.  Note that your changes to this list will NOT be saved in the event of an Alt-F4 or other similarly graceless exit.  You will the preset files stored within steamapps/common/Cities_Skylines/BordercitiesPresets.");
+
+                GUILayout.Space(2f);
+
+                for (int i = 0; i < presetEntries.Length; i++)
+                {
+                    GUILayout.BeginHorizontal();
+
+                    presetEntries[i] = GUILayout.TextField(presetEntries[i], 31, GUILayout.MaxWidth(280));
+                    presetEntries[i] = Regex.Replace(presetEntries[i], @"[^a-zA-Z0-9 ]", "");
+                    if (GUILayout.Button("Save", GUILayout.MaxWidth(60), GUILayout.MaxHeight(25)))
+                    {
+                        if (IsValidFilename(presetEntries[i]))
+                        {
+                            SavePreset(presetEntries[i], true);
+                            SavePreset(presetEntries[i], true);
+                            SaveBank();
+                        }
+
+                    }
+                    if (GUILayout.Button("Load", GUILayout.MaxWidth(60), GUILayout.MaxHeight(25)))
+                    {
+                        LoadPreset(presetEntries[i], true);
+                    }
+
+                    i++;
+
+                    presetEntries[i] = GUILayout.TextField(presetEntries[i], 31, GUILayout.MaxWidth(280));
+                    presetEntries[i] = Regex.Replace(presetEntries[i], @"[^a-zA-Z0-9 ]", "");
+                    if (GUILayout.Button("Save", GUILayout.MaxWidth(60), GUILayout.MaxHeight(25)))
+                    {
+                        if (IsValidFilename(presetEntries[i]))
+                        {
+                            SavePreset(presetEntries[i], true);
+                            SavePreset(presetEntries[i], true);
+
+                        }
+                    }
+                    if (GUILayout.Button("Load", GUILayout.MaxWidth(60), GUILayout.MaxHeight(25)))
+                    {
+                        LoadPreset(presetEntries[i], true);
+                    }
+
+                    GUILayout.EndHorizontal();
+                }
+
+                GUILayout.Label("Support for custom presets is sort of thrown together for the moment. The name of the input field must match the filename, and is case sensitive.  Having a nicer preset browser is on the todo list.");
+
+                if (GUILayout.Button("Reset Bank (This will save!)"))
+                {
+                    ResetBank();
+                }
+
+            }
+            #endregion
+            #region View Modes
+            if (tab == Config.Tab.ViewModes)
+            {
+                ResizeWindow(800, 755);
+
+                ViewModeGUI("Building Level", "BuildingLevel", existBuildingLevel, "Connections", "Connections", existConnections);
+                ViewModeGUI("Crime Rate", "CrimeRate", existCrimeRate, "Density", "Density", existDensity);
+                ViewModeGUI("Districts", "Districts", existDistricts, "Education", "Education", existEducation);
+                ViewModeGUI("Electricity", "Electricity", existElectricity, "Entertainment", "Entertainment", existEntertainment);
+                ViewModeGUI("Fire Safety", "FireSafety", existFireSafety, "Garbage", "Garbage", existGarbage);
+                ViewModeGUI("Happiness", "Happiness", existHappiness, "Health", "Health", existHealth);
+                ViewModeGUI("Land Value", "LandValue", existLandValue, "Natural Resources", "NaturalResources", existNaturalResources);
+                ViewModeGUI("Noise Pollution", "NoisePollution", existNoisePollution, "Pollution", "Pollution", existPollution);
+                ViewModeGUI("Terrain Height", "TerrainHeight", existTerrainHeight, "Traffic", "Traffic", existTraffic);
+                ViewModeGUI("Transport", "Transport", existTransport, "Water", "Water", existWater);
+                ViewModeGUI("Wind", "Wind", existWind);
+
+
+                GUILayout.Space(15);
+                if (automaticMode)
+                    GUILayout.Label("Dial in custom colors! You'll want to go easy on 'Mix' so that blue<->red gameplay info remains discernible.");
+                else
+                    GUILayout.Label("Advanced Mode detected: For clarity, these are the exact same color sliders from the main page.  You can technically mix and match all possible settings, and per info mode, if you so desire.  The colors are here as a shortcut, as it is assumed that you'll want to use very different colors for each Info Mode.");
+
+                GUILayout.Space(5);
+                GUILayout.Label("Mix: " + edge.edgesOnly.ToString("F2"));
+                edge.edgesOnly = GUILayout.HorizontalSlider(edge.edgesOnly, 0.000f, 1.000f, GUILayout.MaxWidth(500));
+                GUILayout.BeginHorizontal();
+                GUILayout.Label("R " + setR.ToString("F2"), GUILayout.MaxWidth(10f));
+                setR = GUILayout.HorizontalSlider(setR, 0.000f, 3.000f, GUILayout.Width(90));
+
+
+                GUILayout.Label("G " + setG.ToString("F2"), GUILayout.MaxWidth(10f));
+                setG = GUILayout.HorizontalSlider(setG, 0.000f, 3.000f, GUILayout.Width(90));
+
+
+                GUILayout.Label("B " + setB.ToString("F2"), GUILayout.MaxWidth(10f));
+                setB = GUILayout.HorizontalSlider(setB, 0.000f, 3.000f, GUILayout.Width(90));
+
+                GUILayout.Label("x" + colorMultiplier.ToString("F1"), GUILayout.MaxWidth(20f));
+                colorMultiplier = GUILayout.HorizontalSlider(colorMultiplier, 0.0f, 10.0f, GUILayout.Width(90));
+
+                if (GUILayout.Button("Apply Edge Color", GUILayout.MaxWidth(120)))
+                {
+                    EdgeColor(setR, setG, setB);
+                    EdgeColor(setR, setG, setB);
+                }
+                if (GUILayout.Button("Black", GUILayout.MaxWidth(55)))
+                {
+                    setR = 0.0f;
+                    setG = 0.0f;
+                    setB = 0.0f;
+                    colorMultiplier = 1.0f;
+                    EdgeColor(0.0f, 0.0f, 0.0f);
+                    EdgeColor(0.0f, 0.0f, 0.0f);
+                }
+                GUILayout.EndHorizontal();
+
+
+
+
+                GUILayout.BeginHorizontal();
+                GUILayout.Label("R " + mixSetR.ToString("F2"), GUILayout.MaxWidth(10f));
+                mixSetR = GUILayout.HorizontalSlider(mixSetR, 0.000f, 3.000f, GUILayout.Width(90));
+
+
+                GUILayout.Label("G " + mixSetG.ToString("F2"), GUILayout.MaxWidth(10f));
+                mixSetG = GUILayout.HorizontalSlider(mixSetG, 0.000f, 3.000f, GUILayout.Width(90));
+
+
+                GUILayout.Label("B " + mixSetB.ToString("F2"), GUILayout.MaxWidth(10f));
+                mixSetB = GUILayout.HorizontalSlider(mixSetB, 0.000f, 3.000f, GUILayout.Width(90));
+
+                GUILayout.Label("x" + mixColorMultiplier.ToString("F2"), GUILayout.MaxWidth(20f));
+                mixColorMultiplier = GUILayout.HorizontalSlider(mixColorMultiplier, 0.0f, 10.0f, GUILayout.Width(90));
+
+                if (GUILayout.Button("Apply Mix Color", GUILayout.MaxWidth(120)))
+                {
+                    MixColor(mixSetR, mixSetG, mixSetB);
+                    MixColor(mixSetR, mixSetG, mixSetB);
+                }
+                if (GUILayout.Button("White", GUILayout.MaxWidth(55)))
+                {
+                    mixSetR = 1.0f;
+                    mixSetG = 1.0f;
+                    mixSetB = 1.0f;
+                    mixColorMultiplier = 1.0f;
+                    MixColor(1.0f, 1.0f, 1.0f);
+                    MixColor(1.0f, 1.0f, 1.0f);
+                }
+                GUILayout.EndHorizontal();
+                if (infoManager.CurrentMode != InfoManager.InfoMode.None)
+                {
+                    if (GUILayout.Button("Shortcut for 'Set " + GetCurrentInfoModeString() + "'! (Current info mode)"))
+                    {
+                        QuicksaveActiveViewMode();
+                    }
+                }
+                else
+                {
+                    if (GUILayout.Button("Shortcut for 'Set [InfoMode].'  Enter an info mode to use!"))
+                    {
+                        QuicksaveActiveViewMode();
+                    }
+                }
+                GUILayout.Space(10f);
+                if (GUILayout.Button("Return to configuration tab"))
+                {
+                    tab = Config.Tab.EdgeDetection;
+                }
+                GUILayout.Space(3f);
+
+
+                GUILayout.Label("Any 'Set' for a given Info Mode is generated and saved to disk ('steamapps/common/Cities_Skylines/BordercitiesPresets/InfoModes') in its own dedicated XML file (IE 'Wind.xml' 'Water.xml'), and only upon clicking will the file be created, if not already existing.  Your main config will be loaded in the absence of a custom 'Info Mode' XML.  When clicking 'Set', whichever settings are currently on-screen will be the settings saved to your desired Info Mode's XML file -- regardless of whether or not you had first pressed 'Save Settings'.  For ease of understanding, know that your main config is entirely separate from the Info-Mode XML database here, as well as separate from the general 'Custom' XML config-saves located in the 'Custom' tab.  Your primary config (the one that auto-loads when you start the game via 'Save Settings') is the configuration that will be automatically loaded upon exiting an Info Mode (if you are also not using 'Effect Enabled in Info Modes Only.')");
+
+                GUILayout.Space(4);
+
+
+
+            }
+
+
+
+
+
+            #endregion
+
+            #region Bottom Navigation
+            if (!firstTime)
+            {
+                if (tab == Config.Tab.EdgeDetection && isOn)
+                {
+                    subViewOnly = GUILayout.Toggle(subViewOnly, "Optional: Effect enabled within 'Info Modes' only? (Auto-disables/enables accordingly)");
+                    useInfoModeSpecific = GUILayout.Toggle(useInfoModeSpecific, "Optional: Use 'Info-Mode'-specific Presets? (upon activation, 'Info Modes' tab will appear above.)");
+                    wantsToneMapper = GUILayout.Toggle(wantsToneMapper, "Optional: Incorporate brightness/gamma settings into Bordered Skylines' functionality? (Plug & Play/Advanced share this)");
+                    if (wantsToneMapper)
+                    {
+                        GUILayout.BeginHorizontal();
+                        GUILayout.Label("Gamma: " + toneMapGamma.ToString("F2"), GUILayout.MaxWidth(60));
+                        toneMapGamma = GUILayout.HorizontalSlider(toneMapGamma, 0.0f, 30.0f, GUILayout.MaxWidth(100));
+
+                        GUILayout.Label("Boost: " + toneMapBoost.ToString("F2"), GUILayout.MaxWidth(60));
+                        toneMapBoost = GUILayout.HorizontalSlider(toneMapBoost, 0.0f, 30.0f, GUILayout.MaxWidth(100));
+                        GUILayout.EndHorizontal();
+                    }
+                    if (isOn)
+                    {
+                        if (GUILayout.Button("Disable Bordered Skylines", redButton))
+                        {
+                            ToggleBorderedSkylines(false);
+                        }
+                    }
+                }
+                GUILayout.BeginHorizontal();
+                if (tab != Config.Tab.Hotkey)
+                {
+
+                    
+                        if (GUILayout.Button("Reset Brightness") && tab != Config.Tab.Presets)
+                        {
+                            ResetTonemapper();
+                        }
+                    
+                    if (!automaticMode)
+                    {
+                        if (tab != Config.Tab.Presets)
+                        {
+                            if (GUILayout.Button("Load from last saved"))
+                            {
+                                LoadConfig(true);
+                            }
+                        }
+
+                    }
+                    if (tab != Config.Tab.Presets)
+                    {
+                        if (automaticMode && tab == Config.Tab.EdgeDetection)
+                        {
+                            if (isOn)
+                            {
+                                if (GUILayout.Button("Save (Active preset will load by default in future sessions)"))
+                                {
+                                    SaveConfig();
+                                }
+                            }
+                            else
+                            {
+                                if (GUILayout.Button("Save (Bordered Skylines will be Disabled by default in future sessions)"))
+                                {
+                                    SaveConfig();
+                                }
+                            }
+                        }
+                        else
+                        {
+                            if (GUILayout.Button("Save (Your active configuration will load by default in future sessions"))
+                            {
+                                SaveConfig();
+                            }
+                        }
+                    }
+                    else
+                    {
+
+                        if (GUILayout.Button("Save the current look as default"))
+                        {
+                            SaveConfig();
+                        }
+                    }
+                }
+
+                if (GUILayout.Button("Close Window"))
+                {
+                    showSettingsPanel = false;
+                    if (!overrideFirstTime)
+                        overrideFirstTime = true;
+                }
+
+                GUILayout.EndHorizontal();
+
+
+            }
+            #endregion
+            dragBar.width = windowRect.width;
+            windowLoc.x = windowRect.x;
+            windowLoc.y = windowRect.y;
+
+        }
+
+       
 
         void Awake()
         {
@@ -932,7 +1778,7 @@ namespace Bordercities
             edge.mult1 = 1.637f;
             edge.mult2 = 10.0f;
 
-            edge.edgeColor = sobeCitiesC;
+            edge.edgeColor = Color.black;
             edge.edgesOnlyBgColor = Color.white;
             if (!CheckTonemapper())
                 ResetTonemapper();
@@ -1188,17 +2034,7 @@ namespace Bordercities
         }
 
 
-        void OnGUI()
-        {
-            //GUI.skin = skin;
-            //GUI.backgroundColor = Color.gray;
-            if (firstTime)
-                tab = Config.Tab.Hotkey;
-            if (showSettingsPanel)
-            {
-                windowRect = GUI.Window(391435, windowRect, SettingsPanel, "Bordered Skylines (NEW: Draggable Window!)");
-            }
-        }
+        
 
         void MatchColorsOnGUI()
         {
@@ -1317,824 +2153,8 @@ namespace Bordercities
                 Preset.SerializeInfoMode(name, presetToSave);
         }
 
+        
 
-        void SettingsPanel(int wnd)
-        {
-           
-            GUI.DragWindow(dragBar);
-            #region Top Navigation Buttons
-            GUILayout.BeginHorizontal();
-            if (!firstTime || !automaticMode)
-            {
-                if (GUILayout.Button("Main"))
-                {
-                    tab = Config.Tab.EdgeDetection;
-                }
-                if (!automaticMode)
-                {
-                    if (GUILayout.Button("Bonus Effects"))
-                    {
-                        tab = Config.Tab.Bloom;
-                    }
-                    if (GUILayout.Button("Presets"))
-                    {
-                        LoadBank();
-                        tab = Config.Tab.Presets;
-
-                    }
-                }
-                if (useInfoModeSpecific)
-                {
-                    if (GUILayout.Button("Info Modes"))
-                    {
-                        tab = Config.Tab.ViewModes;
-                    }
-                }
-                if (GUILayout.Button("Hotkey Configuration"))
-                {
-                    tab = Config.Tab.Hotkey;
-                }
-                
-            }
-
-            GUILayout.EndHorizontal();
-            GUILayout.Space(3f);
-#endregion
-            #region Tab - Edge Detection
-            if (tab == Config.Tab.EdgeDetection)
-            {
-                ResizeDefaults();
-                if (edge != null)
-                {
-                    if (!isOn)
-                    {
-                        ResizeWindow(803, 190);
-                        GUILayout.Space(30f);
-                        if (GUILayout.Button("Enable Bordered Skylines"))
-                        {
-                            if (firstTime && automaticMode)
-                                LowEndAutomatic();
-                            ToggleBorderedSkylines(true);
-                        }
-                        GUILayout.Space(30f);
-                        
-                    }
-                    if (isOn)
-                    {
-
-                        if (automaticMode)
-                        {
-                            ResizeWindow(803, 530);
-
-                            GUILayout.Label("PRESETS (NOTE: Recommended viewing resolutions are merely suggestions based upon the need to scale up the effect as resolution increases. There are no performance differences -- use whichever preset looks best to your eyes.  Note that if a preset is tuned for a particular resolution, there is a chance that you might experience severe artifacts if using it at a lower resolution.  This will cause no harm, but it will look pretty terrible.");
-                            GUILayout.Space(6f);
-                            GUILayout.BeginHorizontal();
-                            GUILayout.Label("720p-1080p + NO DR:", GUILayout.Width(150));
-                            GUILayout.Space(5f);
-                            if (GUILayout.Button("Auto-SobelSkies(NEW)", GUILayout.MaxWidth(150f)))
-                            {
-                                LowEndAutomatic();
-                            }
-                            if (GUILayout.Button("Auto-Sobel", GUILayout.MaxWidth(150f)))
-                            {
-                                ClassicSobelAutomatic();
-                            }
-                            if (GUILayout.Button("Auto-Triangle", GUILayout.MaxWidth(150f)))
-                            {
-                                ClassicTriangleAutomatic();
-                            }
-                            if (GUILayout.Button("Eyefriendly(er)", GUILayout.MaxWidth(150f)))
-                            {
-                                LowEndAltAutomatic();
-                            }
-                            GUILayout.EndHorizontal();
-                            GUILayout.BeginHorizontal();
-                            GUILayout.Label("1080p + DR 175+", GUILayout.Width(150));
-                            if (GUILayout.Button("Bordercities", GUILayout.MaxWidth(150f)))
-                            {
-                                BordercitiesAutomatic();
-                            }
-                            if (wantsToneMapper)
-                            {
-                                if (GUILayout.Button("BC|Bright", GUILayout.MaxWidth(150f)))
-                                {
-                                    BordercitiesBrightAutomatic();
-                                }
-                                if (GUILayout.Button("BC|Gritty", GUILayout.MaxWidth(150f)))
-                                {
-                                    BordercitiesGrittyAutomatic();
-                                }
-                            }
-                            if (GUILayout.Button("Sobelcities", GUILayout.MaxWidth(150f)))
-                            {
-                                SobelcitiesAutomatic();
-                            }
-                            if (GUILayout.Button("Realism", GUILayout.MaxWidth(150f)))
-                            {
-                                RealismAutomatic();
-                            }
-                            if (GUILayout.Button("Cartoon", GUILayout.MaxWidth(150f)))
-                            {
-                                CartoonThreeAutomatic();
-                            }
-                            if (GUILayout.Button("Retro", GUILayout.MaxWidth(150f)))
-                            {
-                                CartoonAutomatic();
-                            }
-                            if (GUILayout.Button("Colorful", GUILayout.MaxWidth(150f)))
-                            {
-                                CartoonAltAutomatic();
-                            }
-                            GUILayout.EndHorizontal();
-                            GUILayout.BeginHorizontal();
-                            GUILayout.Label("1080p/1440p + DR 250+:", GUILayout.Width(150));
-                            if (GUILayout.Button("Ultra", GUILayout.MaxWidth(130f)))
-                            {
-                                UltraAutomatic();
-                            }
-                            GUILayout.EndHorizontal();
-                            GUILayout.BeginHorizontal();
-                            GUILayout.Label("GIMMICKY:", GUILayout.Width(150));
-                            if (GUILayout.Button("Random (WARNING: Could potentially be very bright!", GUILayout.MaxWidth(330)))
-                            {
-                                RandomAutomatic();
-                            }
-                            GUILayout.EndHorizontal();
-                            GUILayout.Space(6f);
-                            if (displayText != null && displayTitle != null)
-                            {
-                                GUILayout.Label("CURRENT MODE: "+displayTitle);
-                                GUILayout.Space(6f);
-                                GUILayout.Label(displayText);
-                            }
-                            if (activeStockPreset == ActiveStockPreset.Cartoon || activeStockPreset == ActiveStockPreset.CartoonAlt)
-                            {
-                                if (GUILayout.Button("CARTOON SPECIFIC: Randomize Color Theme)"))
-                                {
-                                    Color tempColor = new Color(Random.Range(0.00f, 1.00f), Random.Range(0.00f, 1.00f), Random.Range(0.00f, 1.00f));
-                                    cartoonMixC = tempColor;
-                                    edge.edgesOnlyBgColor = cartoonMixC;
-                                    mixSetR = edge.edgesOnlyBgColor.r;
-                                    mixSetG = edge.edgesOnlyBgColor.g;
-                                    mixSetB = edge.edgesOnlyBgColor.b;
-                                    setR = edge.edgeColor.r;
-                                    setG = edge.edgeColor.g;
-                                    setB = edge.edgeColor.b;
-                                    mixColorMultiplier = 1.0f;
-                                    colorMultiplier = 1.0f; 
-                                }
-                                if (GUILayout.Button("Reset Cartoon Color"))
-                                {
-                                    cartoonMixC = Color.white;
-                                    edge.edgesOnlyBgColor = cartoonMixC;
-                                    mixSetR = 1.0f;
-                                    mixSetG = 1.0f;
-                                    mixSetB = 1.0f;
-                                    setR = 1.0f;
-                                    setG = 1.0f;
-                                    setB = 1.0f;
-                                    mixColorMultiplier = 1.0f;
-                                    colorMultiplier = 1.0f;
-                                }
-                            }
-                            GUILayout.Space(15f);
-                            GUILayout.Label("If you are unsatisfied with these stock presets, or wish to build from scratch:");
-                            GUILayout.BeginHorizontal();
-                            if (GUILayout.Button("Enter Advanced Mode (WARNING: This is some real rocket surgery kind of stuff)"))
-                            {
-                                automaticMode = false;
-
-                            }
-                            GUILayout.EndHorizontal();
-                            if (!firstTime)
-                            {
-                                GUILayout.Space(2f);
-                                if (config.edgeToggleKeyCode == KeyCode.None)
-                                    GUILayout.Label("Did you know: you can set a hotkey for toggling the effect?  See 'Hotkey Config' tab!'");
-                                GUILayout.Space(2f);
-                            }
-                            else
-                                GUILayout.Space(6f);
-
-                            
-
-                        }
-                        else
-                        {
-                            GUILayout.Space(10f);
-                            ResizeWindow(803, 700);
-                            GUILayout.Label("(NOTE 4/1: THE ADVANCED MODE GUI WILL BE UNDERGOING MAJOR RENOVATION ON APRIL 1 AS IT IS DESPERATELY NEEDED!!!");
-
-                            switch (edge.mode)
-                            {
-                                case EdgeDetection.EdgeDetectMode.TriangleDepthNormals:
-                                    {
-                                        GUILayout.Label("Edge mode: Triangle Depth Normals");
-                                        break;
-                                    }
-                                case EdgeDetection.EdgeDetectMode.RobertsCrossDepthNormals:
-                                    {
-                                        GUILayout.Label("Edge mode: Roberts Cross Depth Normals");
-                                        break;
-                                    }
-                                case EdgeDetection.EdgeDetectMode.SobelDepth:
-                                    {
-                                        GUILayout.Label("Edge mode: Classic 'Sobel Depth'");
-                                        break;
-                                    }
-                                case EdgeDetection.EdgeDetectMode.SobelDepthThin:
-                                    {
-                                        GUILayout.Label("Edge mode: 'Sobel Skylines'");
-                                        break;
-                                    }
-                                default:
-                                    {
-                                        GUILayout.Label("Edge mode:");
-                                        break;
-                                    }
-                            }
-                            GUILayout.BeginHorizontal();
-                            if (GUILayout.Button("Triangle Depth Normals"))
-                            {
-
-                                edge.mode = EdgeDetection.EdgeDetectMode.TriangleDepthNormals;
-                                edge.SetCameraFlag();
-                            }
-                            if (GUILayout.Button("Roberts Cross Depth Normals"))
-                            {
-                                edge.mode = EdgeDetection.EdgeDetectMode.RobertsCrossDepthNormals;
-                                edge.SetCameraFlag();
-                            }
-                            if (GUILayout.Button("Classic Sobel"))
-                            {
-                                edge.mode = EdgeDetection.EdgeDetectMode.SobelDepth;
-                                edge.SetCameraFlag();
-                            }
-                            if (GUILayout.Button("'Sobel Skylines' (New)"))
-                            {
-                                edge.mode = EdgeDetection.EdgeDetectMode.SobelDepthThin;
-                                edge.SetCameraFlag();
-                            }
-                            GUILayout.EndHorizontal();
-                            GUILayout.Label("Edge distance: " + (edge.sampleDist - 0.5f).ToString("F0"));
-                            edge.sampleDist = GUILayout.HorizontalSlider(edge.sampleDist, 1, 5, GUILayout.MaxWidth(100));
-                            GUILayout.Label("Mix: " + edge.edgesOnly.ToString("F2"));
-                            edge.edgesOnly = GUILayout.HorizontalSlider(edge.edgesOnly, 0.000f, 1.000f, GUILayout.MaxWidth(500));                            
-                            
-
-                            if (edge.mode == EdgeDetection.EdgeDetectMode.TriangleDepthNormals || edge.mode == EdgeDetection.EdgeDetectMode.RobertsCrossDepthNormals)
-                            {
-                                autoEdge = GUILayout.Toggle(autoEdge, "Automatic zoom-level compensation?");
-                                GUILayout.Space(15f);
-                                GUILayout.BeginHorizontal();
-                                GUILayout.Label("Depth sensitivity: " + edge.sensitivityDepth.ToString("F2"), GUILayout.MaxWidth(300));
-                                if (!autoEdge)
-                                    edge.sensitivityDepth = GUILayout.HorizontalSlider(edge.sensitivityDepth, 0.000f, 50.000f, GUILayout.MaxWidth(125));
-                                GUILayout.EndHorizontal();
-                                GUILayout.BeginHorizontal();
-                                GUILayout.Label("Normal sensitivity: " + edge.sensitivityNormals.ToString("F2"), GUILayout.MaxWidth(300));
-                                if (!autoEdge)
-                                    edge.sensitivityNormals = GUILayout.HorizontalSlider(edge.sensitivityNormals, 0.000f, 5.000f, GUILayout.MaxWidth(125));
-                                GUILayout.EndHorizontal();
-                                GUILayout.Space(15f);
-
-                            }
-                            if (edge.mode == EdgeDetection.EdgeDetectMode.SobelDepthThin)
-                            {
-                                
-                                
-                                GUILayout.Space(5f);
-                                autoSobelEdge = GUILayout.Toggle(autoSobelEdge, "Automatic zoom-level compensation?");
-
-                                GUILayout.BeginHorizontal();
-                                GUILayout.Label("Diagonal Depth: " + edge.depthsDiagonal.ToString("F1"), GUILayout.MaxWidth(150));
-                                //if (!autoSobelEdge)
-                                edge.depthsDiagonal = GUILayout.HorizontalSlider(edge.depthsDiagonal, 0.000f, 1.000f);
-                                GUILayout.EndHorizontal();
-                                if (!autoSobelEdge)
-                                {
-                                    GUILayout.BeginHorizontal();
-                                    GUILayout.Label("Axis/Center: " + edge.axisVsCenter.ToString("F3"), GUILayout.MaxWidth(150));
-                                    edge.axisVsCenter = GUILayout.HorizontalSlider(edge.axisVsCenter, 0.001f, 1.000f);
-                                    GUILayout.EndHorizontal();
-                                }
-                                        
-                                   
-                                GUILayout.Space(5f);
-
-                                GUILayout.BeginHorizontal();
-                                if (autoSobelEdge)
-                                    GUILayout.Label("Horizontal Offset:" + edge.mult1.ToString("F3"), GUILayout.MaxWidth(150));
-                                else
-                                    GUILayout.Label("Horizontal:" + edge.mult1.ToString("F3"), GUILayout.MaxWidth(150));
-                                edge.mult1 = GUILayout.HorizontalSlider(edge.mult1, 0.000f, 10.100f);
-                                GUILayout.EndHorizontal();
-
-                                GUILayout.BeginHorizontal();
-                                if (!autoSobelEdge)
-                                {
-                                    GUILayout.Label("Fine-tune H:" + edge.mult3.ToString("F3"), GUILayout.MaxWidth(150));
-                                    edge.mult3 = GUILayout.HorizontalSlider(edge.mult3, 0.000f, 10.000f);
-                                }
-                                    
-                                GUILayout.EndHorizontal();
-                                GUILayout.BeginHorizontal();
-                                    
-                                if (autoSobelEdge)
-                                    GUILayout.Label("Vertical Offset:" + edge.mult2.ToString("F3"), GUILayout.MaxWidth(150));
-                                else
-                                    GUILayout.Label("Vertical:" + edge.mult2.ToString("F3"), GUILayout.MaxWidth(150));
-
-                                edge.mult2 = GUILayout.HorizontalSlider(edge.mult2, 0.000f, 20.000f);
-                                GUILayout.EndHorizontal();
-                                GUILayout.BeginHorizontal();
-                                if (!autoSobelEdge)
-                                {
-                                    GUILayout.Label("Fine-tune V: " + edge.mult4.ToString("F3"), GUILayout.MaxWidth(150));
-                                    edge.mult4 = GUILayout.HorizontalSlider(edge.mult4, 0.000f, 10.000f);
-                                }
-                                GUILayout.EndHorizontal();
-                                if (GUILayout.Button("Reset SobelSkylines-specfic parameters"))
-                                {
-                                    edge.mult1 = 1.0f;
-                                    edge.mult2 = 10.0f;
-                                    edge.mult3 = 1.0f;
-                                    edge.mult4 = 1.0f;
-                                }
-
-                                GUILayout.Space(3f);
-                                
-
-                            }
-                            if (edge.mode == EdgeDetection.EdgeDetectMode.SobelDepth)
-                            {
-                                GUILayout.BeginHorizontal();
-                                GUILayout.Label("Edge exponent: " + edge.edgeExp.ToString("F2"), GUILayout.MaxWidth(50));
-                                edge.edgeExp = GUILayout.HorizontalSlider(edge.edgeExp, 0.004f, 1.000f, GUILayout.MaxWidth(100));
-                                GUILayout.EndHorizontal();
-                            }
-                            
-                            GUILayout.BeginHorizontal();
-                            GUILayout.Label("R " + setR.ToString("F2"), GUILayout.MaxWidth(10f));
-                            setR = GUILayout.HorizontalSlider(setR, 0.000f, 3.000f, GUILayout.Width(90));
-
-
-                            GUILayout.Label("G " + setG.ToString("F2"), GUILayout.MaxWidth(10f));
-                            setG = GUILayout.HorizontalSlider(setG, 0.000f, 3.000f, GUILayout.Width(90));
-
-
-                            GUILayout.Label("B " + setB.ToString("F2"), GUILayout.MaxWidth(10f));
-                            setB = GUILayout.HorizontalSlider(setB, 0.000f, 3.000f, GUILayout.Width(90));
-                                
-                            GUILayout.Label("x" + colorMultiplier.ToString("F1"), GUILayout.MaxWidth(20f));
-                            colorMultiplier = GUILayout.HorizontalSlider(colorMultiplier, 0.0f, 10.0f, GUILayout.Width(90));
-
-                            if (GUILayout.Button("Apply Edge Color", GUILayout.MaxWidth(120)))
-                            {
-                                EdgeColor(setR, setG, setB);
-                                EdgeColor(setR, setG, setB);
-                            }
-                            if (GUILayout.Button("Black", GUILayout.MaxWidth(55)))
-                            {
-                                setR = 0.0f;
-                                setG = 0.0f;
-                                setB = 0.0f;
-                                colorMultiplier = 1.0f;
-                                EdgeColor(0.0f, 0.0f, 0.0f);
-                                EdgeColor(0.0f, 0.0f, 0.0f);
-                            }
-                            GUILayout.EndHorizontal();
-
-
-
-
-                            GUILayout.BeginHorizontal();
-                            GUILayout.Label("R " + mixSetR.ToString("F2"), GUILayout.MaxWidth(10f));
-                            mixSetR = GUILayout.HorizontalSlider(mixSetR, 0.000f, 3.000f, GUILayout.Width(90));
-
-
-                            GUILayout.Label("G " + mixSetG.ToString("F2"), GUILayout.MaxWidth(10f));
-                            mixSetG = GUILayout.HorizontalSlider(mixSetG, 0.000f, 3.000f, GUILayout.Width(90));
-
-
-                            GUILayout.Label("B " + mixSetB.ToString("F2"), GUILayout.MaxWidth(10f));
-                            mixSetB = GUILayout.HorizontalSlider(mixSetB, 0.000f, 3.000f, GUILayout.Width(90));
-
-                            GUILayout.Label("x" + mixColorMultiplier.ToString("F2"), GUILayout.MaxWidth(20f));
-                            mixColorMultiplier = GUILayout.HorizontalSlider(mixColorMultiplier, 0.0f, 10.0f, GUILayout.Width(90));
-
-                            if (GUILayout.Button("Apply Mix Color", GUILayout.MaxWidth(120)))
-                            {
-                                MixColor(mixSetR, mixSetG, mixSetB);
-                                MixColor(mixSetR, mixSetG, mixSetB);
-                            }
-                            if (GUILayout.Button("White", GUILayout.MaxWidth(55)))
-                            {
-                                mixSetR = 1.0f;
-                                mixSetG = 1.0f;
-                                mixSetB = 1.0f;
-                                mixColorMultiplier = 1.0f;
-                                MixColor(1.0f, 1.0f, 1.0f);
-                                MixColor(1.0f, 1.0f, 1.0f);
-                            }
-
-                            GUILayout.EndHorizontal();
-
-
-                           
-                            if (infoManager.CurrentMode == InfoManager.InfoMode.None)
-                            {
-                                
-                                
-                            }
-                            else
-                            {
-                                GUILayout.Label("Gamma and boost settings have no effect in View Modes.");
-                            }
-                            GUILayout.Space(5f);
-
-                            if (GUILayout.Button("Advanced mode is on. Click to switch back to 'Plug & Play' mode."))
-                            {
-                                automaticMode = true;
-                                DetermineMode();
-                            }
-
-                            GUILayout.Space(5);
-                        }
-                    }
-                }
-            }
-            #endregion
-            #region Tab - Bloom
-            if (tab == Config.Tab.Bloom)
-            {
-                ResizeWindow(803, 415);
-                GUILayout.Label("NOTE: There is already a Bloom effect in Cities Skylines, and it is quite better than what Bordercities provides here.  However, because they both achieve a different effect, the Bordercities Bloom has been maintained in the event you wish to stack the bloom effects.");
-                GUILayout.Space(5f);
-                if (!bloom.enabled)
-                    bloom.enabled = GUILayout.Toggle(bloom.enabled, "Click to enable Bloom.");
-                else
-                    bloom.enabled = GUILayout.Toggle(bloom.enabled, "Click to disable Bloom.");
-
-                {
-                    if (bloom.enabled)
-                    {
-                        GUILayout.Label("Threshold: " + bloom.threshold.ToString("F2"));
-                        bloom.threshold = GUILayout.HorizontalSlider(bloom.threshold, 0.00f, 1.50f, GUILayout.Width(570));
-                        GUILayout.Label("Intensity: " + bloom.intensity.ToString("F2"));
-                        bloom.intensity = GUILayout.HorizontalSlider(bloom.intensity, 0.00f, 2.50f, GUILayout.Width(570));
-                        GUILayout.Label("Blur size: " + bloom.blurSize.ToString("F2"));
-                        bloom.blurSize = GUILayout.HorizontalSlider(bloom.blurSize, 0.00f, 5.50f, GUILayout.Width(570));
-
-                    }
-                }
-            }
-            #endregion
-            #region Tab - Hotkey
-            if (tab == Config.Tab.Hotkey)
-            {
-                if (firstTime)
-                {
-                    ResizeWindow(575, 400);
-                    GUILayout.Label("BORDERCITIES FIRST-TIME INITIALIZATION (Never popups again after choice)");
-                    GUILayout.Label("Choose and confirm your hotkey for Bordercities.  LeftBracket is default.");
-                    GUILayout.Label("NOTE: Bordercities will -never- automatically pop-up again as soon as you've confirmed your hotkey choice.   This initialization process ensures that all users, regardless of hardware, operating system, or current keyboard configuration, will be able to enjoy Bordercities.");
-
-
-                }
-
-
-                if (!firstTime)
-                {
-                    ResizeWindow(538, 600);
-                    GUILayout.Label("WARNING: HOTKEY BUTTONS WILL SAVE UPON CLICK.  THIS INCLUDES YOUR EFFECTS SETTINGS.  If you wish to create a safe backup of your active Effect, navigate to the 'XML' tab above and create a permanent copy before selecting a hotkey here.  This will not be like this for much longer.");
-
-                }
-                KeyboardGrid(0);
-
-
-
-
-                if (firstTime && config.keyCode != KeyCode.None)
-                {
-                    GUILayout.Space(3f);
-                    if (hasClicked)
-                        GUILayout.Label("Hotkey '" + KeyToString(config.keyCode) + "' has been chosen and is active.  Confirm it now by using the hotkey.");
-                    GUILayout.Space(10f);
-                    GUILayout.Label("NOTE: Hotkey can be changed at anytime via the 'Hotkey' window tab in the config panel.");
-                }
-
-                if (!firstTime)
-                {
-                    if (config.keyCode != KeyCode.None)
-                        GUILayout.Label("Current 'Config' hotkey: " + config.keyCode);
-                    else
-                        GUILayout.Label("No config hotkey is bound to Bordercities.");
-                    GUILayout.Space(45f);
-                    GUILayout.Label("Set edge toggle hotkey below: ");
-                    KeyboardGrid(1);
-                    if (config.edgeToggleKeyCode != KeyCode.None)
-                        GUILayout.Label("Current 'Edge Enable' hotkey: " + config.edgeToggleKeyCode);
-                    else
-                        GUILayout.Label("No edge enable hotkey is bound to Bordercities.");
-                    GUILayout.Space(5f);
-                    GUILayout.Label("More key options coming soon!");
-                }
-
-            }
-            #endregion
-            #region Tab - Presets
-            if (tab == Config.Tab.Presets)
-            {
-                ResizeWindow(600, 750);
-                GUILayout.Label("NOTE: Your preset bank list is saved automatically, and as a whole, upon either saving any of your fields, or, proper exit of the game.  Note that your changes to this list will NOT be saved in the event of an Alt-F4 or other similarly graceless exit.  You will the preset files stored within steamapps/common/Cities_Skylines/BordercitiesPresets.");
-
-                GUILayout.Space(2f);
-
-                for (int i = 0; i < presetEntries.Length; i++)
-                {
-                    GUILayout.BeginHorizontal();
-                    
-                    presetEntries[i] = GUILayout.TextField(presetEntries[i], 31, GUILayout.MaxWidth(280));
-                    presetEntries[i] = Regex.Replace(presetEntries[i], @"[^a-zA-Z0-9 ]", "");
-                    if (GUILayout.Button("Save", GUILayout.MaxWidth(60), GUILayout.MaxHeight(25)))
-                    {
-                        if (IsValidFilename(presetEntries[i]))
-                        {
-                            SavePreset(presetEntries[i], true);
-                            SavePreset(presetEntries[i], true);
-                            SaveBank();
-                        }
-                        
-                    }
-                    if (GUILayout.Button("Load", GUILayout.MaxWidth(60),GUILayout.MaxHeight(25)))
-                    {
-                        LoadPreset(presetEntries[i], true);
-                    }
-
-                    i++;
-
-                    presetEntries[i] = GUILayout.TextField(presetEntries[i], 31, GUILayout.MaxWidth(280));
-                    presetEntries[i] = Regex.Replace(presetEntries[i], @"[^a-zA-Z0-9 ]", "");
-                    if (GUILayout.Button("Save", GUILayout.MaxWidth(60), GUILayout.MaxHeight(25)))
-                    {
-                        if (IsValidFilename(presetEntries[i]))
-                        {
-                            SavePreset(presetEntries[i], true);
-                            SavePreset(presetEntries[i], true);
-
-                        }
-                    }
-                    if (GUILayout.Button("Load", GUILayout.MaxWidth(60), GUILayout.MaxHeight(25)))
-                    {
-                        LoadPreset(presetEntries[i], true);
-                    }
-                    
-                    GUILayout.EndHorizontal();  
-                }
-
-                GUILayout.Label("Support for custom presets is sort of thrown together for the moment. The name of the input field must match the filename, and is case sensitive.  Having a nicer preset browser is on the todo list.");
-
-                if (GUILayout.Button("Reset Bank (This will save!)"))
-                {
-                    ResetBank();
-                }
-
-            }
-            #endregion
-            #region View Modes
-            if (tab == Config.Tab.ViewModes)
-            {
-                ResizeWindow(800, 755);
-
-                ViewModeGUI("Building Level", "BuildingLevel", existBuildingLevel, "Connections", "Connections", existConnections);
-                ViewModeGUI("Crime Rate", "CrimeRate", existCrimeRate, "Density", "Density", existDensity);
-                ViewModeGUI("Districts","Districts",existDistricts,"Education","Education",existEducation);
-                ViewModeGUI("Electricity","Electricity",existElectricity,"Entertainment","Entertainment",existEntertainment);
-                ViewModeGUI("Fire Safety", "FireSafety", existFireSafety,"Garbage","Garbage",existGarbage);
-                ViewModeGUI("Happiness","Happiness",existHappiness,"Health","Health",existHealth);
-                ViewModeGUI("Land Value","LandValue",existLandValue,"Natural Resources","NaturalResources",existNaturalResources);
-                ViewModeGUI("Noise Pollution","NoisePollution",existNoisePollution,"Pollution","Pollution",existPollution);
-                ViewModeGUI("Terrain Height","TerrainHeight",existTerrainHeight,"Traffic","Traffic",existTraffic);
-                ViewModeGUI("Transport","Transport",existTransport,"Water","Water",existWater);
-                ViewModeGUI("Wind", "Wind", existWind);
-
-                
-                GUILayout.Space(15);
-                if (automaticMode)
-                    GUILayout.Label("Dial in custom colors! You'll want to go easy on 'Mix' so that blue<->red gameplay info remains discernible.");
-                else
-                    GUILayout.Label("Advanced Mode detected: For clarity, these are the exact same color sliders from the main page.  You can technically mix and match all possible settings, and per info mode, if you so desire.  The colors are here as a shortcut, as it is assumed that you'll want to use very different colors for each Info Mode.");
-
-                GUILayout.Space(5);
-                GUILayout.Label("Mix: " + edge.edgesOnly.ToString("F2"));
-                edge.edgesOnly = GUILayout.HorizontalSlider(edge.edgesOnly, 0.000f, 1.000f, GUILayout.MaxWidth(500));  
-                GUILayout.BeginHorizontal();
-                GUILayout.Label("R " + setR.ToString("F2"), GUILayout.MaxWidth(10f));
-                setR = GUILayout.HorizontalSlider(setR, 0.000f, 3.000f, GUILayout.Width(90));
-
-
-                GUILayout.Label("G " + setG.ToString("F2"), GUILayout.MaxWidth(10f));
-                setG = GUILayout.HorizontalSlider(setG, 0.000f, 3.000f, GUILayout.Width(90));
-
-
-                GUILayout.Label("B " + setB.ToString("F2"), GUILayout.MaxWidth(10f));
-                setB = GUILayout.HorizontalSlider(setB, 0.000f, 3.000f, GUILayout.Width(90));
-
-                GUILayout.Label("x" + colorMultiplier.ToString("F1"), GUILayout.MaxWidth(20f));
-                colorMultiplier = GUILayout.HorizontalSlider(colorMultiplier, 0.0f, 10.0f, GUILayout.Width(90));
-
-                if (GUILayout.Button("Apply Edge Color", GUILayout.MaxWidth(120)))
-                {
-                    EdgeColor(setR, setG, setB);
-                    EdgeColor(setR, setG, setB);
-                }
-                if (GUILayout.Button("Black", GUILayout.MaxWidth(55)))
-                {
-                    setR = 0.0f;
-                    setG = 0.0f;
-                    setB = 0.0f;
-                    colorMultiplier = 1.0f;
-                    EdgeColor(0.0f, 0.0f, 0.0f);
-                    EdgeColor(0.0f, 0.0f, 0.0f);
-                }
-                GUILayout.EndHorizontal();
-
-
-
-
-                GUILayout.BeginHorizontal();
-                GUILayout.Label("R " + mixSetR.ToString("F2"), GUILayout.MaxWidth(10f));
-                mixSetR = GUILayout.HorizontalSlider(mixSetR, 0.000f, 3.000f, GUILayout.Width(90));
-
-
-                GUILayout.Label("G " + mixSetG.ToString("F2"), GUILayout.MaxWidth(10f));
-                mixSetG = GUILayout.HorizontalSlider(mixSetG, 0.000f, 3.000f, GUILayout.Width(90));
-
-
-                GUILayout.Label("B " + mixSetB.ToString("F2"), GUILayout.MaxWidth(10f));
-                mixSetB = GUILayout.HorizontalSlider(mixSetB, 0.000f, 3.000f, GUILayout.Width(90));
-
-                GUILayout.Label("x" + mixColorMultiplier.ToString("F2"), GUILayout.MaxWidth(20f));
-                mixColorMultiplier = GUILayout.HorizontalSlider(mixColorMultiplier, 0.0f, 10.0f, GUILayout.Width(90));
-
-                if (GUILayout.Button("Apply Mix Color", GUILayout.MaxWidth(120)))
-                {
-                    MixColor(mixSetR, mixSetG, mixSetB);
-                    MixColor(mixSetR, mixSetG, mixSetB);
-                }
-                if (GUILayout.Button("White", GUILayout.MaxWidth(55)))
-                {
-                    mixSetR = 1.0f;
-                    mixSetG = 1.0f;
-                    mixSetB = 1.0f;
-                    mixColorMultiplier = 1.0f;
-                    MixColor(1.0f, 1.0f, 1.0f);
-                    MixColor(1.0f, 1.0f, 1.0f);
-                }
-                GUILayout.EndHorizontal();
-                if (infoManager.CurrentMode != InfoManager.InfoMode.None)
-                {
-                    if (GUILayout.Button("Shortcut for 'Set " + GetCurrentInfoModeString() + "'! (Current info mode)"))
-                    {
-                        QuicksaveActiveViewMode();
-                    }
-                }
-                else
-                {
-                    if (GUILayout.Button("Shortcut for 'Set [InfoMode].'  Enter an info mode to use!"))
-                    {
-                        QuicksaveActiveViewMode();
-                    }
-                }
-                GUILayout.Space(10f);
-                if (GUILayout.Button("Return to configuration tab"))
-                {
-                    tab = Config.Tab.EdgeDetection;
-                }
-                GUILayout.Space(3f);
-                
-
-                GUILayout.Label("Any 'Set' for a given Info Mode is generated and saved to disk ('steamapps/common/Cities_Skylines/BordercitiesPresets/InfoModes') in its own dedicated XML file (IE 'Wind.xml' 'Water.xml'), and only upon clicking will the file be created, if not already existing.  Your main config will be loaded in the absence of a custom 'Info Mode' XML.  When clicking 'Set', whichever settings are currently on-screen will be the settings saved to your desired Info Mode's XML file -- regardless of whether or not you had first pressed 'Save Settings'.  For ease of understanding, know that your main config is entirely separate from the Info-Mode XML database here, as well as separate from the general 'Custom' XML config-saves located in the 'Custom' tab.  Your primary config (the one that auto-loads when you start the game via 'Save Settings') is the configuration that will be automatically loaded upon exiting an Info Mode (if you are also not using 'Effect Enabled in Info Modes Only.')");
-
-                GUILayout.Space(4);
-                
-
-
-            }
-
-
-
-
-
-            #endregion
-
-            #region Bottom Navigation
-            if (!firstTime)
-            {
-                if (tab == Config.Tab.EdgeDetection && isOn)
-                {
-                    subViewOnly = GUILayout.Toggle(subViewOnly, "Optional: Effect enabled within 'Info Modes' only? (Auto-disables/enables accordingly)");
-                    useInfoModeSpecific = GUILayout.Toggle(useInfoModeSpecific, "Optional: Use 'Info-Mode'-specific Presets? (upon activation, 'Info Modes' tab will appear above.)");
-                    wantsToneMapper = GUILayout.Toggle(wantsToneMapper, "Optional: Incorporate brightness/gamma settings into Bordered Skylines' functionality? (Plug & Play/Advanced share this)");
-                    if (wantsToneMapper)
-                    { 
-                            GUILayout.BeginHorizontal();
-                            GUILayout.Label("Gamma: " + toneMapGamma.ToString("F2"), GUILayout.MaxWidth(60));
-                            toneMapGamma = GUILayout.HorizontalSlider(toneMapGamma, 0.0f, 30.0f, GUILayout.MaxWidth(100));
-
-                            GUILayout.Label("Boost: " + toneMapBoost.ToString("F2"), GUILayout.MaxWidth(60));
-                            toneMapBoost = GUILayout.HorizontalSlider(toneMapBoost, 0.0f, 30.0f, GUILayout.MaxWidth(100));
-                            GUILayout.EndHorizontal();
-                    }
-                    if (isOn)
-                    {
-                        if (GUILayout.Button("Disable Bordered Skylines"))
-                        {
-                            ToggleBorderedSkylines(false);
-                        }
-                    }
-                }
-                GUILayout.BeginHorizontal();
-                if (tab != Config.Tab.Hotkey)
-                {
-
-                    if (wantsToneMapper)
-                    {
-                        if (GUILayout.Button("Reset Brightness (Tonemapper)") && tab != Config.Tab.Presets)
-                        {
-                            ResetTonemapper();
-                        }
-                    }
-                    if (!automaticMode)
-                    {
-                        if (tab != Config.Tab.Presets)
-                        {
-                            if (GUILayout.Button("Load from last saved"))
-                            {
-                                LoadConfig(true);
-                            }
-                        }
-                        
-                    }
-                    if (tab != Config.Tab.Presets)
-                    {
-                        if (automaticMode && tab == Config.Tab.EdgeDetection)
-                        {
-                            if (isOn)
-                            {
-                                if (GUILayout.Button("Save (Active preset will load by default in future sessions)"))
-                                {
-                                    SaveConfig();
-                                }
-                            }
-                            else
-                            {
-                                if (GUILayout.Button("Save (Bordered Skylines will be Disabled by default in future sessions)"))
-                                {
-                                    SaveConfig();
-                                }
-                            }
-                        }
-                        else
-                        {
-                            if (GUILayout.Button("Save (Your active configuration will load by default in future sessions"))
-                            {
-                                SaveConfig();
-                            }
-                        }
-                        
-                        GUILayout.Space(40f);
-                    }
-                    else
-                    {
-                        
-                        if (GUILayout.Button("Save the current look as default"))
-                        {
-                            SaveConfig(); 
-                        }
-                    }
-                }
-                
-                if (GUILayout.Button("Close Window"))
-                {
-                    showSettingsPanel = false;
-                    if (!overrideFirstTime)
-                        overrideFirstTime = true;
-                }
-
-                GUILayout.EndHorizontal();
-
-                
-            }
-            #endregion
-            dragBar.width = windowRect.width;
-            windowLoc.x = windowRect.x;
-            windowLoc.y = windowRect.y;
-
-        }
-
-       
         bool LoadPreset(string name, bool falseIfInfoMode)
         {
             Preset presetToLoad;
