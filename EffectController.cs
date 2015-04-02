@@ -1553,8 +1553,8 @@ namespace Bordercities
             {
                 if (!subViewOnly)
                 {
-                    toneMapGamma = 1.98f;
-                    toneMapBoost = 8.13f;
+                    toneMapGamma = defaultGamma;
+                    toneMapBoost = defaultBoost;
                 }
                 else
                 {
