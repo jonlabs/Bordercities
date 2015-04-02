@@ -2364,7 +2364,7 @@ namespace Bordercities
                 {
                     LoadConfig(true);
                 }
-                GUILayout.Space(10);
+                GUILayout.Space(10); 
             }
         }
 
@@ -2372,6 +2372,11 @@ namespace Bordercities
         {
             toneMapBoost = defaultBoost;
             toneMapGamma = defaultGamma;
+            if (!wantsToneMapper)
+            {
+                tonem.m_ToneMappingGamma = defaultGamma;
+                tonem.m_ToneMappingBoostFactor = defaultBoost;
+            }
         }
         void SetTonemapper(float gam, float boost)
         {
