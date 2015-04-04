@@ -886,16 +886,16 @@ namespace Bordercities
                 GUILayout.EndHorizontal();
                 if (infoManager.CurrentMode != InfoManager.InfoMode.None)
                 {
-                    if (GUILayout.Button("Shortcut for 'Set " + GetCurrentInfoModeString() + "'! (Current info mode)"))
+                    if (GUILayout.Button("Set '" + GetCurrentInfoModeLabelString() + "'! (Shortcut: Active Info Mode.)"))
                     {
                         QuicksaveActiveViewMode();
                     }
                 }
                 else
                 {
-                    if (GUILayout.Button("Shortcut for 'Set [InfoMode].'  Enter an info mode to use!"))
+                    if (GUILayout.Button("Not currently in an Info Mode."))
                     {
-                        QuicksaveActiveViewMode();
+
                     }
                 }
                 GUILayout.Space(10f);
@@ -2282,6 +2282,59 @@ namespace Bordercities
             }
         }
 
+        string GetCurrentInfoModeLabelString()
+        {
+            switch (infoManager.CurrentMode)
+            {
+                case InfoManager.InfoMode.BuildingLevel:
+                    return "Building Level";
+                case InfoManager.InfoMode.Connections:
+                    return "Connections";
+                case InfoManager.InfoMode.CrimeRate:
+                    return "Crime Rate";
+                case InfoManager.InfoMode.Density:
+                    return "Density";
+                case InfoManager.InfoMode.Districts:
+                    return "Districts";
+                case InfoManager.InfoMode.Education:
+                    return "Education";
+                case InfoManager.InfoMode.Electricity:
+                    return "Electricity";
+                case InfoManager.InfoMode.Entertainment:
+                    return "Entertainment";
+                case InfoManager.InfoMode.FireSafety:
+                    return "Fire Safety";
+                case InfoManager.InfoMode.Garbage:
+                    return "Garbage";
+                case InfoManager.InfoMode.Happiness:
+                    return "Happiness";
+                case InfoManager.InfoMode.Health:
+                    return "Health";
+                case InfoManager.InfoMode.LandValue:
+                    return "Land Value";
+                case InfoManager.InfoMode.NaturalResources:
+                    return "Natural Resources";
+                case InfoManager.InfoMode.NoisePollution:
+                    return "Noise Pollution";
+                case InfoManager.InfoMode.None:
+                    return "None";
+                case InfoManager.InfoMode.Pollution:
+                    return "Pollution";
+                case InfoManager.InfoMode.TerrainHeight:
+                    return "Terrain Height";
+                case InfoManager.InfoMode.Traffic:
+                    return "Traffic";
+                case InfoManager.InfoMode.Transport:
+                    return "Transport";
+                case InfoManager.InfoMode.Water:
+                    return "Water";
+                case InfoManager.InfoMode.Wind:
+                    return "Wind";
+                default:
+                    return "Default";
+            }
+        }
+
         private bool existBuildingLevel = false;
         private bool existConnections = false;
         private bool existCrimeRate = false;
@@ -2336,6 +2389,7 @@ namespace Bordercities
                 {
                     currentInfoMode = infoManager.CurrentMode;
                     LoadConfig(true);
+                    useInfoModeSpecific = true;
                     return;
                 }
                 ViewModeCheckAndSet(InfoManager.InfoMode.BuildingLevel, "BuildingLevel");
@@ -2364,6 +2418,7 @@ namespace Bordercities
                 {
                     LoadConfig(true);
                 }
+                useInfoModeSpecific = true;
                 GUILayout.Space(10); 
             }
         }
@@ -2515,14 +2570,14 @@ namespace Bordercities
             }
             if (exists)
             {
-                if (GUILayout.Button("Activate " + label, GUILayout.MaxWidth(180), GUILayout.MinWidth(180)))
+                if (GUILayout.Button("Load " + label, GUILayout.MaxWidth(180), GUILayout.MinWidth(180)))
                 {
                     LoadPreset(filename, false);
                 }
             }
             else
             {
-                if (GUILayout.Button("No " + label + " found!", GUILayout.MaxWidth(180), GUILayout.MinWidth(180)))
+                if (GUILayout.Button("NONE", GUILayout.MaxWidth(180), GUILayout.MinWidth(180)))
                 {
 
                 }
@@ -2541,14 +2596,14 @@ namespace Bordercities
             }
             if (exists)
             {
-                if (GUILayout.Button("Activate " + label, GUILayout.MaxWidth(180), GUILayout.MinWidth(180)))
+                if (GUILayout.Button("Load " + label, GUILayout.MaxWidth(180), GUILayout.MinWidth(180)))
                 {
-                    LoadPreset(label, false);
+                    LoadPreset(filename, false);
                 }
             }
             else
             {
-                if (GUILayout.Button("No " + label + " found!", GUILayout.MaxWidth(180), GUILayout.MinWidth(180)))
+                if (GUILayout.Button("NONE", GUILayout.MaxWidth(180), GUILayout.MinWidth(180)))
                 {
                     
                 }
@@ -2565,14 +2620,14 @@ namespace Bordercities
             }
             if (exists2)
             {
-                if (GUILayout.Button("Activate " + label2, GUILayout.MaxWidth(180), GUILayout.MinWidth(180)))
+                if (GUILayout.Button("Load " + label2, GUILayout.MaxWidth(180), GUILayout.MinWidth(180)))
                 {
                     LoadPreset(filename2, false);
                 }
             }
             else
             {
-                if (GUILayout.Button("No " + label2 + " found!", GUILayout.MaxWidth(180), GUILayout.MinWidth(180)))
+                if (GUILayout.Button("NONE", GUILayout.MaxWidth(180), GUILayout.MinWidth(180)))
                 {
 
                 }
@@ -2580,31 +2635,7 @@ namespace Bordercities
 
             GUILayout.EndHorizontal();
         }
-        void ViewModeGUI(string inputField, string presetName, string label, string doubleWord, bool exists)
-        {
-            GUILayout.BeginHorizontal();
-            if (GUILayout.Button("Set " + label, GUILayout.MaxWidth(180), GUILayout.MinWidth(180)))
-            {
-                SavePreset(doubleWord, false);
-                SavePreset(doubleWord, false);
-                InitializeExistBools();
-            }
-            if (exists)
-            {
-                if (GUILayout.Button("Activate " + label, GUILayout.MaxWidth(180), GUILayout.MinWidth(180)))
-                {
-                    LoadPreset(doubleWord, false);
-                }
-            }
-            else
-            {
-                if (GUILayout.Button("No " + label + " found!", GUILayout.MaxWidth(180), GUILayout.MinWidth(180)))
-                {
-
-                }
-            }
-            GUILayout.EndHorizontal();
-        }
+        
 
         bool ShouldWeExitPreview(Preset infoModePreset)
         {
@@ -2656,6 +2687,7 @@ namespace Bordercities
                 if (!LoadPreset(preset, false))
                 {
                     LoadConfig(false);
+                    useInfoModeSpecific = true;
                 }
             }
         }
