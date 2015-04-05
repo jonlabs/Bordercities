@@ -11,6 +11,7 @@ namespace Bordercities
         public enum ActiveStockPreset
         {
             Bordercities,
+            BordercitiesEasier,
             BordercitiesGritty,
             BordercitiesBright,
             Sobelcities,
@@ -261,11 +262,11 @@ namespace Bordercities
 
                         if (automaticMode)
                         {
-                            ResizeWindow(803, 690);
+                            ResizeWindow(803, 750);
 
                             GUILayout.BeginHorizontal();
                             GUILayout.Label("PLUG & PLAY PRESETS:", bordSkyStyle_header);
-                            GUILayout.Label("Choose what looks best to you.  Listed screen resolutions are simply recommendations based on personal tweaking.  Know that the higher a suggested intended resolution, the thicker the edges in that preset will look at lower resolutions. Dynamic Resolution (DR) strongly recommended.");
+                            GUILayout.Label("Use whichever of the below preset looks best to you, regardless of the listed resolutions.  The resolutions are simply recommendations to ensure a quick & easy setup for you.  Know that the higher a suggested intended resolution, the thicker the edges in that preset will look at lower resolutions. Dynamic Resolution (DR) strongly recommended.");
                             GUILayout.EndHorizontal();
                             GUILayout.Space(6f);
 
@@ -277,15 +278,15 @@ namespace Bordercities
                             GUILayout.BeginVertical();
                             GUILayout.Label("720p/1080p & NO DR:", bordSkyStyle_header, GUILayout.Width(165));
                             GUILayout.Space(5f);
-                            if (GUILayout.Button("Auto-SobelSkies(NEW)", GUILayout.Width(165)))
+                            if (GUILayout.Button("Sobel Skylines", GUILayout.Width(165)))
                             {
                                 LowEndAutomatic();
                             }
-                            if (GUILayout.Button("Auto-Sobel", GUILayout.Width(165)))
+                            if (GUILayout.Button("Classic Sobel", GUILayout.Width(165)))
                             {
                                 ClassicSobelAutomatic();
                             }
-                            if (GUILayout.Button("Auto-Triangle", GUILayout.Width(165)))
+                            if (GUILayout.Button("Triangle", GUILayout.Width(165)))
                             {
                                 ClassicTriangleAutomatic();
                             }
@@ -299,6 +300,10 @@ namespace Bordercities
 
                             GUILayout.BeginVertical();
                             GUILayout.Label("1080p & 175+ DR", bordSkyStyle_header, GUILayout.Width(165));
+                            if (GUILayout.Button("Sobelcities", GUILayout.Width(165)))
+                            {
+                                SobelcitiesAutomatic();
+                            }
                             if (GUILayout.Button("Bordercities", GUILayout.Width(165)))
                             {
                                 BordercitiesAutomatic();
@@ -314,9 +319,9 @@ namespace Bordercities
                                     BordercitiesGrittyAutomatic();
                                 }
                             }
-                            if (GUILayout.Button("Sobelcities", GUILayout.Width(165)))
+                            if (GUILayout.Button("BC|EasierViewing", GUILayout.Width(165)))
                             {
-                                SobelcitiesAutomatic();
+                                BordercitiesEasyViewingAutomatic();
                             }
                             if (GUILayout.Button("Realism", GUILayout.Width(165)))
                             {
@@ -404,7 +409,7 @@ namespace Bordercities
                             {
                                 GUILayout.Space(2f);
                                 if (config.edgeToggleKeyCode == KeyCode.None)
-                                    GUILayout.Label("Did you know: you can set a hotkey for toggling the effect?  See 'Hotkey Config' tab!'");
+                                    GUILayout.Label("Did you know: you can set a hotkey for toggling the effect?  See 'Hotkey Config' tab!'", bordSkyStyle_header);
                                 GUILayout.Space(2f);
                             }
                             else
@@ -662,7 +667,7 @@ namespace Bordercities
             if (tab == Config.Tab.Bloom)
             {
                 ResizeWindow(803, 415);
-                GUILayout.Label("NOTE: There is already a Bloom effect in Cities Skylines, and it is quite better than what Bordercities provides here.  However, because they both achieve a different effect, the Bordercities Bloom has been maintained in the event you wish to stack the bloom effects.");
+                GUILayout.Label("NOTE: There is already a Bloom effect in Cities Skylines, and it is quite better than what Bordered Skylines provides here.  However, because they both achieve a different effect, Bordered Skylines maintains this bloom in case you wish to stack both bloom effects.");
                 GUILayout.Space(5f);
                 if (!bloom.enabled)
                     bloom.enabled = GUILayout.Toggle(bloom.enabled, "Click to enable Bloom.");
@@ -687,9 +692,9 @@ namespace Bordercities
                 if (firstTime)
                 {
                     ResizeWindow(575, 400);
-                    GUILayout.Label("BORDERCITIES FIRST-TIME INITIALIZATION (Never popups again after choice)");
-                    GUILayout.Label("Choose and confirm your hotkey for Bordercities.  LeftBracket is default.");
-                    GUILayout.Label("NOTE: Bordercities will -never- automatically pop-up again as soon as you've confirmed your hotkey choice.   This initialization process ensures that all users, regardless of hardware, operating system, or current keyboard configuration, will be able to enjoy Bordercities.");
+                    GUILayout.Label("BORDERED SKYLINES FIRST-TIME INITIALIZATION (Never popups again after choice)");
+                    GUILayout.Label("Choose and confirm your hotkey for Bordered Skylines.  LeftBracket is default.");
+                    GUILayout.Label("NOTE: Bordered Skylines will -never- automatically pop-up again as soon as you've confirmed your hotkey choice.   This initialization process ensures that all users, regardless of hardware, operating system, or current keyboard configuration, will be able to enjoy Bordered Skylines.");
 
 
                 }
@@ -720,14 +725,14 @@ namespace Bordercities
                     if (config.keyCode != KeyCode.None)
                         GUILayout.Label("Current 'Config' hotkey: " + config.keyCode);
                     else
-                        GUILayout.Label("No config hotkey is bound to Bordercities.");
+                        GUILayout.Label("No config hotkey is bound to Bordered Skylines.");
                     GUILayout.Space(45f);
                     GUILayout.Label("Set edge toggle hotkey below: ");
                     KeyboardGrid(1);
                     if (config.edgeToggleKeyCode != KeyCode.None)
                         GUILayout.Label("Current 'Edge Enable' hotkey: " + config.edgeToggleKeyCode);
                     else
-                        GUILayout.Label("No edge enable hotkey is bound to Bordercities.");
+                        GUILayout.Label("No edge enable hotkey is bound to Bordered Skylines.");
                     GUILayout.Space(5f);
                     GUILayout.Label("More key options coming soon!");
                 }
@@ -1399,6 +1404,9 @@ namespace Bordercities
                 case ActiveStockPreset.Bordercities:
                     BordercitiesAutomatic();
                     break;
+                case ActiveStockPreset.BordercitiesEasier:
+                    BordercitiesEasyViewingAutomatic();
+                    break;
                 case ActiveStockPreset.BordercitiesGritty:
                     BordercitiesGrittyAutomatic();
                     break;
@@ -1566,7 +1574,7 @@ namespace Bordercities
             bloom.threshold = 0.27f;
             bloom.intensity = 0.39f;
             bloom.blurSize = 5.50f;
-            displayText = "Same as it was way back when, you know, back when they called it 'Auto-Sobel.'  We didn't have a care in the world back then.  All it took was a simple press of the 'Toggle Plug & Play' button.  There, just like that, a stronger effect.  Click it again, back to how it was.  We didn't need supersampling or anything.  You either chose one.. or you chose the other.  How I miss those days.";
+            displayText = "Left here in the event that you prefer it over Sobel Skylines, 'Classic Auto-Sobel' is simply the original 'Auto-Sobel' as it was before 'Sobel Skylines', the Cities:Skylines-specific implementation of Unity's 'Sobel' edge detection method was introduced.";
         }
 
 
@@ -1590,7 +1598,7 @@ namespace Bordercities
             bloom.threshold = 0.27f;
             bloom.intensity = 0.39f;
             bloom.blurSize = 5.50f;
-            displayText = "Slick, black, and an exact duplicate of the very first mode to be included in Bordered Skylines, and as well, the very first mode to receive a hand-tweaked algorithm for C:S compatibility.  A wise choice for those whose eyes can take it (likely because you're using at least 125%-150% DR, being just enough to ease the eyesore.";
+            displayText = "The effect this preset has is TREMENDOUS.  ...for better or for worse.  Going on a stroll in first person camera is downright breathtaking.  Zoomed out and viewing your entire city?  ..Not so much.";
         }
         void LowEndAltAutomatic()
         {
@@ -1610,7 +1618,7 @@ namespace Bordercities
             bloom.threshold = 0.27f;
             bloom.intensity = 0.39f;
             bloom.blurSize = 5.50f;
-            displayText = "This preset attempts to get around the harshness of the 'Triangle' edge detection mode's edges when viewing at low resolutions.  It attempts this by adding a slight gray tint to detected edges.";
+            displayText = "This preset attempts to get around the harshness of the above 'Triangle' edge detection mode's edges when viewing at low resolutions.  It attempts this by adding a slight gray tint to detected edges.";
             mixSetR = edge.edgesOnlyBgColor.r;
             mixSetG = edge.edgesOnlyBgColor.g;
             mixSetB = edge.edgesOnlyBgColor.b;
@@ -1649,7 +1657,7 @@ namespace Bordercities
             edge.edgesOnlyBgColor = Color.white;
             if (!CheckTonemapper())
                 ResetTonemapper();
-            displayText = "This is where it all began.  The title says it all.";
+            displayText = "This, providing you're viewing at 175% DR or more at 1080, is my personal favorite for strolling cities up close.  If you are looking for a 24/7 gameplay, 'fully-zoomed-out'-compatible mode, try the below 'Bordercities: Easier Viewing.'";
             bloom.enabled = false;
             bloom.threshold = 0.27f;
             bloom.intensity = 0.39f;
@@ -1678,6 +1686,49 @@ namespace Bordercities
             
         }
 
+        void BordercitiesEasyViewingAutomatic()
+        {
+            displayTitle = "Bordercities: Easier Viewing";
+            activeStockPreset = ActiveStockPreset.BordercitiesEasier;
+            automaticMode = true;
+            edge.mode = EdgeDetection.EdgeDetectMode.TriangleDepthNormals;
+            edge.edgeExp = 0.5f;
+            edge.sampleDist = 1.0f;
+            edge.edgesOnly = 0f;
+            autoEdge = true;
+            edge.edgeColor = Color.black;
+            edge.edgesOnlyBgColor = Color.white;
+            if (!CheckTonemapper())
+                ResetTonemapper();
+            displayText = "Sacrifices a little bit of the edge grit in favor of eye-friendly visuals when zoomed out.  I want to look into a way of automatically switching upon a certain threshold of being zoomed out (provided that the transition would look smooth.)";
+            bloom.enabled = false;
+            bloom.threshold = 0.27f;
+            bloom.intensity = 0.39f;
+            bloom.blurSize = 5.50f;
+            mixSetR = edge.edgesOnlyBgColor.r;
+            mixSetG = edge.edgesOnlyBgColor.g;
+            mixSetB = edge.edgesOnlyBgColor.b;
+            setR = edge.edgeColor.r;
+            setG = edge.edgeColor.g;
+            setB = edge.edgeColor.b;
+            mixColorMultiplier = 1.0f;
+            colorMultiplier = 1.0f;
+            if (wantsToneMapper)
+            {
+                if (!subViewOnly)
+                {
+                    toneMapGamma = defaultGamma;
+                    toneMapBoost = defaultBoost;
+                }
+                else
+                {
+                    toneMapGamma = defaultGamma;
+                    toneMapBoost = defaultBoost;
+                }
+            }
+
+        }
+
         void BordercitiesGrittyAutomatic()
         {
             displayTitle = "Bordercities: Gritty";
@@ -1692,7 +1743,7 @@ namespace Bordercities
             edge.edgesOnlyBgColor = Color.white;
             if (!CheckTonemapper())
                 ResetTonemapper();
-            displayText = "This preset uses the Tonemapper to achieve a grittier look.";
+            displayText = "Bordercities, as above, though with additional Tonemapper settings to achieve a grittier look.";
             bloom.enabled = false;
             bloom.threshold = 0.27f;
             bloom.intensity = 0.39f;
@@ -1735,7 +1786,7 @@ namespace Bordercities
             edge.edgesOnlyBgColor = Color.white;
             if (!CheckTonemapper())
                 ResetTonemapper();
-            displayText = "This preset uses the Tonemapper to achieve a brighter & more pleasant look.";
+            displayText = "Bordercities, as above, though with additional Tonemapper settings to achieve a brighter & more pleasant look.";
             bloom.enabled = false;
             bloom.threshold = 0.27f;
             bloom.intensity = 0.39f;
@@ -1782,7 +1833,7 @@ namespace Bordercities
             edge.edgesOnlyBgColor = Color.white;
             if (!CheckTonemapper())
                 ResetTonemapper();
-            displayText = "NEW 3/31!  Sobelcities puts the newly automated zoom-compensation into play while attempting to achieve a Borderlands effect.  (NOTE 4/1: The 'Sobel Skylines' edge detection mode was tuned around having the lowest degree of edging possible.  Thus, there are currently some issues with excessive line drawing in this mode from my attempt to amp it up a bit.  Will be worked on in the near future.)";
+            displayText = "Sobelcities is designed for those wishing to have a Borderlands-esque feel without the excess visual noise of the Triangle-based presets (IE Bordercities, Auto-Triangle.)";
             bloom.enabled = false;
             bloom.threshold = 0.27f;
             bloom.intensity = 0.39f;
