@@ -549,8 +549,8 @@ namespace Bordercities
                                 GUILayout.EndHorizontal();
                                 if (GUILayout.Button("Reset SobelSkylines-specfic parameters"))
                                 {
-                                    edge.mult1 = 1.0f;
-                                    edge.mult2 = 10.0f;
+                                    edge.mult1 = 1.750f;
+                                    edge.mult2 = 3.750f;
                                     edge.mult3 = 1.0f;
                                     edge.mult4 = 1.0f;
                                 }
@@ -1510,8 +1510,8 @@ namespace Bordercities
             automaticMode = true;
             autoSobelEdge = true;
             edge.depthsDiagonal = 1.0f;
-            edge.mult1 = 1.0f;
-            edge.mult2 = 10.0f;
+            edge.mult1 = 1.753f;
+            edge.mult2 = 3.679f;
             edge.mode = EdgeDetection.EdgeDetectMode.SobelDepthThin;
             edge.sampleDist = 1f;
             edge.edgesOnly = 0;
@@ -1775,8 +1775,8 @@ namespace Bordercities
             edge.edgesOnly = 0f;
             autoSobelEdge = true;
             edge.depthsDiagonal = 0.779f;
-            edge.mult1 = 1.637f;
-            edge.mult2 = 10.0f;
+            edge.mult1 = 1.753f;
+            edge.mult2 = 3.679f;
 
             edge.edgeColor = Color.black;
             edge.edgesOnlyBgColor = Color.white;
@@ -2833,6 +2833,8 @@ namespace Bordercities
               edge.mult4 = Mathf.Lerp(edge.mult4, depthLimit, 0.5f);
             }
         }
+
+        
         
 
         void AutomaticAlgorithms()
@@ -2925,7 +2927,6 @@ namespace Bordercities
             SobelVerticalCheck(true, 1000, 1399, 0.483f);
             SobelVerticalCheck(true, 1400, 1749, 0.394f);
             SobelVerticalCheck(true, 1750, 4000, 0.268f);
-
 
 
 
