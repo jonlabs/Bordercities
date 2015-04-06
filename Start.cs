@@ -21,6 +21,8 @@ namespace Bordercities
     {
         private Camera camera;
         private EffectController toggler;
+        private EdgeDetection edge;
+        private BloomOptimized bloom;
 
         public override void OnLevelLoaded(LoadMode mode)
         {
@@ -38,6 +40,10 @@ namespace Bordercities
         {
             if (toggler != null)
                 toggler.SaveBank();
+            GameObject.Destroy(toggler);
+            GameObject.Destroy(edge);
+            GameObject.Destroy(bloom);
+
         }
 
         
@@ -47,9 +53,9 @@ namespace Bordercities
 
             if (camera != null)
             {
-                EdgeDetection edge = camera.gameObject.AddComponent<EdgeDetection>();
+                edge = camera.gameObject.AddComponent<EdgeDetection>();
                 edge.enabled = false;
-                BloomOptimized bloom = camera.gameObject.AddComponent<BloomOptimized>();
+                bloom = camera.gameObject.AddComponent<BloomOptimized>();
                 bloom.enabled = false;
             }
             else
