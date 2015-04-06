@@ -120,6 +120,7 @@ namespace Bordercities
         private Color sobeCitiesC;
 
         public GUIStyle bordSkyStyle_header = null;
+        public GUIStyle bordSkyStyle_critical = null;
         public GUIStyle greenButton;
         public Texture2D greenTex;
         public GUIStyle yellowButton;
@@ -139,6 +140,7 @@ namespace Bordercities
             {
                 greenButton = new GUIStyle(GUI.skin.button);
                 greenButton.normal.textColor = lightGreen;
+                greenButton.fontStyle = FontStyle.Bold;
                 //greenTex = new Texture2D(1, 1);
                 //greenTex.SetPixel(0, 0, darkGreen);
                 //greenTex.Apply();
@@ -155,7 +157,8 @@ namespace Bordercities
             }
             if (bordSkyStyle_header == null)
                 bordSkyStyle_header = new GUIStyle();
-            
+            if (bordSkyStyle_critical == null)
+                bordSkyStyle_critical = new GUIStyle();
 
             bordSkySkin = GUI.skin;
             
@@ -163,6 +166,9 @@ namespace Bordercities
             bordSkyStyle_header.fontStyle = FontStyle.Bold;
             bordSkyStyle_header.fontSize = 15;
             bordSkyStyle_header.normal.textColor = lightYellow;
+            bordSkyStyle_critical.fontStyle = FontStyle.Bold;
+            bordSkyStyle_critical.fontSize = 15;
+            bordSkyStyle_critical.normal.textColor = lightGreen;
             bordSkySkin.button.padding = new RectOffset(5,5,0,0);
 
 
@@ -265,7 +271,7 @@ namespace Bordercities
 
                         if (automaticMode)
                         {
-                            ResizeWindow(803, 750);
+                            ResizeWindow(803, 710);
 
                             GUILayout.BeginHorizontal();
                             GUILayout.Label("PLUG & PLAY PRESETS:", bordSkyStyle_header);
@@ -303,28 +309,32 @@ namespace Bordercities
 
                             GUILayout.BeginVertical();
                             GUILayout.Label("1080p & 175+ DR", bordSkyStyle_header, GUILayout.Width(165));
-                            if (GUILayout.Button("Sobelcities", GUILayout.Width(165)))
+                            GUILayout.BeginHorizontal();
+                            if (GUILayout.Button("Sobelcities", GUILayout.Width(102.5f)))
                             {
                                 SobelcitiesAutomatic();
                             }
-                            if (GUILayout.Button("SC|Overdrive", GUILayout.Width(165)))
+                            if (GUILayout.Button("<-- x2", GUILayout.Width(62.5f)))
                             {
                                 SobelcitiesODAutomatic();
                             }
+                            GUILayout.EndHorizontal();
                             if (GUILayout.Button("Bordercities", GUILayout.Width(165)))
                             {
                                 BordercitiesAutomatic();
                             }
                             if (wantsToneMapper)
                             {
-                                if (GUILayout.Button("BC|Bright", GUILayout.Width(165)))
+                                GUILayout.BeginHorizontal();
+                                if (GUILayout.Button("BC|Bright", GUILayout.Width(82.5f)))
                                 {
                                     BordercitiesBrightAutomatic();
                                 }
-                                if (GUILayout.Button("BC|Gritty", GUILayout.Width(165)))
+                                if (GUILayout.Button("BC|Grit", GUILayout.Width(82.5f)))
                                 {
                                     BordercitiesGrittyAutomatic();
                                 }
+                                GUILayout.EndHorizontal();
                             }
                             if (GUILayout.Button("BC|EasierViewing", GUILayout.Width(165)))
                             {
@@ -338,14 +348,16 @@ namespace Bordercities
                             {
                                 CartoonThreeAutomatic();
                             }
-                            if (GUILayout.Button("Retro", GUILayout.Width(165)))
+                            GUILayout.BeginHorizontal();
+                            if (GUILayout.Button("Retro", GUILayout.Width(72.5f)))
                             {
                                 CartoonAutomatic();
                             }
-                            if (GUILayout.Button("Colorful", GUILayout.Width(165)))
+                            if (GUILayout.Button("Colorful", GUILayout.Width(92.5f)))
                             {
                                 CartoonAltAutomatic();
                             }
+                            GUILayout.EndHorizontal();
                             GUILayout.EndVertical();
 
                             GUILayout.BeginVertical();
@@ -367,12 +379,16 @@ namespace Bordercities
                             //GUILayout.EndScrollView();
                             if (displayText != null && displayTitle != null)
                             {
+                                GUILayout.Space(5f);
+                                GUILayout.Label("MAKE SURE TO SAVE (bottom of panel) WHEN YOU'VE FOUND YOUR FAVORITE!", bordSkyStyle_critical);
+                                GUILayout.Space(5f);
                                 GUILayout.Label("CURRENT MODE: " + displayTitle, bordSkyStyle_header);
-                                GUILayout.Space(6f);
+                                GUILayout.Space(3f);
                                 GUILayout.Label(displayText);
                             }
                             if (activeStockPreset == ActiveStockPreset.Cartoon || activeStockPreset == ActiveStockPreset.CartoonAlt)
                             {
+                                GUILayout.BeginHorizontal();
                                 GUILayout.Label("CARTOON SPECIFIC OPTIONS:", bordSkyStyle_header);
                                 if (GUILayout.Button("Randomize Color Theme)"))
                                 {
@@ -401,9 +417,10 @@ namespace Bordercities
                                     mixColorMultiplier = 1.0f;
                                     colorMultiplier = 1.0f;
                                 }
+                                GUILayout.EndHorizontal();
                             }
                            
-                            GUILayout.Space(15f);
+                            GUILayout.Space(11f);
                             GUILayout.Label("If you are unsatisfied with these stock presets, or wish to build from scratch:", bordSkyStyle_header);
                             GUILayout.BeginHorizontal();
                             if (GUILayout.Button("Enter Advanced Mode", yellowButton, GUILayout.Height(27)))
@@ -420,14 +437,14 @@ namespace Bordercities
                                 GUILayout.Space(2f);
                             }
                             else
-                                GUILayout.Space(6f);
+                                GUILayout.Space(5f);
 
 
 
                         }
                         else
                         {
-                            GUILayout.Space(10f);
+                            GUILayout.Space(5f);
                             ResizeWindow(803, 700);
                             GUILayout.Label("ADVANCED MODE:", bordSkyStyle_header);
                             switch (edge.mode)
@@ -985,14 +1002,14 @@ namespace Bordercities
                         {
                             if (isOn)
                             {
-                                if (GUILayout.Button("Save (Active preset will load by default in future sessions)"))
+                                if (GUILayout.Button("Save (Active preset will load by default in future sessions)", greenButton))
                                 {
                                     SaveConfig();
                                 }
                             }
                             else
                             {
-                                if (GUILayout.Button("Save (Bordered Skylines will be Disabled by default in future sessions)"))
+                                if (GUILayout.Button("Save (Bordered Skylines will be Disabled by default in future sessions)", yellowButton))
                                 {
                                     SaveConfig();
                                 }
@@ -1000,7 +1017,7 @@ namespace Bordercities
                         }
                         else
                         {
-                            if (GUILayout.Button("Save (Your active configuration will load by default in future sessions"))
+                            if (GUILayout.Button("Save (Your active configuration will load by default in future sessions", greenButton))
                             {
                                 SaveConfig();
                             }
