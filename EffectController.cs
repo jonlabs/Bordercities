@@ -15,6 +15,7 @@ namespace Bordercities
             BordercitiesGritty,
             BordercitiesBright,
             Sobelcities,
+            SobelcitiesOD,
             Cartoon,
             Realism,
             HighEndPC,
@@ -100,6 +101,7 @@ namespace Bordercities
         private Color cartoonMixC;
         private Color lowEndEdgeC;
         private Color realismEdgeC;
+        private Color sobelcitiesODc;
 
         private Color lightRed;
         private Color lightGreen;
@@ -179,6 +181,7 @@ namespace Bordercities
             lowEndEdgeC = new Color(0.08f, 0.08f, 0.06f);
             realismEdgeC = new Color(0.17f,0.17f,0.17f);
             sobeCitiesC = new Color(0.32f, 0.33f, 0.32f);
+            sobelcitiesODc = new Color(0.35f, 0.35f, 0.35f);
             lightRed = new Color(1.0f, 0.6f, 0.6f);
             lightGreen = new Color(0.6f, 1.0f, 0.6f);
             lightBlue = new Color(0.6f, 0.6f, 1.0f);
@@ -303,6 +306,10 @@ namespace Bordercities
                             if (GUILayout.Button("Sobelcities", GUILayout.Width(165)))
                             {
                                 SobelcitiesAutomatic();
+                            }
+                            if (GUILayout.Button("SC|Overdrive", GUILayout.Width(165)))
+                            {
+                                SobelcitiesODAutomatic();
                             }
                             if (GUILayout.Button("Bordercities", GUILayout.Width(165)))
                             {
@@ -1416,6 +1423,9 @@ namespace Bordercities
                 case ActiveStockPreset.Sobelcities:
                     SobelcitiesAutomatic();
                     break;
+                case ActiveStockPreset.SobelcitiesOD:
+                    SobelcitiesODAutomatic();
+                    break;
                 case ActiveStockPreset.LowEndMain:
                     LowEndAutomatic();
                     break;
@@ -1859,7 +1869,52 @@ namespace Bordercities
                     toneMapBoost = defaultBoost;
                 }
             }
+        }
 
+        void SobelcitiesODAutomatic()
+        {
+            displayTitle = "Sobelcities: Overdrive";
+            activeStockPreset = ActiveStockPreset.SobelcitiesOD;
+            automaticMode = true;
+            edge.mode = EdgeDetection.EdgeDetectMode.SobelDepthThin;
+            edge.edgeExp = 0.5f;
+            edge.sampleDist = 4f;
+            edge.edgesOnly = 0;
+            autoSobelEdge = true;
+            edge.depthsDiagonal = 0.779f;
+            edge.mult1 = 1.702f;
+            edge.mult2 = 6.742f;
+
+            edge.edgeColor = sobelcitiesODc;
+            edge.edgesOnlyBgColor = Color.white;
+            if (!CheckTonemapper())
+                ResetTonemapper();
+            displayText = "This version of Sobelcities creates a stronger effect, however, at a cost.  When zoomed out, the sides of certain tall buildings will be improperly detected as edges.  To compensate for this, Sobelcities:Overdrive gives the edge coloring a slight gray tint, so that these improper 'edges' can be perceived as shadows rather than as a glitchy, 'overdriven' effect, hence this preset's name.  Use this preset if you don't mind the 'shadowing' upon tall buildings when fully zoomed out.  COMING SOON: Improvements to the 'Sobel Skylines' 'auto-zoom-compensation' algorithm to achieve the best of both worlds.";
+            bloom.enabled = false;
+            bloom.threshold = 0.27f;
+            bloom.intensity = 0.39f;
+            bloom.blurSize = 5.50f;
+            mixSetR = edge.edgesOnlyBgColor.r;
+            mixSetG = edge.edgesOnlyBgColor.g;
+            mixSetB = edge.edgesOnlyBgColor.b;
+            setR = edge.edgeColor.r;
+            setG = edge.edgeColor.g;
+            setB = edge.edgeColor.b;
+            mixColorMultiplier = 1.0f;
+            colorMultiplier = 1.0f;
+            if (wantsToneMapper)
+            {
+                if (!subViewOnly)
+                {
+                    toneMapGamma = 2.2f;
+                    toneMapBoost = 1.365f;
+                }
+                else
+                {
+                    toneMapGamma = defaultGamma;
+                    toneMapBoost = defaultBoost;
+                }
+            }
         }
 
         void RealismAutomatic()
