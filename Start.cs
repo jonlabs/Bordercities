@@ -54,12 +54,10 @@ namespace Bordercities
             Deinitialize();
         }
 
-        //public override void OnReleased()
-        //{
-       //     Deinitialize();
-        //}
-
-        
+        public override void OnReleased()
+        {
+            Deinitialize();
+        }
 
         private void AttachEffects()
         {
