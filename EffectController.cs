@@ -310,11 +310,11 @@ namespace Bordercities
                             GUILayout.BeginVertical();
                             GUILayout.Label("1080p & 175+ DR", bordSkyStyle_header, GUILayout.Width(165));
                             GUILayout.BeginHorizontal();
-                            if (GUILayout.Button("Sobelcities", GUILayout.Width(102.5f)))
+                            if (GUILayout.Button("Sobelcities", GUILayout.Width(92.5f)))
                             {
                                 SobelcitiesAutomatic();
                             }
-                            if (GUILayout.Button("<-- x2", GUILayout.Width(62.5f)))
+                            if (GUILayout.Button("++(NEW!)", GUILayout.Width(72.5f)))
                             {
                                 SobelcitiesODAutomatic();
                             }
@@ -1890,7 +1890,7 @@ namespace Bordercities
 
         void SobelcitiesODAutomatic()
         {
-            displayTitle = "Sobelcities: Overdrive";
+            displayTitle = "Sobelcities: Overdrive (aka '++')";
             activeStockPreset = ActiveStockPreset.SobelcitiesOD;
             automaticMode = true;
             edge.mode = EdgeDetection.EdgeDetectMode.SobelDepthThin;
