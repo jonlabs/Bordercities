@@ -122,11 +122,11 @@ namespace Bordercities
 
         public GUIStyle bordSkyStyle_header = null;
         public GUIStyle bordSkyStyle_critical = null;
-        public GUIStyle greenButton;
+        public GUIStyle bordSky_greenButton;
         public Texture2D greenTex;
-        public GUIStyle yellowButton;
+        public GUIStyle bordSky_yellowButton;
         public Texture2D yellowTex;
-        public GUIStyle redButton;
+        public GUIStyle bordSky_redButton;
         public Texture2D redTex;
         public GUISkin bordSkySkin = null;
         public float heightTester = 20f;
@@ -137,24 +137,24 @@ namespace Bordercities
         {
             if (bordSkySkin == null)
                 bordSkySkin = new GUISkin();
-            if (greenButton == null)
+            if (bordSky_greenButton == null)
             {
-                greenButton = new GUIStyle(GUI.skin.button);
-                greenButton.normal.textColor = lightGreen;
-                greenButton.fontStyle = FontStyle.Bold;
+                bordSky_greenButton = new GUIStyle(GUI.skin.button);
+                bordSky_greenButton.normal.textColor = lightGreen;
+                bordSky_greenButton.fontStyle = FontStyle.Bold;
                 //greenTex = new Texture2D(1, 1);
                 //greenTex.SetPixel(0, 0, darkGreen);
                 //greenTex.Apply();
             }
-            if (redButton == null)
+            if (bordSky_redButton == null)
             {
-                redButton = new GUIStyle(GUI.skin.button);
-                redButton.normal.textColor = lightRed;
+                bordSky_redButton = new GUIStyle(GUI.skin.button);
+                bordSky_redButton.normal.textColor = lightRed;
             }
-            if (yellowButton == null)
+            if (bordSky_yellowButton == null)
             {
-                yellowButton = new GUIStyle(GUI.skin.button);
-                yellowButton.normal.textColor = lightYellow;
+                bordSky_yellowButton = new GUIStyle(GUI.skin.button);
+                bordSky_yellowButton.normal.textColor = lightYellow;
             }
             if (bordSkyStyle_header == null)
                 bordSkyStyle_header = new GUIStyle();
@@ -185,7 +185,7 @@ namespace Bordercities
         void InitializeColors()
         {
             cartoonEdgeC = new Color(0.04f, 0.04f, 0.04f);
-            lowEndEdgeC = new Color(0.08f, 0.08f, 0.06f);
+            lowEndEdgeC = new Color(0.13f, 0.13f, 0.13f);
             realismEdgeC = new Color(0.17f,0.17f,0.17f);
             sobeCitiesC = new Color(0.32f, 0.33f, 0.32f);
             sobelcitiesODc = new Color(0.35f, 0.35f, 0.35f);
@@ -258,7 +258,7 @@ namespace Bordercities
                     {
                         ResizeWindow(803, 190);
                         GUILayout.Space(30f);
-                        if (GUILayout.Button("Enable Bordered Skylines", greenButton))
+                        if (GUILayout.Button("Enable Bordered Skylines", bordSky_greenButton))
                         {
                             if (firstTime && automaticMode)
                                 LowEndAutomatic();
@@ -289,24 +289,24 @@ namespace Bordercities
                             GUILayout.Label("720p/1080p & NO DR:", bordSkyStyle_header, GUILayout.Width(165));
                             GUILayout.Space(5f);
                             GUILayout.BeginHorizontal();
-                            if (GUILayout.Button("Sobelskies", GUILayout.Width(72.5f)))
+                            if (GUILayout.Button("Sobelskies", GUILayout.Width(79.5f)))
                             {
                                 LowEndAutomatic();
                             }
-                            if (GUILayout.Button("++Lo(NEW!)", GUILayout.Width(92.5f)))
+                            if (GUILayout.Button("SS++", GUILayout.Width(85.5f)))
                             {
                                 SobelcitiesOD720Automatic();
                             }
                             GUILayout.EndHorizontal();
-                            if (GUILayout.Button("Classic Sobel", GUILayout.Width(165)))
+                            if (GUILayout.Button("Classic Auto-Sobel", GUILayout.Width(165)))
                             {
                                 ClassicSobelAutomatic();
                             }
-                            if (GUILayout.Button("Triangle", GUILayout.Width(165)))
+                            if (GUILayout.Button("Classic Auto-Triangle", GUILayout.Width(165)))
                             {
                                 ClassicTriangleAutomatic();
                             }
-                            if (GUILayout.Button("Eyefriendly(er)", GUILayout.Width(165)))
+                            if (GUILayout.Button("AT|Eyefriendly(er)", GUILayout.Width(165)))
                             {
                                 LowEndAltAutomatic();
                                 GUI.color = darkGreen;
@@ -317,11 +317,11 @@ namespace Bordercities
                             GUILayout.BeginVertical();
                             GUILayout.Label("1080p & 175+ DR", bordSkyStyle_header, GUILayout.Width(165));
                             GUILayout.BeginHorizontal();
-                            if (GUILayout.Button("Sobelcities", GUILayout.Width(87.5f)))
+                            if (GUILayout.Button("Sobelcities", GUILayout.Width(90.5f)))
                             {
                                 SobelcitiesAutomatic();
                             }
-                            if (GUILayout.Button("++Hi(NEW!)", GUILayout.Width(77.5f)))
+                            if (GUILayout.Button("SC++", GUILayout.Width(74.5f)))
                             {
                                 SobelcitiesODAutomatic();
                             }
@@ -430,7 +430,7 @@ namespace Bordercities
                             GUILayout.Space(11f);
                             GUILayout.Label("If you are unsatisfied with these stock presets, or wish to build from scratch:", bordSkyStyle_header);
                             GUILayout.BeginHorizontal();
-                            if (GUILayout.Button("Enter Advanced Mode", yellowButton, GUILayout.Height(27)))
+                            if (GUILayout.Button("Enter Advanced Mode", bordSky_yellowButton, GUILayout.Height(27)))
                             {
                                 automaticMode = false;
 
@@ -682,7 +682,7 @@ namespace Bordercities
                             }
                             GUILayout.Space(5f);
 
-                            if (GUILayout.Button("Switch back to 'Plug & Play' Mode.", yellowButton))
+                            if (GUILayout.Button("Switch back to 'Plug & Play' Mode.", bordSky_yellowButton))
                             {
                                 automaticMode = true;
                                 DetermineMode();
@@ -976,7 +976,7 @@ namespace Bordercities
                     }
                     if (isOn)
                     {
-                        if (GUILayout.Button("Disable Bordered Skylines", redButton))
+                        if (GUILayout.Button("Disable Bordered Skylines", bordSky_redButton))
                         {
                             ToggleBorderedSkylines(false);
                         }
@@ -1009,14 +1009,14 @@ namespace Bordercities
                         {
                             if (isOn)
                             {
-                                if (GUILayout.Button("Save (Active preset will load by default in future sessions)", greenButton))
+                                if (GUILayout.Button("Save (Active preset will load by default in future sessions)", bordSky_greenButton))
                                 {
                                     SaveConfig();
                                 }
                             }
                             else
                             {
-                                if (GUILayout.Button("Save (Bordered Skylines will be Disabled by default in future sessions)", yellowButton))
+                                if (GUILayout.Button("Save (Bordered Skylines will be Disabled by default in future sessions)", bordSky_yellowButton))
                                 {
                                     SaveConfig();
                                 }
@@ -1024,7 +1024,7 @@ namespace Bordercities
                         }
                         else
                         {
-                            if (GUILayout.Button("Save (Your active configuration will load by default in future sessions", greenButton))
+                            if (GUILayout.Button("Save (Your active configuration will load by default in future sessions", bordSky_greenButton))
                             {
                                 SaveConfig();
                             }
@@ -1550,7 +1550,7 @@ namespace Bordercities
 
         void LowEndAutomatic()
         {
-            displayTitle = "(NEW 3/31) Sobel Skylines";
+            displayTitle = "Sobel Skies (Default)";
             activeStockPreset = ActiveStockPreset.LowEndMain;
             automaticMode = true;
             autoSobelEdge = true;
@@ -1611,7 +1611,7 @@ namespace Bordercities
             bloom.threshold = 0.27f;
             bloom.intensity = 0.39f;
             bloom.blurSize = 5.50f;
-            displayText = "Left here in the event that you prefer it over Sobel Skylines, 'Classic Auto-Sobel' is simply the original 'Auto-Sobel' as it was before 'Sobel Skylines', the Cities:Skylines-specific implementation of Unity's 'Sobel' edge detection method was introduced.";
+            displayText = "'Classic Auto-Sobel' was the original 'Sobel' edge detection mode in Bordered Skylines.  'Sobel Skylines' was later implemented as a C:S-specific adaptation of the original 'Auto-Sobel' algorithm.  'Classic Auto-Sobel' has been retained should you prefer it.";
         }
 
 
@@ -1635,7 +1635,7 @@ namespace Bordercities
             bloom.threshold = 0.27f;
             bloom.intensity = 0.39f;
             bloom.blurSize = 5.50f;
-            displayText = "The effect this preset has is TREMENDOUS.  ...for better or for worse.  Going on a stroll in first person camera is downright breathtaking.  Zoomed out and viewing your entire city?  ..Not so much.";
+            displayText = "Like 'Classic Auto-Sobel,' this mode was one of the originals in Bordered Skylines.  In comparison to its brother 'Auto-Sobel', 'Auto-Triangle' imparts a TREMENDOUS effect... for better or for worse.  Going on a stroll in first person camera?  Downright breathtaking.  Zoomed out and viewing your entire city?  ..not so much.";
         }
         void LowEndAltAutomatic()
         {
@@ -1655,7 +1655,7 @@ namespace Bordercities
             bloom.threshold = 0.27f;
             bloom.intensity = 0.39f;
             bloom.blurSize = 5.50f;
-            displayText = "This preset attempts to get around the harshness of the above 'Triangle' edge detection mode's edges when viewing at low resolutions.  It attempts this by adding a slight gray tint to detected edges.";
+            displayText = "This preset attempts to get around the harshness of the above 'Auto-Triangle' edge detection mode's edges when viewing at low resolutions by adding a slight gray tint to detected edges.";
             mixSetR = edge.edgesOnlyBgColor.r;
             mixSetG = edge.edgesOnlyBgColor.g;
             mixSetB = edge.edgesOnlyBgColor.b;
@@ -1694,7 +1694,7 @@ namespace Bordercities
             edge.edgesOnlyBgColor = Color.white;
             if (!CheckTonemapper())
                 ResetTonemapper();
-            displayText = "This, providing you're viewing at 175% DR or more at 1080, is my personal favorite for strolling cities up close.  If you are looking for a 24/7 gameplay, 'fully-zoomed-out'-compatible mode, try the below 'Bordercities: Easier Viewing.'";
+            displayText = "'Bordercities', providing you're viewing at 175% DR and 1080p or more is my personal favorite for strolling cities up close.  If you are looking for a 24/7 gameplay, 'fully-zoomed-out'-compatible mode, try '++-H'.  If you wish for a softer look than that, use '++-L'.  If you'd rather use a lighter version of this particular edge style, try 'BC|EasierViewing.'";
             bloom.enabled = false;
             bloom.threshold = 0.27f;
             bloom.intensity = 0.39f;
@@ -1737,7 +1737,7 @@ namespace Bordercities
             edge.edgesOnlyBgColor = Color.white;
             if (!CheckTonemapper())
                 ResetTonemapper();
-            displayText = "Sacrifices a little bit of the edge grit in favor of eye-friendly visuals when zoomed out.  I want to look into a way of automatically switching upon a certain threshold of being zoomed out (provided that the transition would look smooth.)";
+            displayText = "A spin-off of 'Bordercities'.  Sacrifices a little bit of the edge grit in favor of eye-friendly visuals when zoomed out.  I want to look into a way of automatically switching upon a certain threshold of being zoomed out (provided that the transition would look smooth.)";
             bloom.enabled = false;
             bloom.threshold = 0.27f;
             bloom.intensity = 0.39f;
@@ -1870,7 +1870,7 @@ namespace Bordercities
             edge.edgesOnlyBgColor = Color.white;
             if (!CheckTonemapper())
                 ResetTonemapper();
-            displayText = "Sobelcities is designed for those wishing to have a Borderlands-esque feel without the excess visual noise of the Triangle-based presets (IE Bordercities, Auto-Triangle.)";
+            displayText = "Sobelcities is the 1080p/175%-DynamicResolution-tuned version of the default 'Sobel Skies' mode.  Designed for those wishing to have a Borderlands-esque feel without the excess visual noise of the Triangle-based presets (IE Bordercities, Auto-Triangle.)";
             bloom.enabled = false;
             bloom.threshold = 0.27f;
             bloom.intensity = 0.39f;
@@ -1900,7 +1900,7 @@ namespace Bordercities
 
         void SobelcitiesODAutomatic()
         {
-            displayTitle = "Sobelcities: Overdrive (aka '++')";
+            displayTitle = "Sobelcities++";
             activeStockPreset = ActiveStockPreset.SobelcitiesOD;
             automaticMode = true;
             edge.mode = EdgeDetection.EdgeDetectMode.SobelDepthThin;
@@ -1916,7 +1916,7 @@ namespace Bordercities
             edge.edgesOnlyBgColor = Color.white;
             if (!CheckTonemapper())
                 ResetTonemapper();
-            displayText = "This version of Sobelcities creates a stronger effect, however, at a cost.  When zoomed out, the sides of certain tall buildings will be improperly detected as edges.  To compensate for this, Sobelcities:Overdrive gives the edge coloring a slight gray tint, so that these improper 'edges' can be perceived as shadows rather than as a glitchy, 'overdriven' effect, hence this preset's name.  Use this preset if you don't mind the 'shadowing' upon tall buildings when fully zoomed out.  COMING SOON: Improvements to the 'Sobel Skylines' 'auto-zoom-compensation' algorithm to achieve the best of both worlds.";
+            displayText = "A spinoff of 'Sobelcities,' 'Sobelcities++' creates a stronger effect than its less intense brother.. however, at a cost.  When zoomed out, the sides of certain tall buildings will be improperly detected as edges.  To compensate for this, Sobelcities:Overdrive gives the edge coloring a slight gray tint, so that these improper 'edges' can be perceived as shadows rather than as a glitchy, 'overdriven' effect, hence this preset's name.  Use this preset if you don't mind the 'shadowing' upon tall buildings when fully zoomed out.  COMING SOON: Improvements to the 'Sobel Skylines' 'auto-zoom-compensation' algorithm to achieve the best of both worlds.";
             bloom.enabled = false;
             bloom.threshold = 0.27f;
             bloom.intensity = 0.39f;
@@ -1946,7 +1946,7 @@ namespace Bordercities
 
         void SobelcitiesOD720Automatic()
         {
-            displayTitle = "Sobelcities: Overdrive 720p (aka '++')";
+            displayTitle = "Sobel Skies ++";
             activeStockPreset = ActiveStockPreset.SobelcitiesOD720;
             automaticMode = true;
             edge.mode = EdgeDetection.EdgeDetectMode.SobelDepthThin;
@@ -1962,7 +1962,7 @@ namespace Bordercities
             edge.edgesOnlyBgColor = Color.white;
             if (!CheckTonemapper())
                 ResetTonemapper();
-            displayText = "This is the 'Sobelcities:Overdrive(++)' preset, retuned for lower resolutions and/or those who are not using Dynamic Resolution.";
+            displayText = "A spinoff of 'Sobel Skies,' 'Sobel Skies ++' creates a stronger effect than its less intense brother.. however, at a cost.  When zoomed out, the sides of certain tall buildings will be improperly detected as edges.  To compensate for this, Sobelcities:Overdrive gives the edge coloring a slight gray tint, so that these improper 'edges' can be perceived as shadows rather than as a glitchy, 'overdriven' effect, hence this preset's name.  Use this preset if you don't mind the 'shadowing' upon tall buildings when fully zoomed out.  COMING SOON: Improvements to the 'Sobel Skylines' 'auto-zoom-compensation' algorithm to achieve the best of both worlds.";
             bloom.enabled = false;
             bloom.threshold = 0.27f;
             bloom.intensity = 0.39f;
@@ -2010,7 +2010,7 @@ namespace Bordercities
             bloom.threshold = 0.27f;
             bloom.intensity = 0.39f;
             bloom.blurSize = 5.50f;
-            displayText = "HIGHLY RECOMMENDED to use DLAA AA from MazK's 'PostProcessFX'!  DLAA provides the 'knock-out punch' to the intended role of Bordered Skylines when aiming to use 'Realism', or, 'Edge Detection' as a visual enhancement tool to maintain the visual detection of distant shapes which would otherwise be lost by the renderer at a distance such as street lamps. Do keep in mind that Bordered Skylines is not an ambient occlusion mod.  If you are looking for -shadowing- at -edge intersections-, try Ulysius' Ambient Occlusion.";
+            displayText = "For users who aim to use Bordered Skylines as a visual enhancement tool rather than as an obvious visual effect.  Using Bordered Skylines in this manner helps to maintain the visual detection of distant shapes which would otherwise be lost by the renderer, such as distant street lamps. Do keep in mind that Bordered Skylines is not an ambient occlusion mod.  If you are looking for -shadowing- at -edge intersections-, try Ulysius' Ambient Occlusion.  HIGHLY RECOMMENDED to use DLAA AA from MazK's 'PostProcessFX' with this preset!  DLAA provides the 'knock-out punch' to complete the look, cancelling out the negative side effects of this 'Realism' preset by smoothing out the results of edge detection --after-- (that's the key) the fact!";
             mixSetR = edge.edgesOnlyBgColor.r;
             mixSetG = edge.edgesOnlyBgColor.g;
             mixSetB = edge.edgesOnlyBgColor.b;
@@ -2052,7 +2052,7 @@ namespace Bordercities
             if (!CheckTonemapper())
                 ResetTonemapper();
             bloom.enabled = false;
-            displayText = "Add a very 50's cartoon look to your game.  Press the below button to generate a color theme (make sure to save it afterwards!)";
+            displayText = "Add a very 50's cartoon look to your game.  Press the below button to generate a color theme (make sure to save it afterwards!)  Coming soon, a special 'Cartoonish-based' automatic-zoom-compensation algorithm, removing any unpleasant black surfaces when zoomed in close enough.";
             mixSetR = edge.edgesOnlyBgColor.r;
             mixSetG = edge.edgesOnlyBgColor.g;
             mixSetB = edge.edgesOnlyBgColor.b;
@@ -2094,7 +2094,7 @@ namespace Bordercities
             if (!CheckTonemapper())
                 ResetTonemapper();
             bloom.enabled = false;
-            displayText = "A little bit more modern than 'Retro', yet still old-school looking.";
+            displayText = "A little bit more modern than 'Retro', yet still old-school looking.  Coming soon, a special 'Cartoonish-based' automatic-zoom-compensation algorithm, removing any unpleasant black surfaces when zoomed in close enough.";
             mixSetR = edge.edgesOnlyBgColor.r;
             mixSetG = edge.edgesOnlyBgColor.g;
             mixSetB = edge.edgesOnlyBgColor.b;
@@ -2135,7 +2135,7 @@ namespace Bordercities
             if (!CheckTonemapper())
                 ResetTonemapper();
             bloom.enabled = false;
-            displayText = "No explanation required!  Unlike the other cartoonish presets, this one does not use a color theme.";
+            displayText = "No explanation required!  Coming soon, a special 'Cartoonish-based' automatic-zoom-compensation algorithm, removing any unpleasant black surfaces when zoomed in close enough.";
             mixSetR = edge.edgesOnlyBgColor.r;
             mixSetG = edge.edgesOnlyBgColor.g;
             mixSetB = edge.edgesOnlyBgColor.b;
@@ -2183,7 +2183,7 @@ namespace Bordercities
         {
             automaticMode = true;
             displayTitle = "Ultra - REQUIRES 1920x1080 + DR 250-300% + 'AMBIENT OCC' + 'SUN SHAFTS' + 'POSTPROCESSFX' WITH BLOOM, MOTION BLUR, AND DLAA ANTI-ALIASING FOR INTENDED LOOK.";
-            displayText = "This mode looks AB-SO-FREAKING-LUTE-LY SPECTACULAR!!!!!!!!!!!!!  ..if you can actually run it.";
+            displayText = "This is BEAUTIFUL.  You may need a super-computer for this.";
             edge.sampleDist = 2.0f;
             activeStockPreset = ActiveStockPreset.HighEndPC;
             edge.mode = EdgeDetection.EdgeDetectMode.RobertsCrossDepthNormals;

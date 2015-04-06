@@ -36,15 +36,28 @@ namespace Bordercities
             AttachEffects();
         }
 
-        public override void OnLevelUnloading()
+        void Deinitialize()
         {
             if (toggler != null)
+            {
                 toggler.SaveBank();
-            GameObject.Destroy(toggler);
-            GameObject.Destroy(edge);
-            GameObject.Destroy(bloom);
-
+                GameObject.Destroy(toggler);
+            }
+            if (edge != null)
+                GameObject.Destroy(edge);
+            if (bloom != null)
+                GameObject.Destroy(bloom);
         }
+
+        public override void OnLevelUnloading()
+        {
+            Deinitialize();
+        }
+
+        //public override void OnReleased()
+        //{
+       //     Deinitialize();
+        //}
 
         
 

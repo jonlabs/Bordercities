@@ -67,7 +67,6 @@
     <Compile Include="EdgeDetection.cs" />
     <Compile Include="PostEffectsBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Utilities.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
