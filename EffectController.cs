@@ -16,6 +16,7 @@ namespace Bordercities
             BordercitiesBright,
             Sobelcities,
             SobelcitiesOD,
+            SobelcitiesOD720,
             Cartoon,
             Realism,
             HighEndPC,
@@ -287,10 +288,16 @@ namespace Bordercities
                             GUILayout.BeginVertical();
                             GUILayout.Label("720p/1080p & NO DR:", bordSkyStyle_header, GUILayout.Width(165));
                             GUILayout.Space(5f);
-                            if (GUILayout.Button("Sobel Skylines", GUILayout.Width(165)))
+                            GUILayout.BeginHorizontal();
+                            if (GUILayout.Button("Sobelskies", GUILayout.Width(72.5f)))
                             {
                                 LowEndAutomatic();
                             }
+                            if (GUILayout.Button("++Lo(NEW!)", GUILayout.Width(92.5f)))
+                            {
+                                SobelcitiesOD720Automatic();
+                            }
+                            GUILayout.EndHorizontal();
                             if (GUILayout.Button("Classic Sobel", GUILayout.Width(165)))
                             {
                                 ClassicSobelAutomatic();
@@ -310,11 +317,11 @@ namespace Bordercities
                             GUILayout.BeginVertical();
                             GUILayout.Label("1080p & 175+ DR", bordSkyStyle_header, GUILayout.Width(165));
                             GUILayout.BeginHorizontal();
-                            if (GUILayout.Button("Sobelcities", GUILayout.Width(92.5f)))
+                            if (GUILayout.Button("Sobelcities", GUILayout.Width(87.5f)))
                             {
                                 SobelcitiesAutomatic();
                             }
-                            if (GUILayout.Button("++(NEW!)", GUILayout.Width(72.5f)))
+                            if (GUILayout.Button("++Hi(NEW!)", GUILayout.Width(77.5f)))
                             {
                                 SobelcitiesODAutomatic();
                             }
@@ -1443,6 +1450,9 @@ namespace Bordercities
                 case ActiveStockPreset.SobelcitiesOD:
                     SobelcitiesODAutomatic();
                     break;
+                case ActiveStockPreset.SobelcitiesOD720:
+                    SobelcitiesOD720Automatic();
+                    break;
                 case ActiveStockPreset.LowEndMain:
                     LowEndAutomatic();
                     break;
@@ -1907,6 +1917,52 @@ namespace Bordercities
             if (!CheckTonemapper())
                 ResetTonemapper();
             displayText = "This version of Sobelcities creates a stronger effect, however, at a cost.  When zoomed out, the sides of certain tall buildings will be improperly detected as edges.  To compensate for this, Sobelcities:Overdrive gives the edge coloring a slight gray tint, so that these improper 'edges' can be perceived as shadows rather than as a glitchy, 'overdriven' effect, hence this preset's name.  Use this preset if you don't mind the 'shadowing' upon tall buildings when fully zoomed out.  COMING SOON: Improvements to the 'Sobel Skylines' 'auto-zoom-compensation' algorithm to achieve the best of both worlds.";
+            bloom.enabled = false;
+            bloom.threshold = 0.27f;
+            bloom.intensity = 0.39f;
+            bloom.blurSize = 5.50f;
+            mixSetR = edge.edgesOnlyBgColor.r;
+            mixSetG = edge.edgesOnlyBgColor.g;
+            mixSetB = edge.edgesOnlyBgColor.b;
+            setR = edge.edgeColor.r;
+            setG = edge.edgeColor.g;
+            setB = edge.edgeColor.b;
+            mixColorMultiplier = 1.0f;
+            colorMultiplier = 1.0f;
+            if (wantsToneMapper)
+            {
+                if (!subViewOnly)
+                {
+                    toneMapGamma = 2.2f;
+                    toneMapBoost = 1.365f;
+                }
+                else
+                {
+                    toneMapGamma = defaultGamma;
+                    toneMapBoost = defaultBoost;
+                }
+            }
+        }
+
+        void SobelcitiesOD720Automatic()
+        {
+            displayTitle = "Sobelcities: Overdrive 720p (aka '++')";
+            activeStockPreset = ActiveStockPreset.SobelcitiesOD720;
+            automaticMode = true;
+            edge.mode = EdgeDetection.EdgeDetectMode.SobelDepthThin;
+            edge.edgeExp = 0.5f;
+            edge.sampleDist = 2f;
+            edge.edgesOnly = 0;
+            autoSobelEdge = true;
+            edge.depthsDiagonal = 0.779f;
+            edge.mult1 = 1.702f;
+            edge.mult2 = 6.742f;
+
+            edge.edgeColor = sobelcitiesODc;
+            edge.edgesOnlyBgColor = Color.white;
+            if (!CheckTonemapper())
+                ResetTonemapper();
+            displayText = "This is the 'Sobelcities:Overdrive(++)' preset, retuned for lower resolutions and/or those who are not using Dynamic Resolution.";
             bloom.enabled = false;
             bloom.threshold = 0.27f;
             bloom.intensity = 0.39f;
