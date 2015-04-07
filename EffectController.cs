@@ -276,7 +276,7 @@ namespace Bordercities
 
                             GUILayout.BeginHorizontal();
                             GUILayout.Label("PLUG & PLAY PRESETS:", bordSkyStyle_header);
-                            GUILayout.Label("Use whichever of the below preset looks best to you, regardless of the listed resolutions.  The resolutions are simply recommendations to ensure a quick & easy setup for you.  Know that the higher a suggested intended resolution, the thicker the edges in that preset will look at lower resolutions. Dynamic Resolution (DR) strongly recommended.");
+                            GUILayout.Label("Use whichever of the below presets looks best to you, regardless of the listed resolutions.  The resolutions are simply recommendations to ensure a quick & easy setup for you.  Know that the higher a suggested intended resolution, the thicker the edges in that preset will look at lower resolutions. Dynamic Resolution (DR) strongly recommended.");
                             GUILayout.EndHorizontal();
                             GUILayout.Space(6f);
 
@@ -289,7 +289,7 @@ namespace Bordercities
                             GUILayout.Label("720p/1080p & NO DR:", bordSkyStyle_header, GUILayout.Width(165));
                             GUILayout.Space(5f);
                             GUILayout.BeginHorizontal();
-                            if (GUILayout.Button("Sobelskies", GUILayout.Width(79.5f)))
+                            if (GUILayout.Button("Sobel Skies", GUILayout.Width(79.5f)))
                             {
                                 LowEndAutomatic();
                             }
@@ -1694,7 +1694,7 @@ namespace Bordercities
             edge.edgesOnlyBgColor = Color.white;
             if (!CheckTonemapper())
                 ResetTonemapper();
-            displayText = "'Bordercities', providing you're viewing at 175% DR and 1080p or more is my personal favorite for strolling cities up close.  If you are looking for a 24/7 gameplay, 'fully-zoomed-out'-compatible mode, try '++-H'.  If you wish for a softer look than that, use '++-L'.  If you'd rather use a lighter version of this particular edge style, try 'BC|EasierViewing.'";
+            displayText = "'Bordercities', providing you're viewing at 175% DR and 1080p or more, is my personal favorite for strolling cities up close.  If you are looking for a 24/7 gameplay preset ('fully-zoomed-out'-compatible, yet still maintaining the strength of effect,) try 'SC++'.  If you wish for a softer look than that, try 'Sobelcities.'  If you'd rather use a lighter version of -this- particular edge style, try 'BC|EasierViewing.'";
             bloom.enabled = false;
             bloom.threshold = 0.27f;
             bloom.intensity = 0.39f;
